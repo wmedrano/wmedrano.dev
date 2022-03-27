@@ -1,2 +1,3 @@
-wmedrano.dev {
+jupyter.wmedrano.dev {
+    reverse_proxy jupyter:21894
 }

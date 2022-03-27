@@ -18,3 +18,10 @@ services:
     networks:
       - web
       - internal
+  jupyter:
+    image: wmedrano_jupyter:latest
+    volumes:
+      - ./jupyter/.jupyter:/root/.jupyter
+      - ./jupyter/app:/usr/src/app
+    networks:
+      - internal
