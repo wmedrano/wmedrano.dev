@@ -1,0 +1,20 @@
+version: "3.9" # optional since v1.27.0
+networks:
+  # Created with: docker network create web
+  web:
+    external: true
+  # Created with: docker network create --internal internal
+  internal:
+    external: false
+    driver: bridge
+services:
+  caddy:
+    image: caddy:latest
+    ports:
+      - "80:80" # http port
+      - "443:443" # https port
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      - web
+      - internal
