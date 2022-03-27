@@ -1,3 +1,5 @@
+caddy/config
+caddy/data
 gitea/data
 jupyter/.jupyter
 jupyter/app

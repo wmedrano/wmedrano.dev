@@ -14,14 +14,18 @@ services:
       - "80:80" # http port
       - "443:443" # https port
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile # Main config
+      - ./caddy/config:/config # Config volume, unused
+      - ./caddy/data:/data # Data volume, unused
     networks:
       - web
       - internal
   jupyter:
     image: wmedrano_jupyter:latest
     volumes:
+      # Contains jupyter lab config, including authentication.
       - ./jupyter/.jupyter:/root/.jupyter
+      # Volume containing notebooks.
       - ./jupyter/app:/usr/src/app
     networks:
       - internal
@@ -32,9 +36,9 @@ services:
       - USER_GUID=1000
     restart: always
     volumes:
-      - ./gitea/data:/data
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      - ./gitea/data:/data # Persistent data for gitea.
+      - /etc/timezone:/etc/timezone:ro # Time configuration.
+      - /etc/localtime:/etc/localtime:ro # Time configuration.
     ports:
       - "21895:22"
     networks:
