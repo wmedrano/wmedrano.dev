@@ -2,7 +2,7 @@ FROM python:3
 WORKDIR /usr/src/app
 
 # Install dependencies.
-RUN pip install jupyterlab
+RUN pip install jupyterlab numpy pandas matplotlib
 
 # Create config directory for jupyter.
 RUN mkdir -p root/.jupyter
