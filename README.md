@@ -5,10 +5,19 @@ Configuration for wmedrano.dev. Initiated with `run.sh`.
 ```mermaid
 flowchart TD
     subgraph Machine
+      gitea --> caddy
       jupyter --> caddy
     end
     caddy --> wmedrano.dev
 ```
+
+## Gitea
+
+Hosted software development control for Git. To first configure Gitea:
+
+1. Visit `gitea.wmedrano.dev`.
+1. Set the domain to `https://gitea.wmedrano.dev`.
+1. Set the ssh port to `21895`. Note: The docker container still starts the ssh at port `22`, but `./docker-compose.yml` maps this to `21895`.
 
 ## Jupyter
 

@@ -1,3 +1,7 @@
 jupyter.wmedrano.dev {
     reverse_proxy jupyter:21894
 }
+
+gitea.wmedrano.dev {
+    reverse_proxy gitea:3000
+}
