@@ -10,6 +10,7 @@ networks:
 services:
   caddy:
     image: caddy:latest
+    restart: always
     ports:
       - "80:80" # http port
       - "443:443" # https port
@@ -22,6 +23,7 @@ services:
       - internal
   jupyter:
     image: wmedrano_jupyter:latest
+    restart: always
     volumes:
       # Contains jupyter lab config, including authentication.
       - ./jupyter/.jupyter:/root/.jupyter
@@ -31,10 +33,10 @@ services:
       - internal
   gitea:
     image: gitea/gitea:1.16.5
+    restart: always
     environment:
       - USER_UID=1000
       - USER_GUID=1000
-    restart: always
     volumes:
       - ./gitea/data:/data # Persistent data for gitea.
       - /etc/timezone:/etc/timezone:ro # Time configuration.
