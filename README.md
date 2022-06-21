@@ -7,6 +7,7 @@ flowchart TD
     subgraph Machine
       gitea --> caddy
       jupyter --> caddy
+      focalboard --> caddy
     end
     caddy --> wmedrano.dev
 ```
@@ -30,3 +31,8 @@ Web interactive Python coding environment. To set the password:
 1. Attach a shell to the docker container.
 1. Run `jupyter lab password`.
 1. Reload the docker container.
+
+## Focalboard
+
+Focalboard is a board based project management system. After the initial run,
+visit `focalboard.wmedrano.dev` to set up the initial admin account.
