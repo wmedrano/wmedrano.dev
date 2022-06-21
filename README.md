@@ -12,6 +12,19 @@ flowchart TD
     caddy --> wmedrano.dev
 ```
 
+## Focalboard
+
+Focalboard is a board based project management system. After the initial run,
+visit `focalboard.wmedrano.dev` to set up the initial admin account.
+
+## Hugo
+
+Hugo is a static site generator.
+
+- `hugo server -D --source ./hugo` - Start a development server with hot reloading.
+- `hugo -D --source ./hugo --destination ./caddy/data/public` - Deploy the website to the Caddy served directory.
+- `hugo new hugo/posts/<post_name>.md` - Create a new post.
+
 ## Gitea
 
 Hosted software development control for Git. To first configure Gitea:
@@ -31,8 +44,3 @@ Web interactive Python coding environment. To set the password:
 1. Attach a shell to the docker container.
 1. Run `jupyter lab password`.
 1. Reload the docker container.
-
-## Focalboard
-
-Focalboard is a board based project management system. After the initial run,
-visit `focalboard.wmedrano.dev` to set up the initial admin account.

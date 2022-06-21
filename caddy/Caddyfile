@@ -9,3 +9,8 @@ focalboard.wmedrano.dev {
 gitea.wmedrano.dev {
     reverse_proxy gitea:3000
 }
+
+wmedrano.dev {
+    root * /data/public
+    file_server browse
+}

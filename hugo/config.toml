@@ -1,0 +1,4 @@
+baseURL = "https://wmedrano.dev/"
+languageCode = "en-us"
+title = "wmedrano.dev"
+theme = "ananke"
