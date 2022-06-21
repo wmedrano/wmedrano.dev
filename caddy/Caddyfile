@@ -2,6 +2,10 @@ jupyter.wmedrano.dev {
     reverse_proxy jupyter:21894
 }
 
+focalboard.wmedrano.dev {
+    reverse_proxy focalboard:8000
+}
+
 gitea.wmedrano.dev {
     reverse_proxy gitea:3000
 }

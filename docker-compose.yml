@@ -31,6 +31,14 @@ services:
       - ./jupyter/app:/usr/src/app
     networks:
       - internal
+  focalboard:
+    image: mattermost/focalboard
+    restart: always
+    volumes:
+      - ./focalboard/data:/data # Persistent data for focalboard.
+    # ports: # - "8000:8000"
+    networks:
+      - web
   gitea:
     image: gitea/gitea:1.16.5
     restart: always
