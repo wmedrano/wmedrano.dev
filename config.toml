@@ -1,4 +1,4 @@
-baseURL = 'https://wmedrano.dev'
+baseURL = 'https://www.wmedrano.dev'
 languageCode = 'en-us'
 title = 'wmedrano dot dev'
 theme = "archie"
