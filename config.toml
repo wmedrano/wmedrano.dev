@@ -2,3 +2,8 @@ baseURL = 'https://wmedrano.dev'
 languageCode = 'en-us'
 title = 'wmedrano dot dev'
 theme = "archie"
+
+[[menu.main]]
+name = "About"
+url = "/about"
+weight = 1
