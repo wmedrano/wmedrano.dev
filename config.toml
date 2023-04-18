@@ -2,6 +2,13 @@ baseURL = 'https://wmedrano.dev'
 languageCode = 'en-us'
 title = 'wmedrano dot dev'
 theme = "archie"
+pygmentsstyle = "nord"
+staticDir = ['static']
+
+[[params.social]]
+name = "GitHub"
+icon = "github"
+url = "https://github.com/wmedrano"
 
 [[menu.main]]
 name = "About"
