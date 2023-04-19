@@ -5,15 +5,12 @@ date = 2023-04-18
 draft = false
 +++
 
-[source code](https://github.com/wmedrano/emacs-config)
-
-
 ## Introduction {#introduction}
 
 This page describes my (will.s.medrano@gmail.com) Emacs configuration. Emacs is
 a highly customizable text editor that can be customized with Emacs Lisp. This
-page is written in Org and is the primary [source code](https://github.com/wmedrano/emacs-config) for my
-actual Emacs configuration!
+page is written in Org and is the primary [source code](https://github.com/wmedrano/emacs-config) for my actual Emacs
+configuration!
 
 
 ### Org Mode {#org-mode}
@@ -60,6 +57,8 @@ following:
 (org-babel-load-file (expand-file-name "emacs-config.org" user-emacs-directory))
 ```
 
+Following this, dependencies should be (re)installed.
+
 
 #### Dependencies {#dependencies}
 
@@ -75,31 +74,29 @@ Dependencies can be installed by running `M-x w/install-dependencies`.
              t)
 (package-initialize)
 ;; Clear the values to prevent duplicating values on config refresh.
-(setq package-selected-packages nil)
-
-;; Ideally, the dependencies would be included next to the sections in which
-;; they are needed. However, it is best to define them up front to allow all
-;; dependencies to be populated during bootstrapping.
-(push 'counsel package-selected-packages)
-(push 'counsel-projectile package-selected-packages)
-(push 'evil package-selected-packages)
-(push 'htmlize package-selected-packages)
-(push 'ivy package-selected-packages)
-(push 'markdown-mode package-selected-packages)
-(push 'nord-theme package-selected-packages)
-(push 'ox-gfm package-selected-packages)
-(push 'ox-hugo package-selected-packages)
-(push 'projectile package-selected-packages)
-(push 'rust-mode package-selected-packages)
-(push 'which-key package-selected-packages)
-(push 'yaml-mode package-selected-packages)
+(setq package-selected-packages '(
+                                  counsel
+                                  counsel-projectile
+                                  evil
+                                  htmlize
+                                  ivy
+                                  markdown-mode
+                                  nord-theme
+                                  ox-gfm
+                                  ox-hugo
+                                  projectile
+                                  rust-mode
+                                  which-key
+                                  yaml-mode
+                                  ))
 
 (defun w/install-dependencies ()
   "Install all dependencies."
   (interactive)
   (package-initialize)
   (package-refresh-contents)
-  (package-install-selected-packages))
+  (package-install-selected-packages)
+  (package-autoremove))
 ```
 
 
@@ -134,7 +131,7 @@ Emacs. See <https://nordtheme.com> for more details.
 #### In Editor Help and Documentation {#in-editor-help-and-documentation}
 
 Emacs provides plenty of built in help. There are several functions that can be
-activated with \`M-x\`.
+activated with `M-x`.
 
 -   `describe-variable` - Open the documentation and source code for an Emacs Lisp
     variable.
@@ -340,7 +337,8 @@ as:
 (defun w/reload-emacs-config ()
 "Reload the emacs config."
 (interactive)
-(load-file (expand-file-name "init.el" user-emacs-directory)))
+(load-file (expand-file-name "init.el" user-emacs-directory))
+(message "Emacs config reloaded."))
 
 (defun w/is-emacs-org-config ()
 "Returns t if the current buffer is the primary org config"
@@ -351,6 +349,20 @@ as:
 
 
 ## Language Specific Configurations {#language-specific-configurations}
+
+
+## Rust Mode {#rust-mode}
+
+```emacs-lisp
+(require 'rust-mode)
+```
+
+
+### Markdown Mode {#markdown-mode}
+
+```emacs-lisp
+(require 'markdown-mode)
+```
 
 
 ### Org Mode {#org-mode}
@@ -374,8 +386,9 @@ programming.
 ```emacs-lisp
 (defun w/org-after-save ()
   (when (w/is-emacs-org-config)
-    ;; Export html asynchronously.
-    (org-html-export-to-html t)
+    ;; TODO: Automatically export to README.md. Currently running
+    ;; org-gfm-export-to-markdown from w/org-after-save fails.
+    ;; (org-gfm-export-to-markdown)
     (w/reload-emacs-config)
     (message "Emacs config reloaded.")))
 
@@ -386,10 +399,42 @@ programming.
 (add-hook 'org-mode-hook #'w/setup-org-mode)
 ```
 
--   Exporting Hugo and GitHub flavored Markdown is supported.
+
+#### Static Site Generation - Hugo {#static-site-generation-hugo}
+
+Hugo is a static site generator. I use it for my blog at [wmedrano.dev.](https://www.wmedrano.dev) Hugo
+supports Markdown and Org Mode. However, the Org Mode support is not quite
+feature rich. For this reason, I use `ox-hugo` to export better formatted
+Markdown for my blog. The workflow for `ox-hugo` and Emacs is:
+
+1.  Create/edit the appropriate Org file. This includes even this configuration
+    itself.
+2.  Run `M-x org-hugo-export-to-md` which will export the Markdown to the Hugo
+    blog source directory. This step depends on knowing the base directory for
+    the Hugo source. This can be done either through an environment variable or
+    by filling in the `org-hugo-base-dir` Emacs Lisp variable. I use the latter
+    for configuration simplicity but may switch to an environment variable if I
+    start to vary my directory structure from machine to machine.
 
 <!--listend-->
 
-```nil
-
+```emacs-lisp
+(require 'ox-hugo)
+(setq org-hugo-base-dir "~/src/wmedrano.dev")
+(defun w/setup-hugo-autoexport ()
+  (when (w/is-emacs-org-config)
+      (add-hook 'after-save-hook #'org-hugo-export-to-md 0 t)))
+(add-hook 'org-mode-hook #'w/setup-hugo-autoexport)
 ```
+
+
+### YAML Mode {#yaml-mode}
+
+```emacs-lisp
+(require 'yaml-mode)
+```
+
+
+## Source Code {#source-code}
+
+[source code](https://github.com/wmedrano/emacs-config)
