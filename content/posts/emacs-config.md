@@ -75,6 +75,7 @@ Dependencies can be installed by running `M-x w/install-dependencies`.
 (package-initialize)
 ;; Clear the values to prevent duplicating values on config refresh.
 (setq package-selected-packages '(
+                                  company
                                   counsel
                                   counsel-projectile
                                   evil
@@ -91,7 +92,9 @@ Dependencies can be installed by running `M-x w/install-dependencies`.
                                   ))
 
 (defun w/install-dependencies ()
-  "Install all dependencies."
+  "Install all dependencies and remove any unused dependencies. If you wish to
+  only install new dependencies and not refresh the index and clean up old
+  dependencies, use (package-install-selected-packages) instead."
   (interactive)
   (package-initialize)
   (package-refresh-contents)
@@ -287,6 +290,7 @@ do things within the scope of a project (usually git). Actions include:
 
 ```emacs-lisp
 (require 'projectile)
+(require 'counsel-projectile)
 (projectile-mode t)
 (w/define-motion-key (kbd "gp") #'projectile-command-map)
 (w/define-motion-key (kbd "gpp") #'counsel-projectile)
@@ -299,9 +303,6 @@ The major key bindings for this are:
 -   `gpu` to run a command at the root of the project. This opens a new compilation
     buffer with the results of the command.
 
-
-#### Counsel Projectile {#counsel-projectile}
-
 Counsel Projectile provides Ivy minibuffer completion for projectile similar to
 how Counsel provides minibuffer completion for most built-in Emacs functions.
 
@@ -311,10 +312,7 @@ how Counsel provides minibuffer completion for most built-in Emacs functions.
 ```
 
 
-### File Handling {#file-handling}
-
-
-#### Disable Backups {#disable-backups}
+### Disable File Backups {#disable-file-backups}
 
 Emacs creates backup files by default. This is accomplished by creating a backup
 of file `<file>` as `<file>~`. Although this seems good in theory, it is
@@ -328,6 +326,16 @@ as:
 
 ```emacs-lisp
 (setq make-backup-files nil)
+```
+
+
+### Auto-Complete {#auto-complete}
+
+The [Company](https://company-mode.github.io) Emacs Lisp package is used to handle auto complete.
+
+```emacs-lisp
+(require 'company)
+(global-company-mode)
 ```
 
 
@@ -351,11 +359,14 @@ as:
 ## Language Specific Configurations {#language-specific-configurations}
 
 
-## Rust Mode {#rust-mode}
+### Rust Mode {#rust-mode}
 
 ```emacs-lisp
 (require 'rust-mode)
 ```
+
+
+## Text Specific Configurations {#text-specific-configurations}
 
 
 ### Markdown Mode {#markdown-mode}
@@ -398,6 +409,12 @@ programming.
   (add-hook 'after-save-hook #'w/org-after-save 0 t))
 (add-hook 'org-mode-hook #'w/setup-org-mode)
 ```
+
+
+#### Useful Keybindings {#useful-keybindings}
+
+-   `C-c C-l` - Insert or update a link.
+-   `TAB` on header - Expand or collapse the section.
 
 
 #### Static Site Generation - Hugo {#static-site-generation-hugo}
