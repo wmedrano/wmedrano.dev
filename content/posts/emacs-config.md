@@ -50,6 +50,59 @@ All custom functions are prefixed with `w/` since Emacs lisp does not support
 officially support name-spacing.
 
 
+#### Bootstrapping {#bootstrapping}
+
+To use this configuration, load the source code from the main Emacs config. This
+can be done by creating a file named `~/.emacs.d/init.el` and placing the
+following:
+
+```nil
+(org-babel-load-file (expand-file-name "emacs-config.org" user-emacs-directory))
+```
+
+
+#### Dependencies {#dependencies}
+
+Dependencies can be installed by running `M-x w/install-dependencies`.
+
+```emacs-lisp
+(require 'package)
+;; Taken from https://melpa.org/#/getting-started
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; This is required to obtain the htmlize package. htmlize is used to improve
+;; the output of Org Mode to html.
+(add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/")
+             t)
+(package-initialize)
+;; Clear the values to prevent duplicating values on config refresh.
+(setq package-selected-packages nil)
+
+;; Ideally, the dependencies would be included next to the sections in which
+;; they are needed. However, it is best to define them up front to allow all
+;; dependencies to be populated during bootstrapping.
+(push 'counsel package-selected-packages)
+(push 'counsel-projectile package-selected-packages)
+(push 'evil package-selected-packages)
+(push 'htmlize package-selected-packages)
+(push 'ivy package-selected-packages)
+(push 'markdown-mode package-selected-packages)
+(push 'nord-theme package-selected-packages)
+(push 'ox-gfm package-selected-packages)
+(push 'ox-hugo package-selected-packages)
+(push 'projectile package-selected-packages)
+(push 'rust-mode package-selected-packages)
+(push 'which-key package-selected-packages)
+(push 'yaml-mode package-selected-packages)
+
+(defun w/install-dependencies ()
+  "Install all dependencies."
+  (interactive)
+  (package-initialize)
+  (package-refresh-contents)
+  (package-install-selected-packages))
+```
+
+
 ## Basics {#basics}
 
 
@@ -331,4 +384,12 @@ programming.
   ;; default.
   (add-hook 'after-save-hook #'w/org-after-save 0 t))
 (add-hook 'org-mode-hook #'w/setup-org-mode)
+```
+
+-   Exporting Hugo and GitHub flavored Markdown is supported.
+
+<!--listend-->
+
+```nil
+
 ```
