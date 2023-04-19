@@ -72,9 +72,8 @@ Dependencies can be installed by running `M-x w/install-dependencies`.
 ;; the output of Org Mode to html.
 (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/")
              t)
-(package-initialize)
-;; Clear the values to prevent duplicating values on config refresh.
 (setq package-selected-packages '(
+                                  ace-window
                                   company
                                   counsel
                                   counsel-projectile
@@ -82,7 +81,9 @@ Dependencies can be installed by running `M-x w/install-dependencies`.
                                   htmlize
                                   ivy
                                   markdown-mode
+                                  mini-modeline
                                   nord-theme
+                                  smart-modeline
                                   ox-gfm
                                   ox-hugo
                                   projectile
@@ -90,6 +91,7 @@ Dependencies can be installed by running `M-x w/install-dependencies`.
                                   which-key
                                   yaml-mode
                                   ))
+(package-initialize)
 
 (defun w/install-dependencies ()
   "Install all dependencies and remove any unused dependencies. If you wish to
@@ -124,10 +126,10 @@ Emacs. See <https://nordtheme.com> for more details.
 ```emacs-lisp
 ;; Show the line number on the left of the editor.
 (global-display-line-numbers-mode t)
-;; Highlight the currently selected line/lines.
 (global-hl-line-mode t)
 ;; Display the column number in the modeline.
 (column-number-mode t)
+(set-frame-font "fira code 11")
 ```
 
 
@@ -171,6 +173,17 @@ This section contains configuration that removes noisy elements from the UI.
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
+
+(require 'smart-mode-line)
+(setq custom-safe-themes '(
+                           "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa"
+                           "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223"
+                           default))
+(sml/setup)
+(sml/apply-theme 'respectful)
+;; Shrink the size of the modeline. Mostly useful for gui (not terminal) mode.
+(require 'mini-modeline)
+(mini-modeline-mode t)
 ```
 
 
@@ -206,6 +219,26 @@ Use "J" and "K" to scroll up and down the buffer as opposed to the standard
 ```emacs-lisp
 (w/define-motion-key (kbd "J") #'evil-scroll-down)
 (w/define-motion-key (kbd "K") #'evil-scroll-up)
+```
+
+To navigate windows, `gw` is used to bring up an interactive menu that supports
+the following commands:
+
+-   `<number>` - Each window is given a number. Selecting a number will jump to
+    that window.
+-   `m <number>` - Swap window.
+-   `x <number>` - Close the window.
+-   `v <number>` - Split the window vertically.
+-   `b <number>` - Split the window horizontally.
+-   `o <number>` - Maximize the selected window.
+-   `?` - Show help for all prefix keys.
+
+<!--listend-->
+
+```emacs-lisp
+;; Always show the dispatch menu even if there are only 2 options.
+(setq aw-dispatch-always t)
+(w/define-motion-key (kbd "gw") #'ace-window)
 ```
 
 Disable the VIM TAB key. This allows TAB to pass through to the underlying
@@ -442,6 +475,17 @@ Markdown for my blog. The workflow for `ox-hugo` and Emacs is:
   (when (w/is-emacs-org-config)
       (add-hook 'after-save-hook #'org-hugo-export-to-md 0 t)))
 (add-hook 'org-mode-hook #'w/setup-hugo-autoexport)
+```
+
+
+#### Github Markdown {#github-markdown}
+
+Github markdown is known as Github flavored Markdown. The `ox-gfm` package
+provides `M-x org-gfm-export-as-markdown` to export to this specific flavor of
+Markdown.
+
+```emacs-lisp
+(require 'ox-gfm)
 ```
 
 
