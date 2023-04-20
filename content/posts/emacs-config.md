@@ -119,6 +119,7 @@ Following this, dependencies should be (re)installed.
              t)
 (setq package-selected-packages '(
                                   ace-window
+                                  all-the-icons-ivy-rich
                                   company
                                   counsel
                                   counsel-projectile
@@ -128,6 +129,7 @@ Following this, dependencies should be (re)installed.
                                   evil-commentary
                                   htmlize
                                   ivy
+                                  ivy-rich
                                   markdown-mode
                                   nord-theme
                                   ox-gfm
@@ -164,9 +166,14 @@ The Nord theme is a clean theme that is available in many places, including
 Emacs. See <https://nordtheme.com> for more details.
 
 ```emacs-lisp
+(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
 (require 'nord-theme)
 (load-theme 'nord t)
-(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
+;; Allow the terminal's default background to shine through. This is required
+;; in order for Nord theme to not override the terminal's transparency
+;; settings.
+(unless (display-graphic-p)
+  (set-face-attribute 'default nil :background "unspecified-bg"))
 ```
 
 
@@ -233,6 +240,16 @@ This section contains configuration that removes noisy elements from the UI.
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
+(defun w/command-error-fn (data context caller)
+  "Ignore several (noisy) signals and pass the rest to the default handler."
+  (when (not (memq (car data) '(buffer-read-only
+                                beginning-of-buffer
+                                end-of-buffer
+                                beginning-of-line
+                                end-of-line)))
+    (command-error-default-function data context caller)))
+
+(setq command-error-function #'w/command-error-fn)
 ```
 
 
@@ -324,6 +341,18 @@ methods to use Ivy minibuffer completion. See <https://github.com/abo-abo/swiper
 (require 'counsel)
 (ivy-mode t)
 (counsel-mode t)
+```
+
+All the icons integration can also be used to add pretty icons to the
+completions when in GUI (not terminal) mode. If the icons are displaying their
+Unicode values instead, run `M-x all-the-icons-install-fonts`.
+
+```emacs-lisp
+(require 'ivy-rich)
+(all-the-icons-ivy-rich-mode t)
+(when (display-graphic-p)
+  (require 'all-the-icons-ivy-rich)
+  (ivy-rich-mode t))
 ```
 
 
@@ -418,6 +447,8 @@ how Counsel provides minibuffer completion for most built-in Emacs functions.
 ```emacs-lisp
 (require 'diff-hl)
 (global-diff-hl-mode t)
+(when (not (display-graphic-p))
+  (diff-hl-margin-mode t))
 ```
 
 
@@ -434,17 +465,32 @@ as:
 <!--listend-->
 
 ```emacs-lisp
-(setq make-backup-files nil)
+(setq make-backup-files nil
+      auto-save-default nil)
 ```
 
 
 ### Auto-Complete {#auto-complete}
 
-The [Company](https://company-mode.github.io) Emacs Lisp package is used to handle auto complete.
+The [Company](https://company-mode.github.io) Emacs Lisp package is used to handle auto complete. By default,
+Company mode provides a simple completion engine. However, if an LSP is
+configured for the major-mode, then the completions should improve.
+
+Keybindings when in completion:
+
+-   Up/Down Arrow - Go up and down selections.
+-   `TAB` - Auto-complete to selection.
+-   `C-h` - Show documentation for selection.
+-   `C-g` - Abort selection.
+
+<!--listend-->
 
 ```emacs-lisp
 (require 'company)
 (global-company-mode)
+(define-key company-active-map (kbd "TAB") #'company-complete-selection)
+(define-key company-active-map (kbd "<tab>") #'company-complete-selection)
+(define-key company-active-map (kbd "RET") nil)
 ```
 
 
@@ -470,11 +516,24 @@ The [Company](https://company-mode.github.io) Emacs Lisp package is used to hand
 
 ### Rust Mode {#rust-mode}
 
+Properly supporting requires installing the `rust-analyzer` LSP. Proper support
+enables things like smart auto-complete, compile checking, code refactors, and
+other stuff. `rust-analyzer` can be installed with:
+
+```bash
+rustup component add rust-analyzer
+```
+
 ```emacs-lisp
 (require 'rust-mode)
+(require 'eglot)
+
+(add-to-list 'eglot-server-programs
+             '((rust-ts-mode rust-mode) . ("rustup" "run" "stable" "rust-analyzer")))
 
 (defun w/setup-rust-mode ()
-  (setq-local fill-column 100))
+  (setq-local fill-column 100)
+  (eglot-ensure))
 (add-hook 'rust-mode-hook #'w/setup-rust-mode)
 ```
 
