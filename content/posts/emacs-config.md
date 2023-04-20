@@ -17,18 +17,20 @@ draft = false
 - [Basics](#basics)
     - [Theme](#theme)
     - [Line Numbering](#line-numbering)
+    - [Mode Line](#mode-line)
         - [In Editor Help and Documentation](#in-editor-help-and-documentation)
         - [Noise Reduction](#noise-reduction)
     - [Key Bindings](#key-bindings)
-        - [Utility Functions](#utility-functions)
         - [Bindings](#bindings)
         - [Mini-Buffer Completions](#mini-buffer-completions)
 - [Text and Formatting](#text-and-formatting)
     - [Spell Correction](#spell-correction)
     - [Auto Fill](#auto-fill)
     - [Tabs &amp; Spaces](#tabs-and-spaces)
+    - [Parenthesis and Braces](#parenthesis-and-braces)
 - [Advanced](#advanced)
     - [Project Management](#project-management)
+    - [Version Control](#version-control)
     - [Disable File Backups](#disable-file-backups)
     - [Auto-Complete](#auto-complete)
     - [Extra Utility Functions](#extra-utility-functions)
@@ -39,7 +41,7 @@ draft = false
     - [Org Mode](#org-mode)
         - [Useful Keybindings](#useful-keybindings)
         - [Static Site Generation - Hugo](#static-site-generation-hugo)
-        - [Github Markdown](#github-markdown)
+        - [GitHub Markdown](#github-markdown)
     - [YAML Mode](#yaml-mode)
 - [Source Code](#source-code)
 
@@ -105,7 +107,7 @@ Following this, dependencies should be (re)installed.
 
 #### Dependencies {#dependencies}
 
-Dependencies can be installed by running `M-x w/install-dependencies`.
+`M-x w/install-dependencies` installs all the dependencies.
 
 ```emacs-lisp
 (require 'package)
@@ -120,17 +122,20 @@ Dependencies can be installed by running `M-x w/install-dependencies`.
                                   company
                                   counsel
                                   counsel-projectile
+                                  diff-hl
                                   eglot
                                   evil
+                                  evil-commentary
                                   htmlize
                                   ivy
                                   markdown-mode
                                   nord-theme
                                   ox-gfm
                                   ox-hugo
+                                  powerline
+                                  powerline-evil
                                   projectile
                                   rust-mode
-                                  smart-mode-line
                                   which-key
                                   yaml-mode
                                   ))
@@ -161,19 +166,30 @@ Emacs. See <https://nordtheme.com> for more details.
 ```emacs-lisp
 (require 'nord-theme)
 (load-theme 'nord t)
-(set-frame-parameter (selected-frame) 'alpha '(95 . 90))
+(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
 ```
 
 
 ### Line Numbering {#line-numbering}
 
 ```emacs-lisp
-;; Show the line number on the left of the editor.
+;; Show the line number on the left of the editor with a minimum of 3
+;; characters.
+(setq display-line-numbers-width 3)
 (global-display-line-numbers-mode t)
 (global-hl-line-mode t)
 ;; Display the column number in the modeline.
 (column-number-mode t)
 (set-frame-font "fira code 11")
+```
+
+
+### Mode Line {#mode-line}
+
+```emacs-lisp
+(require 'powerline)
+(require 'powerline-evil)
+(powerline-evil-vim-color-theme)
 ```
 
 
@@ -217,14 +233,6 @@ This section contains configuration that removes noisy elements from the UI.
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
-
-(require 'smart-mode-line)
-(setq custom-safe-themes '(
-                           "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa"
-                           "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223"
-                           default))
-(sml/setup)
-(sml/apply-theme 'respectful)
 ```
 
 
@@ -234,16 +242,6 @@ The keybindings are based around the [Evil](https://www.emacswiki.org/emacs/Evil
 Emacs package that implements VIM key bindings. The key bindings present in this
 section are basic bindings. More specific bindings are littered throughout this
 document.
-
-
-#### Utility Functions {#utility-functions}
-
-```emacs-lisp
-(defun w/define-motion-key (keys fn)
-  "Define a new motion key binding on KEYS that runs function FN."
-  (define-key evil-normal-state-map keys nil)
-  (define-key evil-motion-state-map keys fn))
-```
 
 
 #### Bindings {#bindings}
@@ -262,6 +260,35 @@ Use "J" and "K" to scroll up and down the buffer as opposed to the standard
 (w/define-motion-key (kbd "K") #'evil-scroll-up)
 ```
 
+Disable the VIM TAB key. This allows TAB to pass through to the underlying
+buffer. Underlying modes often have better functionality under the tab key
+compared to VIM's default. For example, Org Mode uses TAB to expand/collapse
+headings and programming languages use TAB to automatically fix the indentation.
+
+```emacs-lisp
+(define-key evil-motion-state-map (kbd "TAB") nil)
+```
+
+I prefer to use some more standard key bindings. For example, Emacs uses `C-x
+C-s` to save while most other modern tools use just `C-s`.
+
+```emacs-lisp
+(defun w/save-and-maybe-normal-mode ()
+  "Saves the buffer and then switches to normal mode if in Evil insert state."
+  (interactive)
+  (when (evil-insert-state-p) (evil-normal-state))
+  (save-buffer))
+(global-set-key (kbd "C-s") #'w/save-and-maybe-normal-mode)
+```
+
+Evil commentary mode enables VIM style keybindings for commenting out code. The
+binding for this is `gc` followed by the type of entity like `w` for word or `c`
+for the entire line.
+
+```emacs-lisp
+(evil-commentary-mode t)
+```
+
 To navigate windows, `gw` is used to bring up an interactive menu that supports
 the following commands:
 
@@ -272,7 +299,7 @@ the following commands:
 -   `v <number>` - Split the window vertically.
 -   `b <number>` - Split the window horizontally.
 -   `o <number>` - Maximize the selected window.
--   `?` - Show help for all prefix keys.
+-   `?` - Show help menu. This reveals tons of other prefix keys.
 
 <!--listend-->
 
@@ -280,15 +307,6 @@ the following commands:
 ;; Always show the dispatch menu even if there are only 2 options.
 (setq aw-dispatch-always t)
 (w/define-motion-key (kbd "gw") #'ace-window)
-```
-
-Disable the VIM TAB key. This allows TAB to pass through to the underlying
-buffer. Underlying modes often have better functionality under the tab key
-compared to VIM's default. For example, Org Mode uses TAB to expand/collapse
-headings and programming languages use TAB to automatically fix the indentation.
-
-```emacs-lisp
-(define-key evil-motion-state-map (kbd "TAB") nil)
 ```
 
 
@@ -348,6 +366,15 @@ automatically be formatted to fit within (by default) 80 characters.
 ```
 
 
+### Parenthesis and Braces {#parenthesis-and-braces}
+
+Matching end parenthesis and braces are automatically inserted.
+
+```emacs-lisp
+(electric-pair-mode t)
+```
+
+
 ## Advanced {#advanced}
 
 
@@ -383,6 +410,14 @@ how Counsel provides minibuffer completion for most built-in Emacs functions.
 ```emacs-lisp
 (require 'counsel-projectile)
 (counsel-projectile-mode t)
+```
+
+
+### Version Control {#version-control}
+
+```emacs-lisp
+(require 'diff-hl)
+(global-diff-hl-mode t)
 ```
 
 
@@ -475,9 +510,8 @@ programming.
 ```emacs-lisp
 (defun w/org-after-save ()
   (when (w/is-emacs-org-config)
-    ;; TODO: Automatically export to README.md. Currently running
-    ;; org-gfm-export-to-markdown from w/org-after-save fails.
-    ;; (org-gfm-export-to-markdown)
+    (org-gfm-export-to-markdown nil)
+    (rename-file "emacs-config.md" "README.md" t)
     (w/reload-emacs-config)
     (message "Emacs config reloaded.")))
 
@@ -523,9 +557,9 @@ Markdown for my blog. The workflow for `ox-hugo` and Emacs is:
 ```
 
 
-#### Github Markdown {#github-markdown}
+#### GitHub Markdown {#github-markdown}
 
-Github markdown is known as Github flavored Markdown. The `ox-gfm` package
+GitHub markdown is known as GitHub flavored Markdown. The `ox-gfm` package
 provides `M-x org-gfm-export-as-markdown` to export to this specific flavor of
 Markdown.
 
@@ -543,4 +577,4 @@ Markdown.
 
 ## Source Code {#source-code}
 
-[source code](https://github.com/wmedrano/emacs-config)
+Source Code: <https://github.com/wmedrano/emacs-config/blob/main/emacs-config.org>
