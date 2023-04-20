@@ -5,6 +5,49 @@ date = 2023-04-18
 draft = false
 +++
 
+<div class="ox-hugo-toc toc">
+
+<div class="heading">Table of Contents</div>
+
+- [Introduction](#introduction)
+    - [Org Mode](#org-mode)
+        - [Coding Conventions](#coding-conventions)
+        - [Bootstrapping](#bootstrapping)
+        - [Dependencies](#dependencies)
+- [Basics](#basics)
+    - [Theme](#theme)
+    - [Line Numbering](#line-numbering)
+        - [In Editor Help and Documentation](#in-editor-help-and-documentation)
+        - [Noise Reduction](#noise-reduction)
+    - [Key Bindings](#key-bindings)
+        - [Utility Functions](#utility-functions)
+        - [Bindings](#bindings)
+        - [Mini-Buffer Completions](#mini-buffer-completions)
+- [Text and Formatting](#text-and-formatting)
+    - [Spell Correction](#spell-correction)
+    - [Auto Fill](#auto-fill)
+    - [Tabs &amp; Spaces](#tabs-and-spaces)
+- [Advanced](#advanced)
+    - [Project Management](#project-management)
+    - [Disable File Backups](#disable-file-backups)
+    - [Auto-Complete](#auto-complete)
+    - [Extra Utility Functions](#extra-utility-functions)
+- [Language Specific Configurations](#language-specific-configurations)
+    - [Rust Mode](#rust-mode)
+- [Text Specific Configurations](#text-specific-configurations)
+    - [Markdown Mode](#markdown-mode)
+    - [Org Mode](#org-mode)
+        - [Useful Keybindings](#useful-keybindings)
+        - [Static Site Generation - Hugo](#static-site-generation-hugo)
+        - [Github Markdown](#github-markdown)
+    - [YAML Mode](#yaml-mode)
+- [Source Code](#source-code)
+
+</div>
+<!--endtoc-->
+
+
+
 ## Introduction {#introduction}
 
 This page describes my (will.s.medrano@gmail.com) Emacs configuration. Emacs is
@@ -77,17 +120,17 @@ Dependencies can be installed by running `M-x w/install-dependencies`.
                                   company
                                   counsel
                                   counsel-projectile
+                                  eglot
                                   evil
                                   htmlize
                                   ivy
                                   markdown-mode
-                                  mini-modeline
                                   nord-theme
-                                  smart-modeline
                                   ox-gfm
                                   ox-hugo
                                   projectile
                                   rust-mode
+                                  smart-mode-line
                                   which-key
                                   yaml-mode
                                   ))
@@ -118,6 +161,7 @@ Emacs. See <https://nordtheme.com> for more details.
 ```emacs-lisp
 (require 'nord-theme)
 (load-theme 'nord t)
+(set-frame-parameter (selected-frame) 'alpha '(95 . 90))
 ```
 
 
@@ -181,9 +225,6 @@ This section contains configuration that removes noisy elements from the UI.
                            default))
 (sml/setup)
 (sml/apply-theme 'respectful)
-;; Shrink the size of the modeline. Mostly useful for gui (not terminal) mode.
-(require 'mini-modeline)
-(mini-modeline-mode t)
 ```
 
 
@@ -396,6 +437,10 @@ The [Company](https://company-mode.github.io) Emacs Lisp package is used to hand
 
 ```emacs-lisp
 (require 'rust-mode)
+
+(defun w/setup-rust-mode ()
+  (setq-local fill-column 100))
+(add-hook 'rust-mode-hook #'w/setup-rust-mode)
 ```
 
 
