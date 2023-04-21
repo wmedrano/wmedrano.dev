@@ -30,8 +30,10 @@ draft = false
     - [Parenthesis and Braces](#parenthesis-and-braces)
 - [Advanced](#advanced)
     - [Project Management](#project-management)
+        - [Hugo Projects](#hugo-projects)
     - [Version Control](#version-control)
     - [Disable File Backups](#disable-file-backups)
+    - [Code Refactoring](#code-refactoring)
     - [Auto-Complete](#auto-complete)
     - [Extra Utility Functions](#extra-utility-functions)
 - [Language Specific Configurations](#language-specific-configurations)
@@ -287,6 +289,7 @@ Enable Evil mode globally to use VIM like modal editing.
 
 ```emacs-lisp
 (evil-mode)
+(w/define-motion-key (kbd "gd") #'evil-goto-definition)
 ```
 
 Use "J" and "K" to scroll up and down the buffer as opposed to the standard
@@ -465,6 +468,19 @@ how Counsel provides minibuffer completion for most built-in Emacs functions.
 ```
 
 
+#### Hugo Projects {#hugo-projects}
+
+Hugo is a framework for making static websites out of Markdown. To bring up a
+demo for Hugo, the Hugo command is used. This is the perfect use case for using
+the `gpu` command! However, Projectile needs to know that the command is safe to
+run or else it will prompt the user every time. We allow list running Hugo
+projects to reduce the friction.
+
+```emacs-lisp
+(add-to-list 'safe-local-variable-values '(projectile-project-run-cmd . "hugo server --buildDrafts"))
+```
+
+
 ### Version Control {#version-control}
 
 ```emacs-lisp
@@ -484,7 +500,7 @@ of file `<file>` as `<file>~`. Although this seems good in theory, it is
 somewhat noisy for the filesystem so I disable it. The lack of backups is fine
 as:
 
--   File corruption is a very rare occurence.
+-   File corruption is a very rare occurrence.
 -   Important checkpoints are backed up with version control like git + GitHub.
 
 <!--listend-->
@@ -492,6 +508,20 @@ as:
 ```emacs-lisp
 (setq make-backup-files nil
       auto-save-default nil)
+```
+
+
+### Code Refactoring {#code-refactoring}
+
+Code refactoring depends on `eglot`. Eglot is an Emacs package that supports
+interfacing with LSPs. See the
+<https://microsoft.github.io/language-server-protocol> for more
+details. Essentially Language Servers are servers that provide smart
+functionality for specific languages.
+
+```emacs-lisp
+(require 'eglot)
+(w/define-motion-key (kbd "<f2>") #'eglot-rename)
 ```
 
 
