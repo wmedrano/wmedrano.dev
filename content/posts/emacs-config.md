@@ -124,6 +124,7 @@ Following this, dependencies should be (re)installed.
                                   counsel
                                   counsel-projectile
                                   diff-hl
+                                  diminish
                                   eglot
                                   evil
                                   evil-commentary
@@ -235,11 +236,30 @@ intrusive as the pop-up only comes up when a small delay is detected.
 This section contains configuration that removes noisy elements from the UI.
 
 ```emacs-lisp
-(setq inhibit-startup-screen t)
-(setq ring-bell-function 'ignore)
+(setq inhibit-startup-screen t
+      ring-bell-function 'ignore)
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
+```
+
+```emacs-lisp
+(defun w/diminish-noisy-modes ()
+  "Diminish all modes that are not worth showing."
+  (require 'diminish)
+  (diminish 'ivy-mode "")
+  (diminish 'counsel-mode "")
+  (diminish 'which-key-mode "")
+  (diminish 'auto-fill-function "")
+  (diminish 'evil-commentary-mode "")
+  (diminish 'company-mode ""))
+(add-hook 'emacs-startup-hook #'w/diminish-noisy-modes)
+;; Diminish needs to run after startup, but we also run it here in case the
+;; list has been updated and reload config has been requested.
+(w/diminish-noisy-modes)
+```
+
+```emacs-lisp
 (defun w/command-error-fn (data context caller)
   "Ignore several (noisy) signals and pass the rest to the default handler."
   (when (not (memq (car data) '(buffer-read-only
@@ -349,10 +369,9 @@ Unicode values instead, run `M-x all-the-icons-install-fonts`.
 
 ```emacs-lisp
 (require 'ivy-rich)
+(require 'all-the-icons-ivy-rich)
+(ivy-rich-mode t)
 (all-the-icons-ivy-rich-mode t)
-(when (display-graphic-p)
-  (require 'all-the-icons-ivy-rich)
-  (ivy-rich-mode t))
 ```
 
 
@@ -386,6 +405,10 @@ automatically be formatted to fit within (by default) 80 characters.
 
 
 ### Tabs &amp; Spaces {#tabs-and-spaces}
+
+By default, spaces are preferred over tabs. Additionally, pressing the tab key
+does not insert a tab. Instead, it auto-formats the indentation on the current
+line/region.
 
 ```emacs-lisp
 ;; Prefer using spaces over tabs.
@@ -423,15 +446,15 @@ do things within the scope of a project (usually git). Actions include:
 (require 'counsel-projectile)
 (projectile-mode t)
 (w/define-motion-key (kbd "gp") #'projectile-command-map)
-(w/define-motion-key (kbd "gpp") #'counsel-projectile)
 ```
 
 The major key bindings for this are:
 
--   `gpp` runs counsel-projectile. This handles both opening a file and switching to
-    a buffer. For just files use `gpf` and for just buffers use `gpb`.
--   `gpu` to run a command at the root of the project. This opens a new compilation
-    buffer with the results of the command.
+-   `gpp` is used to switch to a new project.
+-   `gpf` is used to select a file within the project.
+-   `gpb` is used to select an opened buffer within the project.
+-   `gpu` to run a command at the root of the project. This opens a new
+    compilation buffer with the results of the command.
 
 Counsel Projectile provides Ivy minibuffer completion for projectile similar to
 how Counsel provides minibuffer completion for most built-in Emacs functions.
@@ -447,6 +470,8 @@ how Counsel provides minibuffer completion for most built-in Emacs functions.
 ```emacs-lisp
 (require 'diff-hl)
 (global-diff-hl-mode t)
+;; Terminal's do not support fringes so we have to fall back to use the
+;; margin.
 (when (not (display-graphic-p))
   (diff-hl-margin-mode t))
 ```
