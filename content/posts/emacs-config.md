@@ -46,6 +46,8 @@ draft = false
         - [GitHub Markdown](#github-markdown)
         - [<span class="org-todo todo TODO">TODO</span> Graphviz Support](#graphviz-support)
     - [YAML Mode](#yaml-mode)
+- [Other Modes](#other-modes)
+    - [File Explorer - Dired Mode](#file-explorer-dired-mode)
 - [Source Code](#source-code)
 
 </div>
@@ -685,6 +687,9 @@ Markdown.
 
 #### <span class="org-todo todo TODO">TODO</span> Graphviz Support {#graphviz-support}
 
+Graphviz is not fully supported yet. The desired behavior is to be able to
+export graphs by adding `dot` source blocks within Org files.
+
 ```emacs-lisp
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -696,6 +701,23 @@ Markdown.
 
 ```emacs-lisp
 (require 'yaml-mode)
+```
+
+
+## Other Modes {#other-modes}
+
+
+### File Explorer - Dired Mode {#file-explorer-dired-mode}
+
+`Dired Mode` is used for exploring the file system. It works well enough out of
+the box but needs some tweaks for a better experience with Evil.
+
+```emacs-lisp
+(add-to-list 'evil-motion-state-modes 'dired-mode)
+(defun w/wmedrano-dired-mode-setup ()
+  "Set up dired mode."
+  (define-key evil-motion-state-local-map (kbd "RET") #'dired-find-file))
+(add-hook 'dired-mode-hook #'w/wmedrano-dired-mode-setup)
 ```
 
 

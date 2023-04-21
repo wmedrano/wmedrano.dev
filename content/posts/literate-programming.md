@@ -120,6 +120,7 @@ always in the literate mood. Sometimes I'm in the "get things done" mood.
 Definitely. I will
 
 -   continue to think of my Emacs configuration as literature first.
+-   continue to explore Org Mode.
 -   think about what the narrative of my code is, even outside the context of a
     literate program.
 -   improve the readability/narrative of future literate programs. I'm mainly
