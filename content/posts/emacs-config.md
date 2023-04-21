@@ -44,6 +44,7 @@ draft = false
         - [Useful Keybindings](#useful-keybindings)
         - [Static Site Generation - Hugo](#static-site-generation-hugo)
         - [GitHub Markdown](#github-markdown)
+        - [<span class="org-todo todo TODO">TODO</span> Graphviz Support](#graphviz-support)
     - [YAML Mode](#yaml-mode)
 - [Source Code](#source-code)
 
@@ -679,6 +680,15 @@ Markdown.
 
 ```emacs-lisp
 (require 'ox-gfm)
+```
+
+
+#### <span class="org-todo todo TODO">TODO</span> Graphviz Support {#graphviz-support}
+
+```emacs-lisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((dot . t))) ; this line activates dot
 ```
 
 
