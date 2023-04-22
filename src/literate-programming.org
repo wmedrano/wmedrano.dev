@@ -101,7 +101,7 @@ functionality that I'm accustomed to was broken out of the box. This includes:
 - Go to definition.
 - Refactoring support like renaming a variable.
 
-** Future
+** Future Work
 
 *Will I migrate any of my real work to literate programming?*
 

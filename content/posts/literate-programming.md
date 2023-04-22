@@ -5,6 +5,24 @@ date = 2023-04-20
 draft = false
 +++
 
+<div class="ox-hugo-toc toc">
+
+<div class="heading">Table of Contents</div>
+
+- [Journey To Literate Programming](#journey-to-literate-programming)
+- [What Is Literate Programming?](#what-is-literate-programming)
+- [Emacs Lisp in Org Mode Experience](#emacs-lisp-in-org-mode-experience)
+- [Result](#result)
+- [Observations](#observations)
+    - [Narrative](#narrative)
+    - [Refactoring](#refactoring)
+    - [Tooling](#tooling)
+- [Future Work](#future-work)
+- [References](#references)
+
+</div>
+<!--endtoc-->
+
 <div class="SUMMARY">
 
 By looking into Org Mode, I managed to sidetrack myself into writing my Emacs
@@ -103,7 +121,7 @@ functionality that I'm accustomed to was broken out of the box. This includes:
 -   Refactoring support like renaming a variable.
 
 
-## Future {#future}
+## Future Work {#future-work}
 
 **Will I migrate any of my real work to literate programming?**
 
