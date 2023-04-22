@@ -7,7 +7,7 @@ defaultcontentlanguage = "en"
 paginate = 20
 
 [markup.highlight]
-style = "nord"
+  style = "nord"
 
 [params]
   author = "Will Medrano"
@@ -39,6 +39,14 @@ style = "nord"
   weight = 1
   url  = "posts/"
 [[menu.main]]
-  name = "About"
+  name = "Configs"
   weight = 2
+  url  = "configs"
+[[menu.main]]
+  name = "Ideas"
+  weight = 3
+  url = "ideas/"
+[[menu.main]]
+  name = "About"
+  weight = 4
   url = "about/"

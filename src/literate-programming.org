@@ -56,7 +56,7 @@ find the place where it fits best.
 ** Result
 
 The final literate program can be read at
-[[https://www.wmedrano.dev/posts/emacs-config]] with the source code residing in
+[[https://www.wmedrano.dev/configs/emacs-config]] with the source code residing in
 [[https://github.com/wmedrano/emacs-config]].
 
 ** Observations
@@ -129,4 +129,4 @@ Definitely. I will
 
 - [[https://www.youtube.com/watch?v=UCEzBNh9ufs][Dynamic Notebooks and Literate Programming - Sam Ritchie]] - London Clojurians
   YouTube channel.
-- [[https://www.wmedrano.dev/posts/emacs-config][My Literate Emacs Configuration]]
+- [[https://www.wmedrano.dev/configs/emacs-config][My Literate Emacs Configuration]]

@@ -1,35 +1,53 @@
----
-title: "About"
-date: 2023-04-16T22:56:59-07:00
-draft: false
----
++++
+title = "About Me"
+author = ["Will Medrano"]
+date = 2023-04-16
+draft = false
++++
 
-I'm Will Medrano. I work as a Senior Software Engineer at Google. My dayjob
-involves dealing with big data but in my spare time I like to tinker with:
+<div class="ox-hugo-toc toc">
 
-- The Rust programming language.
-- Audio for music creation purposes.
-- Ergonomic keyboards.
+<div class="heading">Table of Contents</div>
 
-## Notable Open Source Work
+- [Notable Open Source Work](#notable-open-source-work)
+    - [Rust JACK](#rust-jack)
+    - [wmidi](#wmidi)
+    - [livi-rs](#livi-rs)
+- [Website Source Code](#website-source-code)
 
-### Rust JACK
+</div>
+<!--endtoc-->
 
-[Rust JACK](https://github.com/rustaudio/rust-jack) is a wrapper over JACK for
-the Rust programming language. JACK is the recommended Realtime audio API for
-Linux.
+I'm Will Medrano. I work as a Senior Software Engineer at Google. I deal with
+very big data during my day job, but in my spare time I tinker with a variety of
+things like:
 
-### wmidi
+-   The Rust programming language.
+-   Audio for music creation purposes.
+-   Ergonomic keyboards.
 
-[wmidi](https://github.com/rustaudio/wmidi) is a midi encoding and decoding
-library. Midi is a widely used digital interface to communicate musical data
-such as note keypresses and parameter changes.
 
-### livi-rs
+## Notable Open Source Work {#notable-open-source-work}
 
-[Livi](https://github.com/wmedrano/livi-rs) is a Rust library for hosting LV2
-plugins.
 
-## Website Source Code
+### Rust JACK {#rust-jack}
+
+<https://github.com/rustaudio/rust-jack> is a Rust wrapper over JACK. JACK is the
+recommended Realtime audio API for Linux.
+
+
+### wmidi {#wmidi}
+
+<https://github.com/rustaudio/wmidi> is a midi encoding and decoding library. Midi
+is a widely used digital interface to communicate musical data such as note
+keypresses and parameter changes.
+
+
+### livi-rs {#livi-rs}
+
+<https://github.com/wmedrano-livi-rs> is a Rust library for hosting LV2 plugins.
+
+
+## Website Source Code {#website-source-code}
 
 [source code](https://github.com/wmedrano/wmedrano.dev)

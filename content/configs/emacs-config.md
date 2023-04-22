@@ -104,7 +104,7 @@ To use this configuration, load the source code from the main Emacs config. This
 can be done by creating a file named `~/.emacs.d/init.el` and placing the
 following:
 
-```nil
+```emacs-lisp-code
 (org-babel-load-file (expand-file-name "emacs-config.org" user-emacs-directory))
 ```
 
@@ -134,6 +134,7 @@ Following this, dependencies should be (re)installed.
                                   eglot
                                   evil
                                   evil-commentary
+                                  evil-terminal-cursor-changer
                                   htmlize
                                   ivy
                                   ivy-rich
@@ -197,6 +198,9 @@ Emacs. See <https://nordtheme.com> for more details.
 ;; Display the column number in the modeline.
 (column-number-mode t)
 (set-frame-font "fira code 11")
+(unless (display-graphic-p)
+  (require 'evil-terminal-cursor-changer)
+  (evil-terminal-cursor-changer-activate))
 ```
 
 
@@ -255,12 +259,13 @@ This section contains configuration that removes noisy elements from the UI.
 (defun w/diminish-noisy-modes ()
   "Diminish all modes that are not worth showing."
   (require 'diminish)
-  (diminish 'ivy-mode "")
-  (diminish 'counsel-mode "")
-  (diminish 'which-key-mode "")
   (diminish 'auto-fill-function "")
+  (diminish 'company-mode "")
+  (diminish 'counsel-mode "")
+  (diminish 'eldoc-mode "")
   (diminish 'evil-commentary-mode "")
-  (diminish 'company-mode ""))
+  (diminish 'ivy-mode "")
+  (diminish 'which-key-mode ""))
 (add-hook 'emacs-startup-hook #'w/diminish-noisy-modes)
 ;; Diminish needs to run after startup, but we also run it here in case the
 ;; list has been updated and reload config has been requested.
@@ -295,7 +300,10 @@ Enable Evil mode globally to use VIM like modal editing.
 
 ```emacs-lisp
 (evil-mode)
+(defalias 'forward-evil-word 'forward-evil-symbol)
 (w/define-motion-key (kbd "gd") #'evil-goto-definition)
+(w/define-motion-key (kbd "g.") #'eglot-code-actions)
+(w/define-motion-key (kbd "<f8>") #'flymake-goto-next-error)
 ;; Swiper is a replacement for the standard VIM searching. It is a bit more
 ;; interactive and provides a preview.
 (w/define-motion-key (kbd "/") #'swiper)
@@ -575,7 +583,7 @@ Keybindings when in completion:
 (defun w/open-emacs-config ()
   "Open the Emacs configuration."
   (interactive)
-  (load-file w/emacs-org-config))
+  (find-file (expand-file-name "emacs-config.org" user-emacs-directory)))
 
 (defun w/is-emacs-org-config ()
 "Returns t if the current buffer is the primary org config"
