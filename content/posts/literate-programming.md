@@ -9,8 +9,8 @@ draft = false
 
 <div class="heading">Table of Contents</div>
 
-- [Journey To Literate Programming](#journey-to-literate-programming)
 - [What is Emacs and Org Mode?](#what-is-emacs-and-org-mode)
+- [Journey To Literate Programming](#journey-to-literate-programming)
 - [What Is Literate Programming?](#what-is-literate-programming)
 - [Emacs Lisp in Org Mode Experience](#emacs-lisp-in-org-mode-experience)
 - [Result](#result)
@@ -32,19 +32,6 @@ Configuration as a literate program.
 </div>
 
 
-## Journey To Literate Programming {#journey-to-literate-programming}
-
-I've been an on and off Emacs power user for almost a decade. I really enjoy
-programming my own Emacs configuration and using it. However, I have found that
-the LSP experience and performance has lagged behind VSCode. Despite this, I
-always enjoy coming back and rebuilding my Emacs configuration.
-
-For this return, I wanted to focus on learning Org Mode. However, I first needed
-to remake my Emacs configuration! Conveniently, it turns out that Org Mode
-is one of the supported ways of writing an Emacs configuration. Writing in Org
-Mode is also often considered a form of literate programming.
-
-
 ## What is Emacs and Org Mode? {#what-is-emacs-and-org-mode}
 
 Emacs is a (very old) text editor that is highly customizable. The configuration
@@ -59,12 +46,22 @@ really isn't the draw for me. As a Software Engineer, I much prefer writing code
 as opposed to writing a config. This is why I have spent countless hours
 configuring Emacs as opposed to the bare minimum configuring VSCode. Emacs also
 has a large community of developers that have created several packages. My main
-source for discovering these is [Melpa](https://melpa.org/#/).
+source for discovering these is [Melpa](https://melpa.org/#/). Unfortunately I have mostly been off
+Emacs lately. The primary reason being that LSP integration is not quite as good
+as VSCode.
 
 Org Mode is a note-taking and list management system. Superficially, it is
 similar to Markdown but predates it by about a year (2003 vs 2004). I am just
 now beginning to look into Org Mode to organize my life, but I plan to
 incorporate it into most aspects of my note taking and task tracking.
+
+
+## Journey To Literate Programming {#journey-to-literate-programming}
+
+For my recent return to Emacs, I wanted to focus on learning Org Mode. However,
+I first needed to remake my Emacs configuration! Conveniently, it turns out that
+Org Mode is one of the supported ways of writing an Emacs configuration. Writing
+in Org Mode is also often considered a form of literate programming.
 
 
 ## What Is Literate Programming? {#what-is-literate-programming}
