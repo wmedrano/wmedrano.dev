@@ -10,6 +10,7 @@ draft = false
 <div class="heading">Table of Contents</div>
 
 - [Journey To Literate Programming](#journey-to-literate-programming)
+- [What is Emacs and Org Mode?](#what-is-emacs-and-org-mode)
 - [What Is Literate Programming?](#what-is-literate-programming)
 - [Emacs Lisp in Org Mode Experience](#emacs-lisp-in-org-mode-experience)
 - [Result](#result)
@@ -42,6 +43,28 @@ For this return, I wanted to focus on learning Org Mode. However, I first needed
 to remake my Emacs configuration! Conveniently, it turns out that Org Mode
 is one of the supported ways of writing an Emacs configuration. Writing in Org
 Mode is also often considered a form of literate programming.
+
+
+## What is Emacs and Org Mode? {#what-is-emacs-and-org-mode}
+
+Emacs is a (very old) text editor that is highly customizable. The configuration
+is one of the main appeals of Emacs. It is configured using Emacs Lisp. Pretty
+much everything in Emacs is extensible. The documentation (and built in editor
+documentation) for Emacs is also fantastic. Don't know what a key will do, type
+`C-h k <key that you want to know>` and Emacs will open up a help window with
+the function that the key will run and where that function is defined. Need to
+know what a function does, type `C-h f <function>` to open up its documentation
+with a link to its source code. Although this means Emacs is very powerful, that
+really isn't the draw for me. As a Software Engineer, I much prefer writing code
+as opposed to writing a config. This is why I have spent countless hours
+configuring Emacs as opposed to the bare minimum configuring VSCode. Emacs also
+has a large community of developers that have created several packages. My main
+source for discovering these is [Melpa](https://melpa.org/#/).
+
+Org Mode is a note-taking and list management system. Superficially, it is
+similar to Markdown but predates it by about a year (2003 vs 2004). I am just
+now beginning to look into Org Mode to organize my life, but I plan to
+incorporate it into most aspects of my note taking and task tracking.
 
 
 ## What Is Literate Programming? {#what-is-literate-programming}
