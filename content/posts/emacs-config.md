@@ -32,6 +32,7 @@ draft = false
     - [Project Management](#project-management)
         - [Hugo Projects](#hugo-projects)
     - [Version Control](#version-control)
+        - [<span class="org-todo todo TODO">TODO</span> Git](#git)
     - [Disable File Backups](#disable-file-backups)
     - [Code Refactoring](#code-refactoring)
     - [Auto-Complete](#auto-complete)
@@ -136,6 +137,7 @@ Following this, dependencies should be (re)installed.
                                   htmlize
                                   ivy
                                   ivy-rich
+                                  magit
                                   markdown-mode
                                   nord-theme
                                   ox-gfm
@@ -144,6 +146,7 @@ Following this, dependencies should be (re)installed.
                                   powerline-evil
                                   projectile
                                   rust-mode
+                                  swiper
                                   which-key
                                   yaml-mode
                                   ))
@@ -293,6 +296,10 @@ Enable Evil mode globally to use VIM like modal editing.
 ```emacs-lisp
 (evil-mode)
 (w/define-motion-key (kbd "gd") #'evil-goto-definition)
+;; Swiper is a replacement for the standard VIM searching. It is a bit more
+;; interactive and provides a preview.
+(w/define-motion-key (kbd "/") #'swiper)
+(define-key evil-insert-state-map (kbd "C-S-v") #'evil-paste-after)
 ```
 
 Use "J" and "K" to scroll up and down the buffer as opposed to the standard
@@ -496,6 +503,9 @@ projects to reduce the friction.
 ```
 
 
+#### <span class="org-todo todo TODO">TODO</span> Git {#git}
+
+
 ### Disable File Backups {#disable-file-backups}
 
 Emacs creates backup files by default. This is accomplished by creating a backup
@@ -555,17 +565,21 @@ Keybindings when in completion:
 ### Extra Utility Functions {#extra-utility-functions}
 
 ```emacs-lisp
+(setq w/emacs-org-config (expand-file-name "init.el" user-emacs-directory))
 (defun w/reload-emacs-config ()
 "Reload the emacs config."
 (interactive)
-(load-file (expand-file-name "init.el" user-emacs-directory))
+(load-file w/emacs-org-config)
 (message "Emacs config reloaded."))
+
+(defun w/open-emacs-config ()
+  "Open the Emacs configuration."
+  (interactive)
+  (load-file w/emacs-org-config))
 
 (defun w/is-emacs-org-config ()
 "Returns t if the current buffer is the primary org config"
-(string=
-  (expand-file-name "emacs-config.org" user-emacs-directory)
-  buffer-file-name))
+(string= w/emacs-org-config buffer-file-name))
 ```
 
 
@@ -591,7 +605,8 @@ rustup component add rust-analyzer
 
 (defun w/setup-rust-mode ()
   (setq-local fill-column 100)
-  (eglot-ensure))
+  (eglot-ensure)
+  (add-hook 'before-save-hook #'eglot-format-buffer 0 t))
 (add-hook 'rust-mode-hook #'w/setup-rust-mode)
 ```
 

@@ -1,16 +1,44 @@
-baseURL = 'https://wmedrano.dev'
-languageCode = 'en-us'
-title = 'wmedrano dot dev'
-theme = "archie"
-pygmentsstyle = "nord"
-staticDir = ['static']
+baseurl = "http://www.wmedrano.dev"
+title = "wmedrano dot dev"
+theme = "hugo-coder"
+languagecode = "en"
+defaultcontentlanguage = "en"
 
+paginate = 20
+
+[markup.highlight]
+style = "nord"
+
+[params]
+  author = "Will Medrano"
+  info = "Software Engineer"
+  description = "Will's personal website"
+  keywords = "blog,software,developer"
+  avatarurl = "profile.jpg"
+  since = 2023
+  enableTwemoji = true
+  colorScheme = "auto"
+  hidecolorschemetoggle = false
+
+[taxonomies]
+  category = "categories"
+  series = "series"
+  tag = "tags"
+  author = "authors"
+
+# Social links
 [[params.social]]
-name = "GitHub"
-icon = "github"
-url = "https://github.com/wmedrano"
+  name = "Github"
+  icon = "fa fa-github fa-2x"
+  weight = 1
+  url = "https://github.com/wmedrano"
 
+# Menu links
 [[menu.main]]
-name = "About"
-url = "/about"
-weight = 1
+  name = "Posts"
+  weight = 1
+  url  = "posts/"
+[[menu.main]]
+  name = "About"
+  weight = 2
+  url = "about/"
