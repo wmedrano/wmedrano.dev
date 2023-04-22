@@ -74,3 +74,15 @@ Some skills I noticed:
 - Programming: Execution, quality and optimization
 - Game design
 - Project management
+
+** Tour of My Mechanical Keyboards
+
+I have
+
+- Keyboardio Model 01 and Keyboardio Model 100
+- Ergodox EZ
+- ZSA Moonlander
+- Preonic - The only non-split, but still ortholinear keyboard.
+- Iris
+
+My current daily driver is the Iris.

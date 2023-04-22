@@ -11,6 +11,7 @@ draft = false
 
 - [Rust Essential Libraries/Functionality](#rust-essential-libraries-functionality)
 - [Takeaways from Watching Game Devlogs](#takeaways-from-watching-game-devlogs)
+- [Tour of My Mechanical Keyboards](#tour-of-my-mechanical-keyboards)
 
 </div>
 <!--endtoc-->
@@ -44,3 +45,16 @@ Some skills I noticed:
 -   Programming: Execution, quality and optimization
 -   Game design
 -   Project management
+
+
+## Tour of My Mechanical Keyboards {#tour-of-my-mechanical-keyboards}
+
+I have
+
+-   Keyboardio Model 01 and Keyboardio Model 100
+-   Ergodox EZ
+-   ZSA Moonlander
+-   Preonic - The only non-split, but still ortholinear keyboard.
+-   Iris
+
+My current daily driver is the Iris.

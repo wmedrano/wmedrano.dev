@@ -34,8 +34,10 @@ draft = false
     - [Version Control](#version-control)
         - [<span class="org-todo todo TODO">TODO</span> Git](#git)
     - [Disable File Backups](#disable-file-backups)
-    - [Code Refactoring](#code-refactoring)
+    - [Eglot](#eglot)
+        - [Code Refactoring](#code-refactoring)
     - [Auto-Complete](#auto-complete)
+    - [Syntax Checking](#syntax-checking)
     - [Extra Utility Functions](#extra-utility-functions)
 - [Language Specific Configurations](#language-specific-configurations)
     - [Rust Mode](#rust-mode)
@@ -135,6 +137,8 @@ Following this, dependencies should be (re)installed.
                                   evil
                                   evil-commentary
                                   evil-terminal-cursor-changer
+                                  flyspell-correct
+                                  flyspell-correct-ivy
                                   htmlize
                                   ivy
                                   ivy-rich
@@ -303,7 +307,6 @@ Enable Evil mode globally to use VIM like modal editing.
 (defalias 'forward-evil-word 'forward-evil-symbol)
 (w/define-motion-key (kbd "gd") #'evil-goto-definition)
 (w/define-motion-key (kbd "g.") #'eglot-code-actions)
-(w/define-motion-key (kbd "<f8>") #'flymake-goto-next-error)
 ;; Swiper is a replacement for the standard VIM searching. It is a bit more
 ;; interactive and provides a preview.
 (w/define-motion-key (kbd "/") #'swiper)
@@ -367,6 +370,13 @@ the following commands:
 (w/define-motion-key (kbd "gw") #'ace-window)
 ```
 
+Emacs has a habit of asking `yes` or `no` questions. This requires entering the
+whole word but I prefer to just type `y` or `n`.
+
+```emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+```
+
 
 #### Mini-Buffer Completions {#mini-buffer-completions}
 
@@ -405,11 +415,15 @@ Flyspell is used to assist in spell correction. It assists in both general spell
 correction for text modes (like Markdown and Org) as well as spell correction
 within the comments of programming modes. Spell corrections manifest themselves
 as red (or orange) squiggles that can be interacted with using the mouse middle
-click.
+click or with `C-c a`.
 
 ```emacs-lisp
+(require 'flyspell)
+(require 'flyspell-correct)
+(require 'flyspell-correct-ivy)
 (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 (add-hook 'text-mode-hook #'flyspell-mode)
+(define-key flyspell-mode-map (kbd "C-c a") #'flyspell-correct-wrapper)
 ```
 
 
@@ -532,13 +546,22 @@ as:
 ```
 
 
-### Code Refactoring {#code-refactoring}
+### Eglot {#eglot}
 
 Code refactoring depends on `eglot`. Eglot is an Emacs package that supports
 interfacing with LSPs. See the
 <https://microsoft.github.io/language-server-protocol> for more
 details. Essentially Language Servers are servers that provide smart
-functionality for specific languages.
+functionality for specific languages. This is typically what people consider to
+be "IDE" functionality. There are a few packages that require Eglot or at the
+very least provide a better experience with Eglot.
+
+Eglot is configured for each major mode separately. See the Language Specific
+configurations sections to see if the Major Mode supports Eglot. For example,
+`rust-mode` supports Eglot for enhanced functionality.
+
+
+#### Code Refactoring {#code-refactoring}
 
 ```emacs-lisp
 (require 'eglot)
@@ -549,7 +572,7 @@ functionality for specific languages.
 ### Auto-Complete {#auto-complete}
 
 The [Company](https://company-mode.github.io) Emacs Lisp package is used to handle auto complete. By default,
-Company mode provides a simple completion engine. However, if an LSP is
+Company mode provides a simple completion engine. However, if an Eglot is
 configured for the major-mode, then the completions should improve.
 
 Keybindings when in completion:
@@ -570,15 +593,26 @@ Keybindings when in completion:
 ```
 
 
+### Syntax Checking {#syntax-checking}
+
+Syntax checking is exposed through the flymake package which is bundled with
+Emacs. To get improved syntax checking, Eglot needs to be enabled for the major
+mode.
+
+```emacs-lisp
+(w/define-motion-key (kbd "<f8>") #'flymake-goto-next-error)
+```
+
+
 ### Extra Utility Functions {#extra-utility-functions}
 
 ```emacs-lisp
-(setq w/emacs-org-config (expand-file-name "init.el" user-emacs-directory))
+(setq w/emacs-org-config (expand-file-name "emacs-config.org" user-emacs-directory))
 (defun w/reload-emacs-config ()
-"Reload the emacs config."
-(interactive)
-(load-file w/emacs-org-config)
-(message "Emacs config reloaded."))
+  "Reload the emacs config."
+  (interactive)
+  (load-file (expand-file-name "init.el" user-emacs-directory))
+  (message "Emacs config reloaded."))
 
 (defun w/open-emacs-config ()
   "Open the Emacs configuration."
@@ -586,8 +620,8 @@ Keybindings when in completion:
   (find-file (expand-file-name "emacs-config.org" user-emacs-directory)))
 
 (defun w/is-emacs-org-config ()
-"Returns t if the current buffer is the primary org config"
-(string= w/emacs-org-config buffer-file-name))
+  "Returns t if the current buffer is the primary org config"
+  (string= w/emacs-org-config buffer-file-name))
 ```
 
 
@@ -692,7 +726,8 @@ Markdown for my blog. The workflow for `ox-hugo` and Emacs is:
 (setq org-hugo-base-dir "~/src/wmedrano.dev")
 (defun w/setup-hugo-autoexport ()
   (when (w/is-emacs-org-config)
-      (add-hook 'after-save-hook #'org-hugo-export-to-md 0 t)))
+    (message (format "Setting up autoexport for %s" buffer-file-name))
+    (add-hook 'after-save-hook #'org-hugo-export-to-md 0 t)))
 (add-hook 'org-mode-hook #'w/setup-hugo-autoexport)
 ```
 
