@@ -36,8 +36,8 @@ draft = false
     - [Disable File Backups](#disable-file-backups)
     - [Eglot](#eglot)
         - [Code Refactoring](#code-refactoring)
-    - [Auto-Complete](#auto-complete)
-    - [Syntax Checking](#syntax-checking)
+        - [Auto-Complete](#auto-complete)
+        - [Syntax Checking](#syntax-checking)
     - [Extra Utility Functions](#extra-utility-functions)
 - [Language Specific Configurations](#language-specific-configurations)
     - [Rust Mode](#rust-mode)
@@ -569,7 +569,7 @@ configurations sections to see if the Major Mode supports Eglot. For example,
 ```
 
 
-### Auto-Complete {#auto-complete}
+#### Auto-Complete {#auto-complete}
 
 The [Company](https://company-mode.github.io) Emacs Lisp package is used to handle auto complete. By default,
 Company mode provides a simple completion engine. However, if an Eglot is
@@ -593,7 +593,7 @@ Keybindings when in completion:
 ```
 
 
-### Syntax Checking {#syntax-checking}
+#### Syntax Checking {#syntax-checking}
 
 Syntax checking is exposed through the flymake package which is bundled with
 Emacs. To get improved syntax checking, Eglot needs to be enabled for the major
