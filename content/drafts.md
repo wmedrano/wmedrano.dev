@@ -1,20 +1,9 @@
 +++
-title = "Ideas"
+title = "Drafts"
 author = ["Will Medrano"]
 date = 2023-04-22
 draft = false
 +++
-
-<div class="ox-hugo-toc toc">
-
-<div class="heading">Table of Contents</div>
-
-- [Rust Essential Libraries/Functionality](#rust-essential-libraries-functionality)
-- [Takeaways from Watching Game Devlogs](#takeaways-from-watching-game-devlogs)
-- [Tour of My Mechanical Keyboards](#tour-of-my-mechanical-keyboards)
-
-</div>
-<!--endtoc-->
 
 This page contains ideas for possible future posts.
 

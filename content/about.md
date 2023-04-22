@@ -5,19 +5,6 @@ date = 2023-04-16
 draft = false
 +++
 
-<div class="ox-hugo-toc toc">
-
-<div class="heading">Table of Contents</div>
-
-- [Notable Open Source Work](#notable-open-source-work)
-    - [Rust JACK](#rust-jack)
-    - [wmidi](#wmidi)
-    - [livi-rs](#livi-rs)
-- [Website Source Code](#website-source-code)
-
-</div>
-<!--endtoc-->
-
 I'm Will Medrano. I work as a Senior Software Engineer at Google. I deal with
 very big data during my day job, but in my spare time I tinker with a variety of
 things like:

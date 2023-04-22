@@ -1,24 +1,13 @@
 baseurl = "http://www.wmedrano.dev"
 title = "wmedrano dot dev"
-theme = "hugo-coder"
+theme = "PaperMod"
 languagecode = "en"
 defaultcontentlanguage = "en"
 
-paginate = 20
-
 [markup.highlight]
   style = "nord"
-
-[params]
-  author = "Will Medrano"
-  info = "Software Engineer"
-  description = "Will's personal website"
-  keywords = "blog,software,developer"
-  avatarurl = "profile.jpg"
-  since = 2023
-  enableTwemoji = true
-  colorScheme = "auto"
-  hidecolorschemetoggle = false
+  codeFences = true
+  guessSyntax = true
 
 [taxonomies]
   category = "categories"
@@ -26,27 +15,66 @@ paginate = 20
   tag = "tags"
   author = "authors"
 
-# Social links
-[[params.social]]
+[params]
+  env = "production"
+  mainSections = ["posts"]
+  ShowShareButtons = true
+  ShowReadingTime = true
+  ShowToc = true
+  TocOpen = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+
+[params.assets]
+  disableHLJS = true
+
+[params.profileMode]
+  enabled = true
+  imageUrl = "profile.jpg"
+
+[[params.profileMode.buttons]]
+  name = "Posts"
+  url = "/posts"
+
+[[params.profileMode.buttons]]
+  name = "Living Programs"
+  url = "/living-programs"
+
+[[params.profileMode.buttons]]
+  name = "About Me"
+  url = "/about"
+
+[[params.socialIcons]]
   name = "Github"
-  icon = "fa fa-github fa-2x"
-  weight = 1
   url = "https://github.com/wmedrano"
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
 
 # Menu links
 [[menu.main]]
   name = "Posts"
+  id = "posts"
   weight = 1
   url  = "posts/"
 [[menu.main]]
-  name = "Configs"
+  name = "Living Programs"
+  id = "living-programs"
+  title = "Living Programs"
   weight = 2
-  url  = "configs"
+  url  = "living-programs/"
 [[menu.main]]
-  name = "Ideas"
+  name = "Drafts"
+  id = "drafts"
   weight = 3
-  url = "ideas/"
+  url = "drafts/"
+[[menu.main]]
+  name = "Search"
+  id = "search"
+  weight = 4
+  url = "search/"
 [[menu.main]]
   name = "About"
-  weight = 4
-  url = "about/"
+  id = "about"
+  weight = 5
+  url = "about"

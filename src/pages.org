@@ -1,9 +1,16 @@
 #+title: wmedrano.dev Pages
 #+author: Will Medrano
-#+toc: nil
 #+hugo_base_dir: ./..
 #+hugo_section: ./
 
+* Search
+:PROPERTIES:
+:EXPORT_TITLE: Search
+:EXPORT_FILE_NAME: search
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :layout search
+:END:
+
+Search through all content from this site.
 
 * About Me
 :PROPERTIES:
@@ -11,7 +18,6 @@
 :EXPORT_FILE_NAME: about
 :EXPORT_DATE: 2023-04-16
 :END:
-
 
 I'm Will Medrano. I work as a Senior Software Engineer at Google. I deal with
 very big data during my day job, but in my spare time I tinker with a variety of
@@ -41,10 +47,10 @@ https://github.com/wmedrano-livi-rs is a Rust library for hosting LV2 plugins.
 
 [[https://github.com/wmedrano/wmedrano.dev][source code]]
 
-* Ideas
+* Drafts
 :PROPERTIES:
-:EXPORT_TITLE: Ideas
-:EXPORT_FILE_NAME: ideas
+:EXPORT_TITLE: Drafts
+:EXPORT_FILE_NAME: drafts
 :EXPORT_DATE: 2023-04-22
 :END:
 

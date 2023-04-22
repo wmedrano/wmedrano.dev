@@ -5,59 +5,6 @@ date = 2023-04-18
 draft = false
 +++
 
-<div class="ox-hugo-toc toc">
-
-<div class="heading">Table of Contents</div>
-
-- [Introduction](#introduction)
-    - [Org Mode](#org-mode)
-        - [Coding Conventions](#coding-conventions)
-        - [Bootstrapping](#bootstrapping)
-        - [Dependencies](#dependencies)
-- [Basics](#basics)
-    - [Theme](#theme)
-    - [Line Numbering](#line-numbering)
-    - [Mode Line](#mode-line)
-        - [In Editor Help and Documentation](#in-editor-help-and-documentation)
-        - [Noise Reduction](#noise-reduction)
-    - [Key Bindings](#key-bindings)
-        - [Bindings](#bindings)
-        - [Mini-Buffer Completions](#mini-buffer-completions)
-- [Text and Formatting](#text-and-formatting)
-    - [Spell Correction](#spell-correction)
-    - [Auto Fill](#auto-fill)
-    - [Tabs &amp; Spaces](#tabs-and-spaces)
-    - [Parenthesis and Braces](#parenthesis-and-braces)
-- [Advanced](#advanced)
-    - [Project Management](#project-management)
-        - [Hugo Projects](#hugo-projects)
-    - [Version Control](#version-control)
-        - [<span class="org-todo todo TODO">TODO</span> Git](#git)
-    - [Disable File Backups](#disable-file-backups)
-    - [Eglot](#eglot)
-        - [Code Refactoring](#code-refactoring)
-        - [Auto-Complete](#auto-complete)
-        - [Syntax Checking](#syntax-checking)
-    - [Extra Utility Functions](#extra-utility-functions)
-- [Language Specific Configurations](#language-specific-configurations)
-    - [Rust Mode](#rust-mode)
-- [Text Specific Configurations](#text-specific-configurations)
-    - [Markdown Mode](#markdown-mode)
-    - [Org Mode](#org-mode)
-        - [Useful Keybindings](#useful-keybindings)
-        - [Static Site Generation - Hugo](#static-site-generation-hugo)
-        - [GitHub Markdown](#github-markdown)
-        - [<span class="org-todo todo TODO">TODO</span> Graphviz Support](#graphviz-support)
-    - [YAML Mode](#yaml-mode)
-- [Other Modes](#other-modes)
-    - [File Explorer - Dired Mode](#file-explorer-dired-mode)
-- [Source Code](#source-code)
-
-</div>
-<!--endtoc-->
-
-
-
 ## Introduction {#introduction}
 
 This page describes my (will.s.medrano@gmail.com) Emacs configuration. Emacs is
@@ -407,6 +354,24 @@ Unicode values instead, run `M-x all-the-icons-install-fonts`.
 
 
 ## Text and Formatting {#text-and-formatting}
+
+
+### Refreshing {#refreshing}
+
+`C-c r` refreshes the buffer. Technically it is calling
+`revert-buffer-quick`. This has the following behavior:
+
+-   Reverts the current buffer.
+-   If the current file has been editing, a prompt will ask if it is OK to discard
+    the changes.
+-   If the current file is a compilation buffer, a prompt will ask if it is OK to
+    rerun the command.
+
+<!--listend-->
+
+```emacs-lisp
+(global-set-key (kbd "C-c r") #'revert-buffer-quick)
+```
 
 
 ### Spell Correction {#spell-correction}

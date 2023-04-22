@@ -5,25 +5,6 @@ date = 2023-04-20
 draft = false
 +++
 
-<div class="ox-hugo-toc toc">
-
-<div class="heading">Table of Contents</div>
-
-- [What is Emacs and Org Mode?](#what-is-emacs-and-org-mode)
-- [Journey To Literate Programming](#journey-to-literate-programming)
-- [What Is Literate Programming?](#what-is-literate-programming)
-- [Emacs Lisp in Org Mode Experience](#emacs-lisp-in-org-mode-experience)
-- [Result](#result)
-- [Observations](#observations)
-    - [Narrative](#narrative)
-    - [Refactoring](#refactoring)
-    - [Tooling](#tooling)
-- [Future Work](#future-work)
-- [References](#references)
-
-</div>
-<!--endtoc-->
-
 <div class="SUMMARY">
 
 By looking into Org Mode, I managed to sidetrack myself into writing my Emacs
@@ -93,8 +74,8 @@ find the place where it fits best.
 ## Result {#result}
 
 The final literate program can be read at
-<https://www.wmedrano.dev/configs/emacs-config> with the source code residing in
-<https://github.com/wmedrano/emacs-config>.
+<https://www.wmedrano.dev/living-programs/emacs-config> with the source code
+residing in <https://github.com/wmedrano/emacs-config>.
 
 
 ## Observations {#observations}
@@ -170,4 +151,4 @@ Definitely. I will
 
 -   [Dynamic Notebooks and Literate Programming - Sam Ritchie](https://www.youtube.com/watch?v=UCEzBNh9ufs) - London Clojurians
     YouTube channel.
--   [My Literate Emacs Configuration](https://www.wmedrano.dev/configs/emacs-config)
+-   [My Literate Emacs Configuration](https://www.wmedrano.dev/living-programs/emacs-config)
