@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-23T12:49:22-07:00
+lastmod = 2023-04-23T13:46:40-07:00
 draft = false
 +++
 
@@ -28,8 +28,8 @@ The following conventions are used:
 
 ### V0 Features {#v0-features}
 
-V0 is roughly implemented but still requires verification, testing, error
-handling, and bench-marking.
+V0 is roughly implemented but still requires graceful error handling, and
+bench-marking.
 
 Supports:
 
@@ -38,13 +38,13 @@ Supports:
 -   Run length encoding.
 
 
-### V1 Features Brainstorm {#v1-features-brainstorm}
+### Tentative V1 Features {#tentative-v1-features}
 
 -   Dictionary encoding for better string compression.
 -   Compression (like zstd or snappy) for data.
 -   Multiple columns.
 -   Push down filtering.
--   Split column data into blocks. Required by push down filtering.
+-   Split column data into blocks. Required to implement effective push down filtering.
 
 
 ### Encoding {#encoding}
@@ -68,8 +68,8 @@ where
 
 `decode_column` decodes data from a byte stream into a `Vec<T>`.
 
-TODO: Decoding should return an iterator of `(element_count, element)` to
-support efficient reads of run-length-encoded data.
+TODO: Decoding should return an iterator of `RleElement<T>` to support efficient
+reads of run-length-encoded data.
 
 ```rust
 pub fn decode_column<T>(r: &mut impl std::io::Read) -> Vec<T>
@@ -87,8 +87,7 @@ where
 fn test_header_contains_magic_bytes() {
     let data: Vec<i64> = vec![1, 2, 3, 4];
     let encoded_data = encode_column(data.clone(), false);
-    let encoded_data_magic_bytes = &encoded_data[0..9];
-    assert_eq!(encoded_data_magic_bytes, b"wmedrano0");
+    assert_eq!(&encoded_data[0..MAGIC_BYTES_LEN], b"wmedrano0");
 }
 ```
 
@@ -100,8 +99,9 @@ fn test_encode_decode_i64() {
     assert_eq!(encoded_data.len(), 22);
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
-    let decoded_data: Vec<i64> = decode_column(&mut encoded_data_cursor);
-    assert_eq!(decoded_data.as_slice(), &[-1, 10, 10, 10, 11, 12, 12, 10]);
+    assert_eq!(
+        decode_column::<i64>(&mut encoded_data_cursor),
+        vec![-1, 10, 10, 10, 11, 12, 12, 10]);
 }
 ```
 
@@ -120,10 +120,9 @@ fn test_encode_decode_string() {
     assert_eq!(encoded_data.len(), 38);
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
-    let decoded_data: Vec<String> = decode_column(&mut encoded_data_cursor);
     assert_eq!(
-        decoded_data,
-        Vec::from_iter(["foo", "foo", "foo", "bar", "baz", "foo"].into_iter().map(String::from)));
+        decode_column::<String>(&mut encoded_data_cursor),
+        vec!["foo", "foo", "foo", "bar", "baz", "foo"]);
 }
 ```
 
@@ -140,11 +139,11 @@ fn test_encode_decode_string_with_rle() {
     ].into_iter().map(String::from));
     let encoded_data = encode_column(data.clone(), true);
     assert_eq!(encoded_data.len(), 34);
+
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
-    let decoded_data: Vec<String> = decode_column(&mut encoded_data_cursor);
     assert_eq!(
-        decoded_data,
-        Vec::from_iter(["foo", "foo", "foo", "bar", "baz", "foo"].into_iter().map(String::from)));
+        decode_column::<String>(&mut encoded_data_cursor),
+        vec!["foo", "foo", "foo", "bar", "baz", "foo"]);
 }
 ```
 
@@ -179,48 +178,60 @@ pub enum DataType {
 
 ### Data {#data}
 
+
+#### Basic Encoding {#basic-encoding}
+
 The data consists of a sequence of encoded data. Encoding happens using the
-standard `bincode` package to encode/decode data of type `&[T]` and `Vec<T>`.
+`bincode` v2 package to encode/decode data of type `&[T]` and `Vec<T>`.
+
+Note: Bincode v2 currently in release candidate mode.
 
 
 #### RLE {#rle}
 
-[Run length encoding](https://en.wikipedia.org/wiki/Run-length_encoding#:~:text=Run%2Dlength%20encoding%20(RLE),than%20as%20the%20original%20run.) is a compression technique for repeated values. For RLE, the
-data is encoded as a tuple of `(u16, T)` where the first item contains the run
-length and the second contains the element.
+[Run length encoding](https://en.wikipedia.org/wiki/Run-length_encoding#:~:text=Run%2Dlength%20encoding%20(RLE),than%20as%20the%20original%20run.) is a compression technique for repeated values.
 
-TODO: Refactor type from `(u16, T)` to something cleaner like a new custom type,
-`RleElement<T>`.
+For RLE, the data is encoded as a Struct with the run length and the
+element. With Bincode, this is the equivalent (storage wise) of encoding a tuple
+of type `(run_length, element)`.
 
 ```rust
-fn rle_encode_data<T: Eq>(data: impl Iterator<Item = T>) -> Vec<(u16, T)> {
+#[derive(Encode, Decode, Copy, Clone, PartialEq, Debug)]
+pub struct RleElement<T> {
+    // Run length is stored as a u64. We could try using a smaller datatype,
+    // but Bincode uses "variable length encoding" for integers which is
+    // efficient for smaller sizes.
+    pub run_length: u64,
+    pub element: T,
+}
+
+fn rle_encode_data<T: Eq>(data: impl Iterator<Item = T>) -> Vec<RleElement<T>> {
     let mut data = data;
-    let mut element = match data.next() {
-        Some(e) => e,
+    let mut rle = match data.next() {
+        Some(e) => RleElement{run_length: 1, element: e},
         None => return Vec::new(),
     };
-    let mut count = 1;
 
     let mut ret = Vec::new();
-    for next_element in data {
-        if next_element != element || count == u16::MAX {
-            ret.push((count, element));
-            (element, count) = (next_element, 1);
+    for element in data {
+        if element != rle.element || rle.run_length == u64::MAX {
+            ret.push(std::mem::replace(&mut rle, RleElement{run_length: 1, element}));
         } else {
-            count += 1;
+            rle.run_length += 1;
         }
     }
-    if count > 0 {
-        ret.push((count, element));
+    if rle.run_length > 0 {
+        ret.push(rle);
     }
     ret
 }
 
 fn rle_decode_data<'a, T: 'static>(
-    iter: impl 'a + Iterator<Item = &'a (u16, T)>,
+    iter: impl 'a + Iterator<Item = &'a RleElement<T>>,
 ) -> impl Iterator<Item = &'a T> {
-    iter.flat_map(move |(run_length, element)| {
-        std::iter::repeat(element).take(*run_length as usize)
+    iter.flat_map(move |rle| {
+        let run_length = rle.run_length as usize;
+        std::iter::repeat(&rle.element).take(run_length)
     })
 }
 ```
@@ -230,4 +241,5 @@ fn rle_decode_data<'a, T: 'static>(
 
 The source code is stored at
 <https://github.com/wmedrano/wills-columnar-format>. The main source file is
-`wills-columnar-format.org` which is used to generate the `src/lib.rs`.
+`wills-columnar-format.org` which is used to generate the Rust source files like
+`src/lib.rs`.
