@@ -2,6 +2,7 @@
 title = "About Me"
 author = ["Will Medrano"]
 date = 2023-04-16
+lastmod = 2023-04-22T23:12:21-07:00
 draft = false
 +++
 

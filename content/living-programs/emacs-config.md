@@ -2,6 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
+lastmod = 2023-04-22T23:11:15-07:00
 draft = false
 +++
 
@@ -720,7 +721,11 @@ Markdown for my blog. The workflow for `ox-hugo` and Emacs is:
 
 ```emacs-lisp
 (require 'ox-hugo)
-(setq org-hugo-base-dir "~/src/wmedrano.dev")
+(setq
+ ;; wmedrano.dev is assumed to be under this specific directory.
+ org-hugo-base-dir "~/src/wmedrano.dev"
+ ;; Automatically set the "last modified" property.
+ org-hugo-auto-set-lastmod t)
 (defun w/setup-hugo-autoexport ()
   (when (w/is-emacs-org-config)
     (message (format "Setting up autoexport for %s" buffer-file-name))
