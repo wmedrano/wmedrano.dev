@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-23T09:31:56-07:00
+lastmod = 2023-04-23T09:49:33-07:00
 draft = false
 +++
 
@@ -17,7 +17,7 @@ using a well supported columnar format, consider using [Apache Parquet](https://
 
 The following conventions are used:
 
--   All structs are encoded using [Bincode](https://github.com/bincode-org/bincode). `bincode` is a binary
+-   All structs are encoded using [Bincode](https://github.com/bincode-org/bincode). Bincode is a binary
     encoding/decoding scheme implemented in Rust.
 -   Source code snippets are presented for relatively high level constructs. Lower
     level details may be omitted from presentation.
@@ -28,13 +28,23 @@ The following conventions are used:
 
 ### V0 Features {#v0-features}
 
-V0 is implemented but still requires verification, testing, and bench-marking.
+V0 is roughly implemented but still requires verification, testing, error
+handling, and bench-marking.
 
 Supports:
 
 -   Only a single column per encode/decode.
 -   `i64` and `String` types.
 -   Run length encoding.
+
+
+### V1 Features Brainstorm {#v1-features-brainstorm}
+
+-   Dictionary encoding for better string compression.
+-   Compression (like zstd or snappy) for data.
+-   Multiple columns.
+-   Push down filtering.
+-   Split column data into blocks. Required by push down filtering.
 
 
 ### Encoding {#encoding}
@@ -56,7 +66,7 @@ where
 
 ### Decoding {#decoding}
 
-`decode_column` decodes data from a `Read` stream into a `Vec<T>`.
+`decode_column` decodes data from a byte stream into a `Vec<T>`.
 
 TODO: Decoding should return an iterator of `(element_count, element)` to
 support efficient reads of run-length-encoded data.
@@ -72,9 +82,9 @@ where
 
 ## Format Specification {#format-specification}
 
--   `magic-string` - A magic string of "wmedrano0".
--   `header` - The header.
--   `data` - The data.
+-   `magic-bytes` - The magic bytes are "wmedrano0".
+-   `header` - The header contains metadata about the column.
+-   `data` - The encoded column data.
 
 
 ### Header {#header}
@@ -101,7 +111,7 @@ pub enum DataType {
 ### Data {#data}
 
 The data consists of a sequence of encoded data. Encoding happens using the
-standard `bincode` package for all data types.
+standard `bincode` package to encode/decode data of type `&[T]` and `Vec<T>`.
 
 
 #### RLE {#rle}
@@ -145,12 +155,6 @@ fn rle_decode_data<'a, T: 'static>(
     })
 }
 ```
-
-
-#### <span class="org-todo todo TODO">TODO</span> Dictionary Encoding {#dictionary-encoding}
-
-Dictionary encoding is useful for string columns with few unique values. This is
-out of scope for V0.
 
 
 ## Source Code {#source-code}
