@@ -7,7 +7,7 @@
 :PROPERTIES:
 :EXPORT_TITLE: Search
 :EXPORT_FILE_NAME: search
-:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :layout search
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :layout search :slug search :outputs '("html" "json")
 :END:
 
 Search through all content from this site.

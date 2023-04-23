@@ -1,0 +1,56 @@
+#+title: wmedrano.dev Drafts
+#+author: Will Medrano
+#+hugo_base_dir: ./..
+#+hugo_section: ./drafts
+
+* TODO Rust Essential Libraries/Functionality
+:PROPERTIES:
+:EXPORT_TITLE: Rust Essential Libraries/Functionality
+:EXPORT_FILE_NAME: draft-1
+:EXPORT_DATE: 2023-04-22
+:END:
+
+The libraries or functionality I use in most Rust projects.
+- logging
+- command line flags
+- easy parallelism (rayon)
+- CI with building, testing, linting, and releasing.
+
+These are also useful in some contexts:
+
+- performance monitoring
+
+* TODO Takeaways from Watching Game Devlogs
+:PROPERTIES:
+:EXPORT_TITLE: Takeaways from Watching Game Devlogs
+:EXPORT_FILE_NAME: draft-2
+:EXPORT_DATE: 2023-04-22
+:END:
+
+- Solo/SmallTeam developers have a wide variety of skills.
+- With varying levels of mastery for each of those skills.
+- Some very focused, some not so much.
+
+Some skills I noticed:
+
+- Artistic vision (atmosphere, visual, audio, music)
+- Programming: Execution, quality and optimization
+- Game design
+- Project management
+
+* TODO Tour of My Mechanical Keyboards
+:PROPERTIES:
+:EXPORT_TITLE: Tour of my Mechanical Keyboards
+:EXPORT_FILE_NAME: draft-3
+:EXPORT_DATE: 2023-04-22
+:END:
+
+I have
+
+- Keyboardio Model 01 and Keyboardio Model 100
+- Ergodox EZ
+- ZSA Moonlander
+- Preonic - The only non-split, but still ortholinear keyboard.
+- Iris
+
+My current daily driver is the Iris.

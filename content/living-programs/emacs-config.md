@@ -88,6 +88,7 @@ Following this, dependencies should be (re)installed.
                                   flyspell-correct-ivy
                                   htmlize
                                   ivy
+                                  ivy-emoji
                                   ivy-rich
                                   magit
                                   markdown-mode
@@ -252,8 +253,9 @@ Enable Evil mode globally to use VIM like modal editing.
 ```emacs-lisp
 (evil-mode)
 (defalias 'forward-evil-word 'forward-evil-symbol)
+;; Jumps to definition. If Eglot is active, then the language server is used
+;; to find the definition.
 (w/define-motion-key (kbd "gd") #'evil-goto-definition)
-(w/define-motion-key (kbd "g.") #'eglot-code-actions)
 ;; Swiper is a replacement for the standard VIM searching. It is a bit more
 ;; interactive and provides a preview.
 (w/define-motion-key (kbd "/") #'swiper)
@@ -358,7 +360,8 @@ Unicode values instead, run `M-x all-the-icons-install-fonts`.
 
 ### Refreshing {#refreshing}
 
-`C-c r` refreshes the buffer. Technically it is calling
+Files changed on disk are automatically reloaded. Changes are detected every
+second. To manually refresh, call `C-c r`. Technically, this calls
 `revert-buffer-quick`. This has the following behavior:
 
 -   Reverts the current buffer.
@@ -370,6 +373,10 @@ Unicode values instead, run `M-x all-the-icons-install-fonts`.
 <!--listend-->
 
 ```emacs-lisp
+(global-auto-revert-mode t)
+;; Emacs default is 5, but we use a 1 second interval. This is usually fine on
+;; modern a modern SSD or NVMe drive.
+(setq auto-revert-interval 1)
 (global-set-key (kbd "C-c r") #'revert-buffer-quick)
 ```
 
@@ -427,6 +434,16 @@ Matching end parenthesis and braces are automatically inserted.
 ```
 
 
+### Emojis {#emojis}
+
+Emoji's can be inserted by running `M-x ivy-emoji` to select an emoji and insert
+it.
+
+```emacs-lisp
+(require 'ivy-emoji)
+```
+
+
 ## Advanced {#advanced}
 
 
@@ -462,6 +479,20 @@ how Counsel provides minibuffer completion for most built-in Emacs functions.
 ```emacs-lisp
 (require 'counsel-projectile)
 (counsel-projectile-mode t)
+```
+
+Projectile automatically tracks known projects. However, there are some cases
+where there is a valid project but we would normally not navigate their
+directly. An example of this is projects under `.cargo` which are downloaded by
+the compiler and navigated to when using "go to definition" of the library
+functions.
+
+```emacs-lisp
+(defun w/projectile-project-is-ignored (root)
+  "Returns t if the project at the given root should be ignored."
+  (or (string-match-p "\.cargo" root)
+      (string-match-p "\.rustup" root)))
+(setq projectile-ignored-project-function #'w/projectile-project-is-ignored)
 ```
 
 
@@ -531,6 +562,7 @@ configurations sections to see if the Major Mode supports Eglot. For example,
 ```emacs-lisp
 (require 'eglot)
 (w/define-motion-key (kbd "<f2>") #'eglot-rename)
+(w/define-motion-key (kbd "g.") #'eglot-code-actions)
 ```
 
 
@@ -724,6 +756,34 @@ export graphs by adding `dot` source blocks within Org files.
 
 ```emacs-lisp
 (require 'yaml-mode)
+```
+
+
+#### <span class="org-todo todo TODO">TODO</span> YAML Language Server {#yaml-language-server}
+
+Warning: I have not gotten the YAML language server to run yet. I have been able
+to install it, but encounter a crash at runtime. The crash has the error
+`[stderr] SyntaxError: Unexpected token '?'`.
+
+YAML requires installing the YAML language server to `~/.local/npm/bin`. This
+can be installed with NPM by running:
+
+```bash
+npm install -g yaml-language-server --prefix ~/.local/npm
+```
+
+```emacs-lisp
+(require 'yaml-mode)
+(add-to-list 'eglot-server-programs
+             '((yaml-mode) . ("~/.local/npm/bin/yaml-language-server")))
+(defun w/setup-yaml-mode ()
+  "Sets up the YAML major mode."
+  ;; Eglot is commented out until the YAML language server is proven to
+  ;; successfuly run.
+  ;; (eglot-ensure)
+  ;; (add-hook 'before-save-hook #'eglot-format-buffer 0 t)
+  )
+(add-hook 'yaml-mode-hook #'w/setup-yaml-mode)
 ```
 
 
