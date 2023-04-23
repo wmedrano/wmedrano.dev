@@ -2,6 +2,7 @@
 title = "Literate Programming With Org Mode"
 author = ["Will Medrano"]
 date = 2023-04-20
+lastmod = 2023-04-23T16:05:38-07:00
 draft = false
 +++
 
@@ -74,7 +75,7 @@ find the place where it fits best.
 ## Result {#result}
 
 The final literate program can be read at
-<https://www.wmedrano.dev/living-programs/emacs-config> with the source code
+<https://www.wmedrano.dev/literate-programs/emacs-config> with the source code
 residing in <https://github.com/wmedrano/emacs-config>.
 
 
@@ -151,4 +152,4 @@ Definitely. I will
 
 -   [Dynamic Notebooks and Literate Programming - Sam Ritchie](https://www.youtube.com/watch?v=UCEzBNh9ufs) - London Clojurians
     YouTube channel.
--   [My Literate Emacs Configuration](https://www.wmedrano.dev/living-programs/emacs-config)
+-   [My Literate Emacs Configuration](https://www.wmedrano.dev/literate-programs/emacs-config)

@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-23T16:10:38-07:00
+lastmod = 2023-04-23T16:03:43-07:00
 draft = false
 +++
 
@@ -10,7 +10,7 @@ draft = false
 
 **Will's Columnar Format V0**
 
-[Will's Columnar Format](https://wmedrano.dev/literate-programs/wills-columnar-format) is a columnar format made by will.s.medrano@gmail.com. It
+[Will's columnar format](https://wmedrano.dev/living-programs/wills-columnar-format) is a columnar format made by will.s.medrano@gmail.com. It
 is primarily implemented for educational purposes. If you are interested in
 using a well supported columnar format, consider using [Apache Parquet](https://parquet.apache.org/).
 
@@ -28,8 +28,8 @@ The following conventions are used:
 ### Building and Testing Library {#building-and-testing-library}
 
 Will's Columnar Format is programmed in Org mode with Rust code
-blocks. Compiling requires Emacs and Cargo, the Rust package manager. To
-generate the Rust source code:
+blocks. Compiling requires Emacs text editor and Cargo, the Rust package
+manager. To generate the Rust source code:
 
 1.  Open `wills-columnar-format.org` file in Emacs.
 2.  Generate the Rust source code by running: `M-x org-babel-tangle`.
@@ -169,16 +169,11 @@ fn test_encode_decode_string_with_rle() {
 ## Optimization Tips {#optimization-tips}
 
 
-### Sorting Data {#sorting-data}
+### Sorted Data {#sorted-data}
 
-Sorting may be very beneficial if:
-
--   Order is not important.
--   There are lots of repeated values.
-
-If the above are true, try sorting and enabling run length encoding. Run length
-encoding is efficient at storing data that is heavily repeated. By sorting, the
-data will have longer runs of consecutive repeated values.
+If order is not important, try sorting the data and enabling run length
+encoding. Run length encoding is efficient at storing data that is heavily
+repeated. By sorting, the data will have longer runs of repeated values.
 
 
 ## Format Specification {#format-specification}

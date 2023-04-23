@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-23T08:37:29-07:00
+lastmod = 2023-04-23T16:06:32-07:00
 draft = false
 +++
 
@@ -259,7 +259,7 @@ Enable Evil mode globally to use VIM like modal editing.
 (w/define-motion-key (kbd "gd") #'evil-goto-definition)
 ;; Swiper is a replacement for the standard VIM searching. It is a bit more
 ;; interactive and provides a preview.
-(w/define-motion-key (kbd "/") #'swiper)
+;; (w/define-motion-key (kbd "/") #'swiper)
 (define-key evil-insert-state-map (kbd "C-S-v") #'evil-paste-after)
 ```
 
@@ -507,6 +507,26 @@ projects to reduce the friction.
 
 ```emacs-lisp
 (add-to-list 'safe-local-variable-values '(projectile-project-run-cmd . "hugo server --buildDrafts"))
+```
+
+It's also useful to export on save. `w/export-to-hugo-on-save` can be used to
+automatically export on save. It must be manually run.
+
+```emacs-lisp
+(defun w/export-to-hugo-on-save ()
+  "Export to Hugo on save."
+  (interactive)
+  (add-hook 'after-save-hook #'org-hugo-export-to-md 0 t))
+```
+
+
+#### Literate Programming {#literate-programming}
+
+```emacs-lisp
+(defun w/tangle-on-save ()
+  "Run tangle command on save."
+  (interactive)
+  (add-hook 'after-save-hook #'org-babel-tangle 0 t))
 ```
 
 

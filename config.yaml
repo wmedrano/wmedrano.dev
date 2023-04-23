@@ -16,7 +16,7 @@ hasCJKLanguage: false
 params:
   mainSections:
       - posts
-      - living-programs
+      - literate-programs
   featuredImageField: image
   rssFullContent: true
   favicon:  # e.g.: favicon placed in `static/favicon.ico` of your site folder, then set this field to `/favicon.ico` (`/` is necessary)
@@ -85,8 +85,8 @@ menu:
     - name: Posts
       pageRef: /posts
       weight: 2
-    - name: Living Programs
-      pageRef: /living-programs
+    - name: Literate Programs
+      pageRef: /literate-programs
       weight: 3
     - name: Drafts
       pageRef: /drafts
