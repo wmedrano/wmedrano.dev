@@ -3,7 +3,7 @@
 #+hugo_base_dir: ./..
 #+hugo_section: ./drafts
 
-* TODO Rust Essential Libraries/Functionality
+* Rust Essential Libraries/Functionality
 :PROPERTIES:
 :EXPORT_TITLE: Rust Essential Libraries/Functionality
 :EXPORT_FILE_NAME: draft-1
@@ -20,7 +20,7 @@ These are also useful in some contexts:
 
 - performance monitoring
 
-* TODO Takeaways from Watching Game Devlogs
+* Takeaways from Watching Game Devlogs
 :PROPERTIES:
 :EXPORT_TITLE: Takeaways from Watching Game Devlogs
 :EXPORT_FILE_NAME: draft-2
@@ -38,7 +38,7 @@ Some skills I noticed:
 - Game design
 - Project management
 
-* TODO Tour of My Mechanical Keyboards
+* Tour of My Mechanical Keyboards
 :PROPERTIES:
 :EXPORT_TITLE: Tour of my Mechanical Keyboards
 :EXPORT_FILE_NAME: draft-3

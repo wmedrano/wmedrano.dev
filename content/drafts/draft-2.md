@@ -2,7 +2,7 @@
 title = "Takeaways from Watching Game Devlogs"
 author = ["Will Medrano"]
 date = 2023-04-22
-draft = true
+draft = false
 +++
 
 -   Solo/SmallTeam developers have a wide variety of skills.

@@ -2,7 +2,7 @@
 title = "Tour of my Mechanical Keyboards"
 author = ["Will Medrano"]
 date = 2023-04-22
-draft = true
+draft = false
 +++
 
 I have
