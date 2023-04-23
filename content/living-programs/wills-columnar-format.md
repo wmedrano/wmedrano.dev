@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-23T09:49:33-07:00
+lastmod = 2023-04-23T12:49:22-07:00
 draft = false
 +++
 
@@ -76,6 +76,75 @@ pub fn decode_column<T>(r: &mut impl std::io::Read) -> Vec<T>
 where
     T: 'static + Clone + bincode::Decode {
     decode_column_impl(r)
+}
+```
+
+
+### Tests {#tests}
+
+```rust
+#[test]
+fn test_header_contains_magic_bytes() {
+    let data: Vec<i64> = vec![1, 2, 3, 4];
+    let encoded_data = encode_column(data.clone(), false);
+    let encoded_data_magic_bytes = &encoded_data[0..9];
+    assert_eq!(encoded_data_magic_bytes, b"wmedrano0");
+}
+```
+
+```rust
+#[test]
+fn test_encode_decode_i64() {
+    let data: Vec<i64> = vec![-1, 10, 10, 10, 11, 12, 12, 10];
+    let encoded_data = encode_column(data.clone(), false);
+    assert_eq!(encoded_data.len(), 22);
+
+    let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
+    let decoded_data: Vec<i64> = decode_column(&mut encoded_data_cursor);
+    assert_eq!(decoded_data.as_slice(), &[-1, 10, 10, 10, 11, 12, 12, 10]);
+}
+```
+
+```rust
+#[test]
+fn test_encode_decode_string() {
+    let data: Vec<String> = Vec::from_iter([
+        "foo",
+        "foo",
+        "foo",
+        "bar",
+        "baz",
+        "foo",
+    ].into_iter().map(String::from));
+    let encoded_data = encode_column(data.clone(), false);
+    assert_eq!(encoded_data.len(), 38);
+
+    let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
+    let decoded_data: Vec<String> = decode_column(&mut encoded_data_cursor);
+    assert_eq!(
+        decoded_data,
+        Vec::from_iter(["foo", "foo", "foo", "bar", "baz", "foo"].into_iter().map(String::from)));
+}
+```
+
+```rust
+#[test]
+fn test_encode_decode_string_with_rle() {
+    let data: Vec<String> = Vec::from_iter([
+        "foo",
+        "foo",
+        "foo",
+        "bar",
+        "baz",
+        "foo",
+    ].into_iter().map(String::from));
+    let encoded_data = encode_column(data.clone(), true);
+    assert_eq!(encoded_data.len(), 34);
+    let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
+    let decoded_data: Vec<String> = decode_column(&mut encoded_data_cursor);
+    assert_eq!(
+        decoded_data,
+        Vec::from_iter(["foo", "foo", "foo", "bar", "baz", "foo"].into_iter().map(String::from)));
 }
 ```
 
