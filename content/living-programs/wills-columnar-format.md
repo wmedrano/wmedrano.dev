@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-23T09:20:06-07:00
+lastmod = 2023-04-23T09:31:56-07:00
 draft = false
 +++
 
@@ -17,7 +17,7 @@ using a well supported columnar format, consider using [Apache Parquet](https://
 
 The following conventions are used:
 
--   All structs are encoded using `bincode`. `bincode` is a binary
+-   All structs are encoded using [Bincode](https://github.com/bincode-org/bincode). `bincode` is a binary
     encoding/decoding scheme implemented in Rust.
 -   Source code snippets are presented for relatively high level constructs. Lower
     level details may be omitted from presentation.
@@ -83,12 +83,6 @@ The header contains an encoded struct:
 
 ```rust
 #[derive(Encode, Decode, PartialEq, Eq, Copy, Clone, Debug)]
-pub enum DataType {
-    I64 = 0,
-    String = 1,
-}
-
-#[derive(Encode, Decode, PartialEq, Eq, Copy, Clone, Debug)]
 pub struct Header {
     pub data_type: DataType,
     pub is_rle: bool,
@@ -96,14 +90,10 @@ pub struct Header {
     pub data_size: usize,
 }
 
-impl Header {
-    fn encode(&self) -> Vec<u8> {
-        bincode::encode_to_vec(self, Self::CONFIGURATION).unwrap()
-    }
-
-    fn decode(r: &mut impl std::io::Read) -> Header {
-        bincode::decode_from_std_read(r, Self::CONFIGURATION).unwrap()
-    }
+#[derive(Encode, Decode, PartialEq, Eq, Copy, Clone, Debug)]
+pub enum DataType {
+    I64 = 0,
+    String = 1,
 }
 ```
 
@@ -119,6 +109,9 @@ standard `bincode` package for all data types.
 [Run length encoding](https://en.wikipedia.org/wiki/Run-length_encoding#:~:text=Run%2Dlength%20encoding%20(RLE),than%20as%20the%20original%20run.) is a compression technique for repeated values. For RLE, the
 data is encoded as a tuple of `(u16, T)` where the first item contains the run
 length and the second contains the element.
+
+TODO: Refactor type from `(u16, T)` to something cleaner like a new custom type,
+`RleElement<T>`.
 
 ```rust
 fn rle_encode_data<T: Eq>(data: impl Iterator<Item = T>) -> Vec<(u16, T)> {
@@ -162,4 +155,6 @@ out of scope for V0.
 
 ## Source Code {#source-code}
 
-<https://github.com/wmedrano/wills-columnar-format>
+The source code is stored at
+<https://github.com/wmedrano/wills-columnar-format>. The main source file is
+`wills-columnar-format.org` which is used to generate the `src/lib.rs`.

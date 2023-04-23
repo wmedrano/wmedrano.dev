@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-22T23:11:15-07:00
+lastmod = 2023-04-23T08:37:29-07:00
 draft = false
 +++
 
