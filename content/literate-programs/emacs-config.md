@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-23T16:06:32-07:00
+lastmod = 2023-04-23T20:38:32-07:00
 draft = false
 +++
 
@@ -93,6 +93,7 @@ Following this, dependencies should be (re)installed.
                                   ivy-rich
                                   magit
                                   markdown-mode
+                                  monokai-pro-theme
                                   nord-theme
                                   ox-gfm
                                   ox-hugo
@@ -100,6 +101,7 @@ Following this, dependencies should be (re)installed.
                                   powerline-evil
                                   projectile
                                   rust-mode
+                                  spacemacs-theme
                                   swiper
                                   which-key
                                   yaml-mode
@@ -130,12 +132,17 @@ Emacs. See <https://nordtheme.com> for more details.
 
 ```emacs-lisp
 (set-frame-parameter (selected-frame) 'alpha '(95 . 95))
-(require 'nord-theme)
-(load-theme 'nord t)
-;; Allow the terminal's default background to shine through. This is required
-;; in order for Nord theme to not override the terminal's transparency
-;; settings.
+(when (display-graphic-p)
+  (require 'monokai-pro-theme)
+  (load-theme 'monokai-pro-octagon t)
+  (set-frame-parameter (selected-frame) 'alpha '(95 . 95))
+  (set-frame-font "Fira Code 12"))
 (unless (display-graphic-p)
+  (require 'nord)
+  (load-theme 'nord t)
+  ;; Allow the terminal's default background to shine through. This is
+  ;; required in order for Nord theme to not override the terminal's
+  ;; transparency settings.
   (set-face-attribute 'default nil :background "unspecified-bg"))
 ```
 
@@ -150,7 +157,6 @@ Emacs. See <https://nordtheme.com> for more details.
 (global-hl-line-mode t)
 ;; Display the column number in the modeline.
 (column-number-mode t)
-(set-frame-font "fira code 11")
 (unless (display-graphic-p)
   (require 'evil-terminal-cursor-changer)
   (evil-terminal-cursor-changer-activate))
@@ -257,9 +263,14 @@ Enable Evil mode globally to use VIM like modal editing.
 ;; Jumps to definition. If Eglot is active, then the language server is used
 ;; to find the definition.
 (w/define-motion-key (kbd "gd") #'evil-goto-definition)
-;; Swiper is a replacement for the standard VIM searching. It is a bit more
-;; interactive and provides a preview.
-;; (w/define-motion-key (kbd "/") #'swiper)
+;; Similar to VIM search but shows a preview in the minibuffer of several
+;; matches.
+(w/define-motion-key (kbd "/") #'swiper-isearch)
+;; Similar to swiper-isearch but searches all open buffers.
+(w/define-motion-key (kbd "g/") #'swiper-swiper)
+;; Paste contents into the current cursor. This is used to keep consistency of
+;; the paste command in terminal and GUI modes. Most terminal emulators paste
+;; the current clipboard text on C-S-v.
 (define-key evil-insert-state-map (kbd "C-S-v") #'evil-paste-after)
 ```
 

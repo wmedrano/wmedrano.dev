@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-23T16:22:05-07:00
+lastmod = 2023-04-23T20:58:25-07:00
 draft = false
 +++
 
@@ -38,10 +38,7 @@ generate the Rust source code:
 5.  Run tests with `cargo test`.
 
 
-## API {#api}
-
-
-### Features {#features}
+## Features {#features}
 
 
 #### V0 Features {#v0-features}
@@ -65,6 +62,9 @@ Supports:
 -   Split column data into blocks. Required to implement effective push down filtering.
 
 
+## API {#api}
+
+
 ### Encoding {#encoding}
 
 `encode_column` encodes a `Vec<T>` into Will's Columnar Format. If `use_rle` is
@@ -76,7 +76,8 @@ TODO: `use_rle` should have more granular values like `NEVER`, `ALWAYS`, and
 ```rust
 pub fn encode_column<T>(data: Vec<T>, use_rle: bool) -> Vec<u8>
 where
-    T: 'static + bincode::Encode + Eq {
+    T: 'static + bincode::Encode + Eq,
+{
     encode_column_impl(data, use_rle)
 }
 ```
@@ -92,7 +93,8 @@ reads of run-length-encoded data.
 ```rust
 pub fn decode_column<T>(r: &mut impl std::io::Read) -> Vec<T>
 where
-    T: 'static + Clone + bincode::Decode {
+    T: 'static + Clone + bincode::Decode,
+{
     decode_column_impl(r)
 }
 ```
@@ -101,11 +103,27 @@ where
 ### Tests {#tests}
 
 ```rust
-#[test]
 fn test_header_contains_magic_bytes() {
+#[test]
     let data: Vec<i64> = vec![1, 2, 3, 4];
-    let encoded_data = encode_column(data.clone(), false);
-    assert_eq!(&encoded_data[0..MAGIC_BYTES_LEN], b"wmedrano0");
+    let encoded_data: Vec<u8> = encode_column(data.clone(), false);
+        assert_eq!(&encoded_data[0..MAGIC_BYTES_LEN], b"wmedrano0");
+}
+```
+
+```rust
+#[test]
+fn test_encode_decode_several() {
+    test_can_encode_and_decode_for_type::<i8>([-1, -1]);
+    test_can_encode_and_decode_for_type::<u8>([ 1,  2]);
+    test_can_encode_and_decode_for_type::<i16>([-1, 1]);
+    test_can_encode_and_decode_for_type::<u16>([1, 2]);
+    test_can_encode_and_decode_for_type::<i32>([-1, 1]);
+    test_can_encode_and_decode_for_type::<u32>([1, 2]);
+    test_can_encode_and_decode_for_type::<i64>([-1, 1]);
+    test_can_encode_and_decode_for_type::<u64>([1, 2]);
+    test_can_encode_and_decode_for_type::<String>(
+        ["a".to_string(), "b".to_string()]);
 }
 ```
 
@@ -241,31 +259,16 @@ pub struct Element<T> {
     pub element: T,
 }
 
-pub fn encode_data<T: Eq>(data: impl Iterator<Item = T>) -> Vec<Element<T>> {
-    let mut data = data;
-    let mut rle = match data.next() {
-        Some(e) => Element{run_length: 1, element: e},
-        None => return Vec::new(),
-    };
-
-    let mut ret = Vec::new();
-    for element in data {
-        if element != rle.element || rle.run_length == u64::MAX {
-            ret.push(std::mem::replace(&mut rle, Element{run_length: 1, element}));
-        } else {
-            rle.run_length += 1;
-        }
+pub fn encode_data<T: Eq>(data: impl Iterator<Item = T>) -> impl Iterator<Item = Element<T>> {
+    EncodeIter {
+        inner: data.peekable(),
     }
-    if rle.run_length > 0 {
-        ret.push(rle);
-    }
-    ret
 }
 
 pub fn decode_data<'a, T: 'static>(
     iter: impl 'a + Iterator<Item = &'a Element<T>>,
 ) -> impl Iterator<Item = &'a T> {
-    iter.flat_map(move |rle| {
+    iter.flat_map(|rle| {
         let run_length = rle.run_length as usize;
         std::iter::repeat(&rle.element).take(run_length)
     })
@@ -285,7 +288,7 @@ fn test_encode_data_compacts_repeated_elements() {
         "repeated-3", "repeated-3", "repeated-3",
     ];
     assert_eq!(
-        encode_data(data.into_iter()),
+        encode_data(data.into_iter()).collect::<Vec<_>>(),
         vec![
             Element{run_length: 3, element: "repeated-3"},
             Element{run_length: 1, element: "no-repeat"},
