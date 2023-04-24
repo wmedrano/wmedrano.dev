@@ -1,8 +1,8 @@
 +++
 title = "Game of Life"
 author = ["Will Medrano"]
-date = 2023-04-23
-lastmod = 2023-04-24T08:04:47-07:00
+date = 2023-04-24
+lastmod = 2023-04-24T08:17:40-07:00
 draft = false
 +++
 

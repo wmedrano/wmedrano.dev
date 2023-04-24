@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-23T22:07:02-07:00
+lastmod = 2023-04-24T08:15:51-07:00
 draft = false
 +++
 
@@ -771,7 +771,7 @@ Markdown for my blog. The workflow for `ox-hugo` and Emacs is:
 (defun w/setup-hugo-autoexport ()
   (when (w/is-emacs-org-config)
     (message (format "Setting up autoexport for %s" buffer-file-name))
-    (add-hook 'after-save-hook #'org-hugo-export-to-md 0 t)))
+    (w/export-to-hugo-on-save)))
 (add-hook 'org-mode-hook #'w/setup-hugo-autoexport)
 ```
 

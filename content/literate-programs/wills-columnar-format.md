@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-23T20:58:25-07:00
+lastmod = 2023-04-24T08:13:52-07:00
 draft = false
 +++
 
@@ -28,14 +28,23 @@ The following conventions are used:
 ### Building and Testing Library {#building-and-testing-library}
 
 Will's Columnar Format is programmed in Org mode with Rust code
-blocks. Compiling requires Emacs and Cargo, the Rust package manager. To
-generate the Rust source code:
+blocks. Compiling requires Emacs and Cargo, the Rust package manager.
 
-1.  Open `wills-columnar-format.org` file in Emacs.
-2.  Generate the Rust source code by running: `M-x org-babel-tangle`.
-3.  Exit Emacs.
-4.  Compile with the library with `cargo build`.
-5.  Run tests with `cargo test`.
+To generate the Rust source code, run `M-x org-babel-tangle` for
+`wills-columnar-format.org` within Emacs. To automatically tangle the current
+file on save, run:
+
+```emacs-lisp
+(add-hook 'after-save-hook #'org-babel-tangle 0 t)
+```
+
+Building and testing relies on Cargo.
+
+```shell
+cargo build
+cargo test
+cargo test $FN_TO_TEST
+```
 
 
 ## Features {#features}
@@ -103,11 +112,11 @@ where
 ### Tests {#tests}
 
 ```rust
-fn test_header_contains_magic_bytes() {
 #[test]
+fn test_header_contains_magic_bytes() {
     let data: Vec<i64> = vec![1, 2, 3, 4];
     let encoded_data: Vec<u8> = encode_column(data.clone(), false);
-        assert_eq!(&encoded_data[0..MAGIC_BYTES_LEN], b"wmedrano0");
+    assert_eq!(&encoded_data[0..MAGIC_BYTES_LEN], b"wmedrano0");
 }
 ```
 
@@ -115,15 +124,14 @@ fn test_header_contains_magic_bytes() {
 #[test]
 fn test_encode_decode_several() {
     test_can_encode_and_decode_for_type::<i8>([-1, -1]);
-    test_can_encode_and_decode_for_type::<u8>([ 1,  2]);
+    test_can_encode_and_decode_for_type::<u8>([1, 2]);
     test_can_encode_and_decode_for_type::<i16>([-1, 1]);
     test_can_encode_and_decode_for_type::<u16>([1, 2]);
     test_can_encode_and_decode_for_type::<i32>([-1, 1]);
     test_can_encode_and_decode_for_type::<u32>([1, 2]);
     test_can_encode_and_decode_for_type::<i64>([-1, 1]);
     test_can_encode_and_decode_for_type::<u64>([1, 2]);
-    test_can_encode_and_decode_for_type::<String>(
-        ["a".to_string(), "b".to_string()]);
+    test_can_encode_and_decode_for_type::<String>(["a".to_string(), "b".to_string()]);
 }
 ```
 
@@ -137,49 +145,39 @@ fn test_encode_decode_integer() {
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
     assert_eq!(
         decode_column::<i64>(&mut encoded_data_cursor),
-        vec![-1, 10, 10, 10, 11, 12, 12, 10]);
+        vec![-1, 10, 10, 10, 11, 12, 12, 10]
+    );
 }
 ```
 
 ```rust
 #[test]
 fn test_encode_decode_string() {
-    let data: Vec<&'static str> = Vec::from_iter([
-        "foo",
-        "foo",
-        "foo",
-        "bar",
-        "baz",
-        "foo",
-    ].into_iter());
+    let data: Vec<&'static str> =
+        Vec::from_iter(["foo", "foo", "foo", "bar", "baz", "foo"].into_iter());
     let encoded_data = encode_column(data.clone(), false);
     assert_eq!(encoded_data.len(), 38);
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
     assert_eq!(
         decode_column::<String>(&mut encoded_data_cursor),
-        vec!["foo", "foo", "foo", "bar", "baz", "foo"]);
+        vec!["foo", "foo", "foo", "bar", "baz", "foo"]
+    );
 }
 ```
 
 ```rust
 #[test]
 fn test_encode_decode_string_with_rle() {
-    let data = [
-        "foo",
-        "foo",
-        "foo",
-        "bar",
-        "baz",
-        "foo",
-    ];
+    let data = ["foo", "foo", "foo", "bar", "baz", "foo"];
     let encoded_data = encode_column(data.to_vec(), true);
     assert_eq!(encoded_data.len(), 34);
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
     assert_eq!(
         decode_column::<String>(&mut encoded_data_cursor),
-        vec!["foo", "foo", "foo", "bar", "baz", "foo"]);
+        vec!["foo", "foo", "foo", "bar", "baz", "foo"]
+    );
 }
 ```
 
@@ -240,6 +238,40 @@ The data consists of a sequence of encoded data. Encoding happens using the Rust
 
 Note: Bincode v2 currently in release candidate mode.
 
+```rust
+#[test]
+fn test_encoding_size() {
+    // Small numbers are encoded efficiently.
+    assert_eq!(bincode_encoded_size(1u8), 1);
+    assert_eq!(bincode_encoded_size(-1i8), 1);
+    assert_eq!(bincode_encoded_size(1u64), 1);
+    assert_eq!(bincode_encoded_size(-1i64), 1);
+
+    // Larger numbers use more bytes with varint encoding. This does not apply
+    // to u8 and i8 which do not use varint.
+    assert_eq!(bincode_encoded_size(255u16), 3);
+    assert_eq!(bincode_encoded_size(255u8), 1);
+    assert_eq!(bincode_encoded_size(127i8), 1);
+    assert_eq!(bincode_encoded_size(-128i8), 1);
+
+    // Derived types (like Structs and Tuples) take up as much space as their subcomponents.
+    assert_eq!(bincode_encoded_size(1u64), 1);
+    assert_eq!(bincode_encoded_size(25564), 3);
+    assert_eq!(bincode_encoded_size((1u64, 255u64)), 4);
+    assert_eq!(
+        bincode_encoded_size(rle::Element {
+            element: 1u64,
+            run_length: 255
+        }),
+        4
+    );
+
+    // Strings take up string_length + 1.
+    assert_eq!(bincode_encoded_size("string"), 7);
+    assert_eq!(bincode_encoded_size(String::from("string")), 7);
+}
+```
+
 
 ### Run Length Encoding {#run-length-encoding}
 
@@ -282,18 +314,35 @@ pub fn decode_data<'a, T: 'static>(
 #[test]
 fn test_encode_data_compacts_repeated_elements() {
     let data = [
-        "repeated-3", "repeated-3", "repeated-3",
+        "repeated-3",
+        "repeated-3",
+        "repeated-3",
         "no-repeat",
-        "repeated-2", "repeated-2",
-        "repeated-3", "repeated-3", "repeated-3",
+        "repeated-2",
+        "repeated-2",
+        "repeated-3",
+        "repeated-3",
+        "repeated-3",
     ];
     assert_eq!(
         encode_data(data.into_iter()).collect::<Vec<_>>(),
         vec![
-            Element{run_length: 3, element: "repeated-3"},
-            Element{run_length: 1, element: "no-repeat"},
-            Element{run_length: 2, element: "repeated-2"},
-            Element{run_length: 3, element: "repeated-3"},
+            Element {
+                run_length: 3,
+                element: "repeated-3"
+            },
+            Element {
+                run_length: 1,
+                element: "no-repeat"
+            },
+            Element {
+                run_length: 2,
+                element: "repeated-2"
+            },
+            Element {
+                run_length: 3,
+                element: "repeated-3"
+            },
         ],
     );
 }
@@ -303,21 +352,38 @@ fn test_encode_data_compacts_repeated_elements() {
 #[test]
 fn test_decode_repeats_elements_by_run_length() {
     let data = vec![
-        Element{run_length: 3, element: "repeated-3"},
-        Element{run_length: 1, element: "no-repeat"},
-        Element{run_length: 2, element: "repeated-2"},
-        Element{run_length: 3, element: "repeated-3"},
-  ];
-  let decoded_data: Vec<&str> = decode_data(data.iter()).cloned().collect();
-  assert_eq!(
-      decoded_data,
-      [
-          "repeated-3", "repeated-3", "repeated-3",
-          "no-repeat",
-          "repeated-2", "repeated-2",
-          "repeated-3", "repeated-3", "repeated-3",
-      ]
-  );
+        Element {
+            run_length: 3,
+            element: "repeated-3",
+        },
+        Element {
+            run_length: 1,
+            element: "no-repeat",
+        },
+        Element {
+            run_length: 2,
+            element: "repeated-2",
+        },
+        Element {
+            run_length: 3,
+            element: "repeated-3",
+        },
+    ];
+    let decoded_data: Vec<&str> = decode_data(data.iter()).cloned().collect();
+    assert_eq!(
+        decoded_data,
+        [
+            "repeated-3",
+            "repeated-3",
+            "repeated-3",
+            "no-repeat",
+            "repeated-2",
+            "repeated-2",
+            "repeated-3",
+            "repeated-3",
+            "repeated-3",
+        ]
+    );
 }
 ```
 
