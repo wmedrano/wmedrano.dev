@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-23T20:38:32-07:00
+lastmod = 2023-04-23T22:07:02-07:00
 draft = false
 +++
 
@@ -138,7 +138,7 @@ Emacs. See <https://nordtheme.com> for more details.
   (set-frame-parameter (selected-frame) 'alpha '(95 . 95))
   (set-frame-font "Fira Code 12"))
 (unless (display-graphic-p)
-  (require 'nord)
+  (require 'nord-theme)
   (load-theme 'nord t)
   ;; Allow the terminal's default background to shine through. This is
   ;; required in order for Nord theme to not override the terminal's
@@ -630,6 +630,17 @@ mode.
 
 ```emacs-lisp
 (w/define-motion-key (kbd "<f8>") #'flymake-goto-next-error)
+```
+
+```emacs-lisp
+(defun w/force-eglot-didSave ()
+  "Forces eglot to communicate a didSave signal. This usually kicks off syntax
+  checking."
+  (when (eglot-managed-p)
+    (message "Forcing Eglot to send didSave signal.")
+    (message nil)
+    (eglot--signal-textDocument/didSave)))
+(add-hook 'after-revert-hook #'w/force-eglot-didSave)
 ```
 
 
