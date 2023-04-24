@@ -2,7 +2,7 @@
 title = "Game of Life"
 author = ["Will Medrano"]
 date = 2023-04-24
-lastmod = 2023-04-24T08:17:40-07:00
+lastmod = 2023-04-24T08:31:02-07:00
 draft = false
 +++
 
@@ -34,6 +34,24 @@ impl Default for State {
             last_update: Instant::now(),
         }
     }
+}
+```
+
+
+#### Initial Board {#initial-board}
+
+The initial board is currently hardcoded to place life in very particular
+spots. Some of the following items should be implemented instead of this
+hardcoded approach:
+
+-   Start with an empty board and allow the user to place life.
+-   Load the board from a file.
+
+<!--listend-->
+
+```rust
+fn initial_board() -> Board {
+    initial_board_impl()
 }
 ```
 
@@ -75,7 +93,7 @@ passed, then nothing happens.
 ```rust
 fn maybe_update_board(board: &mut Board, last_updated: &mut Instant) {
     let duration_per_update = Duration::from_millis(50);
-    if last_updated.elapsed() <= duration_per_update {
+    if last_updated.elapsed() < duration_per_update {
         return;
     }
     *last_updated = Instant::now();
@@ -189,10 +207,9 @@ impl Board {
         let neighbors = self.count_live_neighbors();
         // Populate cells that survive to the next generation.  These are cells that are currently
         // alive and surround by 2 or 3 neighbors.
-        for (x, y) in self.iter_alive() {
-            let cnt = neighbors.get(&(x, y)).copied().unwrap_or_default();
-            if cnt == 2 || cnt == 3 {
-                ret.add_life(x, y);
+        for pos in self.iter_alive() {
+            if let 2 | 3 = neighbors.get(&pos).copied().unwrap_or_default() {
+                ret.add_life(pos.0, pos.1);
             }
         }
         // Populate cells that are surrounded by exactly 3 neighbors.
