@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-24T08:15:51-07:00
+lastmod = 2023-04-24T09:22:38-07:00
 draft = false
 +++
 
@@ -263,10 +263,7 @@ Enable Evil mode globally to use VIM like modal editing.
 ;; Jumps to definition. If Eglot is active, then the language server is used
 ;; to find the definition.
 (w/define-motion-key (kbd "gd") #'evil-goto-definition)
-;; Similar to VIM search but shows a preview in the minibuffer of several
-;; matches.
-(w/define-motion-key (kbd "/") #'swiper-isearch)
-;; Similar to swiper-isearch but searches all open buffers.
+;; Fuzzy search through all open buffers.
 (w/define-motion-key (kbd "g/") #'swiper-swiper)
 ;; Paste contents into the current cursor. This is used to keep consistency of
 ;; the paste command in terminal and GUI modes. Most terminal emulators paste

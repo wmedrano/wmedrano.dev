@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-24T09:14:59-07:00
+lastmod = 2023-04-24T09:25:56-07:00
 draft = false
 +++
 
@@ -153,8 +153,7 @@ fn test_encode_decode_integer() {
 ```rust
 #[test]
 fn test_encode_decode_string() {
-    let data: Vec<&'static str> =
-        Vec::from_iter(["foo", "foo", "foo", "bar", "baz", "foo"].into_iter());
+    let data: Vec<&'static str> = vec!["foo", "foo", "foo", "bar", "baz", "foo"];
     let encoded_data = encode_column(data.clone(), false);
     assert_eq!(encoded_data.len(), 38);
 
