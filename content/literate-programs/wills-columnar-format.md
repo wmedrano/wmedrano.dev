@@ -2,11 +2,11 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-24T09:25:56-07:00
+lastmod = 2023-04-25T10:11:11-07:00
 draft = false
 +++
 
-## Introduction {#introduction}
+## Introduction {#Introduction-h6a696o03tj0}
 
 **Will's Columnar Format V0**
 
@@ -15,7 +15,7 @@ is primarily implemented for educational purposes. If you are interested in
 using a well supported columnar format, consider using [Apache Parquet](https://parquet.apache.org/).
 
 
-### Conventions {#conventions}
+### Conventions {#IntroductionConventions-gbb696o03tj0}
 
 The following conventions are used:
 
@@ -25,10 +25,13 @@ The following conventions are used:
     level details may be omitted from presentation.
 
 
-### Building and Testing Library {#building-and-testing-library}
+### Building and Testing Library {#IntroductionBuildingandTestingLibrary-r0c696o03tj0}
 
 Will's Columnar Format is programmed in Org mode with Rust code
-blocks. Compiling requires Emacs and Cargo, the Rust package manager.
+blocks. Compiling requires:
+
+1.  Emacs - Text editor and lisp environment.
+2.  Cargo - The Rust package manager.
 
 To generate the Rust source code, run `M-x org-babel-tangle` for
 `wills-columnar-format.org` within Emacs. To automatically tangle the current
@@ -47,10 +50,23 @@ cargo test $FN_TO_TEST
 ```
 
 
-## Features {#features}
+### Dependencies {#IntroductionCargotoml-cqc696o03tj0}
+
+Rust dependencies are automatically fetched with Cargo. This library depends on
+the following crates:
+
+```toml
+# Note: Bincode v2 currently in release candidate. This should be bumped to 2.0
+# once Bincode v2 is released.
+bincode = "2.0.0-rc.3"
+itertools = "0.10"
+```
 
 
-#### V0 Features {#v0-features}
+## Features {#Features-0ed696o03tj0}
+
+
+#### V0 Features {#FeaturesV0Features-81e696o03tj0}
 
 V0 is roughly implemented but still requires graceful error handling, and
 bench-marking.
@@ -62,8 +78,9 @@ Supports:
 -   Run length encoding.
 
 
-#### Tentative V1 Features {#tentative-v1-features}
+#### Tentative V1 Features {#FeaturesTentativeV1Features-ppe696o03tj0}
 
+-   Automatically determine if RLE should be applied.
 -   Dictionary encoding for better string compression.
 -   Compression (like zstd or snappy) for data.
 -   Multiple columns.
@@ -71,20 +88,18 @@ Supports:
 -   Split column data into blocks. Required to implement effective push down filtering.
 
 
-## API {#api}
+## API {#API-6ef696o03tj0}
 
 
-### Encoding {#encoding}
+### Encoding {#APIEncoding-w0g696o03tj0}
 
 `encode_column` encodes a `Vec<T>` into Will's Columnar Format. If `use_rle` is
 true, then run length encoding will be used.
 
-TODO: `use_rle` should have more granular values like `NEVER`, `ALWAYS`, and
-`AUTO`.
-
 ```rust
-pub fn encode_column<T>(data: Vec<T>, use_rle: bool) -> Vec<u8>
+pub fn encode_column<Iter, T>(data: Iter, use_rle: bool) -> Vec<u8>
 where
+    Iter: ExactSizeIterator + Iterator<Item = T>,
     T: 'static + bincode::Encode + Eq,
 {
     encode_column_impl(data, use_rle)
@@ -92,30 +107,44 @@ where
 ```
 
 
-### Decoding {#decoding}
+### Decoding {#APIDecoding-npg696o03tj0}
 
-`decode_column` decodes data from a byte stream into a `Vec<T>`.
-
-TODO: Decoding should return an iterator of `rle::Element<T>` to support efficient
-reads of run-length-encoded data.
+`decode_column` decodes data from a byte stream into an iterator of
+`rle::Element<T>`. See [Run Length Encoding](#DataEncodingRunLengthEncoding-0vm696o03tj0).
 
 ```rust
-pub fn decode_column<T>(r: &mut impl std::io::Read) -> Vec<T>
+pub fn decode_column<T>(r: &'_ mut impl std::io::Read) -> impl '_ + Iterator<Item = rle::Element<T>>
 where
-    T: 'static + Clone + bincode::Decode,
+    T: 'static + bincode::Decode,
 {
     decode_column_impl(r)
 }
 ```
 
 
-### Tests {#tests}
+### Optimization Tips {#OptimizationTips-45i696o03tj0}
+
+
+#### Sorting Data {#OptimizationTipsSortingData-rsi696o03tj0}
+
+If:
+
+-   Order does not matter.
+-   There are lots of repeated values.
+
+If the above are true, try sorting and enabling run length encoding. Run length
+encoding is efficient at storing data that is heavily repeated. By sorting, the
+data will have longer runs of consecutive repeated values. See [Run Length
+Encoding](#DataEncodingRunLengthEncoding-0vm696o03tj0) for technical details.
+
+
+### Tests {#APITests-vfh696o03tj0}
 
 ```rust
 #[test]
-fn test_header_contains_magic_bytes() {
+fn test_encoding_prefixed_by_magic_bytes() {
     let data: Vec<i64> = vec![1, 2, 3, 4];
-    let encoded_data: Vec<u8> = encode_column(data.clone(), false);
+    let encoded_data: Vec<u8> = encode_column(data.into_iter(), false);
     assert_eq!(&encoded_data[0..MAGIC_BYTES_LEN], b"wmedrano0");
 }
 ```
@@ -139,13 +168,58 @@ fn test_encode_decode_several() {
 #[test]
 fn test_encode_decode_integer() {
     let data: Vec<i64> = vec![-1, 10, 10, 10, 11, 12, 12, 10];
-    let encoded_data = encode_column(data.clone(), false);
-    assert_eq!(encoded_data.len(), 22);
+    let encoded_data = encode_column(data.into_iter(), false);
+    assert_eq!(
+        encoded_data.len(),
+        [
+            9, // magic_bytes
+            1, // u8 header:data_type
+            1, // u8 header:use_rle
+            1, // varint header:element_count
+            1, // varint header:data_size
+            8, // data contains 8 elements of varint with size 1.
+        ]
+        .iter()
+        .sum()
+    );
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
-    assert_eq!(
+    assert_equal(
         decode_column::<i64>(&mut encoded_data_cursor),
-        vec![-1, 10, 10, 10, 11, 12, 12, 10]
+        [
+            rle::Element {
+                element: -1,
+                run_length: 1,
+            },
+            rle::Element {
+                element: 10,
+                run_length: 1,
+            },
+            rle::Element {
+                element: 10,
+                run_length: 1,
+            },
+            rle::Element {
+                element: 10,
+                run_length: 1,
+            },
+            rle::Element {
+                element: 11,
+                run_length: 1,
+            },
+            rle::Element {
+                element: 12,
+                run_length: 1,
+            },
+            rle::Element {
+                element: 12,
+                run_length: 1,
+            },
+            rle::Element {
+                element: 10,
+                run_length: 1,
+            },
+        ],
     );
 }
 ```
@@ -154,13 +228,50 @@ fn test_encode_decode_integer() {
 #[test]
 fn test_encode_decode_string() {
     let data: Vec<&'static str> = vec!["foo", "foo", "foo", "bar", "baz", "foo"];
-    let encoded_data = encode_column(data.clone(), false);
-    assert_eq!(encoded_data.len(), 38);
+    let encoded_data = encode_column(data.into_iter(), false);
+    assert_eq!(
+        encoded_data.len(),
+        [
+            9,  // magic_bytes
+            1,  // u8 header:data_type
+            1,  // u8 header:use_rle
+            1,  // varint header:element_count
+            1,  // varint header:data_size
+            24, // data contains 8 elements of varint with size 1.
+        ]
+        .iter()
+        .sum()
+    );
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
-    assert_eq!(
+    assert_equal(
         decode_column::<String>(&mut encoded_data_cursor),
-        vec!["foo", "foo", "foo", "bar", "baz", "foo"]
+        [
+            rle::Element {
+                element: "foo".to_string(),
+                run_length: 1,
+            },
+            rle::Element {
+                element: "foo".to_string(),
+                run_length: 1,
+            },
+            rle::Element {
+                element: "foo".to_string(),
+                run_length: 1,
+            },
+            rle::Element {
+                element: "bar".to_string(),
+                run_length: 1,
+            },
+            rle::Element {
+                element: "baz".to_string(),
+                run_length: 1,
+            },
+            rle::Element {
+                element: "foo".to_string(),
+                run_length: 1,
+            },
+        ],
     );
 }
 ```
@@ -169,52 +280,105 @@ fn test_encode_decode_string() {
 #[test]
 fn test_encode_decode_string_with_rle() {
     let data = ["foo", "foo", "foo", "bar", "baz", "foo"];
-    let encoded_data = encode_column(data.to_vec(), true);
-    assert_eq!(encoded_data.len(), 34);
+    let encoded_data = encode_column(data.into_iter(), true);
+    assert_eq!(
+        encoded_data.len(),
+        [
+            9, // magic_bytes
+            1, // u8 header:data_type
+            1, // u8 header:use_rle
+            1, // varint header:element_count
+            1, // varint header:data_size
+            4, // data:element_1:rle_element string "foo" of encoding size 4.
+            1, // data:element_1:rle_run_length varint of size 1.
+            4, // data:element_2:rle_element string "bar" of encoding size 4.
+            1, // data:element_2:rle_run_length varint of size 1.
+            4, // data:element_3:rle_element string "baz" of encoding size 4.
+            1, // data:element_3:rle_run_length varint of size 1.
+            4, // data:element_3:rle_element string "foo" of encoding size 4.
+            1, // data:element_3:rle_run_length varint of size 1.
+        ]
+        .iter()
+        .sum()
+    );
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
-    assert_eq!(
+    assert_equal(
         decode_column::<String>(&mut encoded_data_cursor),
-        vec!["foo", "foo", "foo", "bar", "baz", "foo"]
+        [
+            rle::Element {
+                element: "foo".to_string(),
+                run_length: 3,
+            },
+            rle::Element {
+                element: "bar".to_string(),
+                run_length: 1,
+            },
+            rle::Element {
+                element: "baz".to_string(),
+                run_length: 1,
+            },
+            rle::Element {
+                element: "foo".to_string(),
+                run_length: 1,
+            },
+        ],
     );
 }
 ```
 
 
-## Optimization Tips {#optimization-tips}
+## Format Specification {#FormatSpecification-zfj696o03tj0}
 
 
-### Sorting Data {#sorting-data}
+### Format Overview {#FormatSpecificationFormatOverview-j3k696o03tj0}
 
-Sorting may be very beneficial if:
+{{< figure src="/ox-hugo/format-overview.png" >}}
 
--   Order is not important.
--   There are lots of repeated values.
+```rust
+fn encode_column_impl<T>(
+    data: impl ExactSizeIterator + Iterator<Item = T>,
+    use_rle: bool,
+) -> Vec<u8>
+where
+    T: 'static + bincode::Encode + Eq,
+{
+    let elements = data.len();
+    let encoded_data = if use_rle {
+        encode_data_rle_impl(data.into_iter())
+    } else {
+        encode_data_base_impl(data.into_iter())
+    };
+    let header = Header {
+        data_type: DataType::from_type::<T>().unwrap(),
+        use_rle,
+        elements,
+        data_size: encoded_data.len(),
+    };
+    encode_header_and_data(MAGIC_BYTES, header, encoded_data)
+}
+```
 
-If the above are true, try sorting and enabling run length encoding. Run length
-encoding is efficient at storing data that is heavily repeated. By sorting, the
-data will have longer runs of consecutive repeated values.
+
+### Magic Bytes {#FormatSpecificationMagicBytes-iyl7tna13tj0}
+
+The magic bytes are 9 bytes long with the contents being "wmedrano0".
+
+```rust
+const MAGIC_BYTES: &[u8; MAGIC_BYTES_LEN] = b"wmedrano0";
+const MAGIC_BYTES_LEN: usize = 9;
+```
 
 
-## Format Specification {#format-specification}
+### Header {#FormatSpecificationHeader-3tk696o03tj0}
 
-
-### Format Overview {#format-overview}
-
--   `magic-bytes` - The magic bytes are 9 bytes long with the contents being "wmedrano0".
--   `header` - The header contains metadata about the column.
--   `data` - The encoded column data.
-
-
-### Header {#header}
-
-The header contains a Bincode V2 encoded struct:
+The header contains a Bincode encoded struct:
 
 ```rust
 #[derive(Encode, Decode, PartialEq, Eq, Copy, Clone, Debug)]
 pub struct Header {
     pub data_type: DataType,
-    pub is_rle: bool,
+    pub use_rle: bool,
     pub elements: usize,
     pub data_size: usize,
 }
@@ -227,38 +391,46 @@ pub enum DataType {
 ```
 
 
-## Data Encoding {#data-encoding}
+## Data Encoding {#DataEncoding-sgl696o03tj0}
 
 
-### Basic Encoding {#basic-encoding}
+### Basic Encoding {#DataEncodingBasicEncoding-e4m696o03tj0}
 
 The data consists of a sequence of encoded data. Encoding happens using the Rust
-[Bincode](https:github.com/bincode-org/bincode) v2 package to encode/decode data of type `&[T]` and `Vec<T>`.
+[Bincode](https:github.com/bincode-org/bincode) package to encode/decode each data element.
 
-Note: Bincode v2 currently in release candidate mode.
+```rust
+fn encode_data_base_impl<T: 'static + bincode::Encode>(data: impl Iterator<Item = T>) -> Vec<u8> {
+    let mut encoded = Vec::new();
+    for element in data {
+        bincode::encode_into_std_write(element, &mut encoded, BINCODE_DATA_CONFIG).unwrap();
+    }
+    encoded
+}
+```
 
 ```rust
 #[test]
 fn test_encoding_size() {
     // Small numbers are encoded efficiently.
-    assert_eq!(bincode_encoded_size(1u8), 1);
-    assert_eq!(bincode_encoded_size(-1i8), 1);
-    assert_eq!(bincode_encoded_size(1u64), 1);
-    assert_eq!(bincode_encoded_size(-1i64), 1);
+    assert_eq!(encoded_size(1u8), 1);
+    assert_eq!(encoded_size(-1i8), 1);
+    assert_eq!(encoded_size(1u64), 1);
+    assert_eq!(encoded_size(-1i64), 1);
 
     // Larger numbers use more bytes with varint encoding. This does not apply
     // to u8 and i8 which do not use varint.
-    assert_eq!(bincode_encoded_size(255u16), 3);
-    assert_eq!(bincode_encoded_size(255u8), 1);
-    assert_eq!(bincode_encoded_size(127i8), 1);
-    assert_eq!(bincode_encoded_size(-128i8), 1);
+    assert_eq!(encoded_size(255u16), 3);
+    assert_eq!(encoded_size(255u8), 1);
+    assert_eq!(encoded_size(127i8), 1);
+    assert_eq!(encoded_size(-128i8), 1);
 
     // Derived types (like Structs and Tuples) take up as much space as their subcomponents.
-    assert_eq!(bincode_encoded_size(1u64), 1);
-    assert_eq!(bincode_encoded_size(25564), 3);
-    assert_eq!(bincode_encoded_size((1u64, 255u64)), 4);
+    assert_eq!(encoded_size(1u64), 1);
+    assert_eq!(encoded_size(25564), 3);
+    assert_eq!(encoded_size((1u64, 255u64)), 4);
     assert_eq!(
-        bincode_encoded_size(rle::Element {
+        encoded_size(rle::Element {
             element: 1u64,
             run_length: 255
         }),
@@ -266,61 +438,87 @@ fn test_encoding_size() {
     );
 
     // Strings take up string_length + 1.
-    assert_eq!(bincode_encoded_size("string"), 7);
-    assert_eq!(bincode_encoded_size(String::from("string")), 7);
-    assert_eq!(bincode_encoded_size((1u8, String::from("string"))), 8);
+    assert_eq!(encoded_size("string"), 7);
+    assert_eq!(encoded_size(String::from("string")), 7);
+    assert_eq!(encoded_size((1u8, String::from("string"))), 8);
 
     // Fixed sized slices take up space for each of its encoded
     // elements. Variable size slices (or slice references) and vectors take
     // up an additional varint integer of overhead for encoding the length.
-    assert_eq!(bincode_encoded_size::<&[u8; 3]>(&[1u8, 2, 3]), 3);
-    assert_eq!(bincode_encoded_size::<[u8; 3]>([1u8, 2, 3]), 3);
-    assert_eq!(bincode_encoded_size::<&[u8]>(&[1u8, 2, 3]), 4);
-    assert_eq!(bincode_encoded_size(vec![1u8, 2, 3]), 4);
+    assert_eq!(encoded_size::<&[u8; 3]>(&[1u8, 2, 3]), 3);
+    assert_eq!(encoded_size::<[u8; 3]>([1u8, 2, 3]), 3);
+    assert_eq!(encoded_size::<&[u8]>(&[1u8, 2, 3]), 4);
+    assert_eq!(encoded_size(vec![1u8, 2, 3]), 4);
 }
 ```
 
 
-### Run Length Encoding {#run-length-encoding}
+### Run Length Encoding {#DataEncodingRunLengthEncoding-0vm696o03tj0}
 
-[Run length encoding](https://en.wikipedia.org/wiki/Run-length_encoding#:~:text=Run%2Dlength%20encoding%20(RLE),than%20as%20the%20original%20run.) is a compression technique for repeated values.
+Run length encoding [[Wikipedia](https://en.wikipedia.org/wiki/Run-length_encoding#:~:text=Run%2Dlength%20encoding%20(RLE),than%20as%20the%20original%20run.)] is a compression technique for repeated values.
 
-For RLE, the data is encoded as a Struct with the run length and the
-element. With Bincode, this is the equivalent (storage wise) of encoding a tuple
-of type `(run_length, element)`.
+TODO: Add visualization.
 
 ```rust
 #[derive(Encode, Decode, Copy, Clone, PartialEq, Debug)]
 pub struct Element<T> {
+    // The underlying element.
+    pub element: T,
     // Run length is stored as a u64. We could try using a smaller datatype,
     // but Bincode uses "variable length encoding" for integers which is
     // efficient for smaller sizes.
     pub run_length: u64,
-    pub element: T,
 }
+```
 
-pub fn encode_data<T: Eq>(data: impl Iterator<Item = T>) -> impl Iterator<Item = Element<T>> {
-    EncodeIter {
-        inner: data.peekable(),
-    }
+To encode an iterator of type `T` with RLE, it is first converted into an
+iterator of type `rle::Element<T>`. It is then used to encode the run length
+encoded vector into bytes.
+
+```rust
+fn encode_data_rle_impl<T: 'static + bincode::Encode + Eq>(
+    data: impl Iterator<Item = T>,
+) -> Vec<u8> {
+    let rle_data /*: impl Iterator<Item=rle::Element<T>>*/ = rle::encode_iter(data);
+    encode_data_base_impl(rle_data)
 }
+```
 
-pub fn decode_data<'a, T: 'static>(
-    iter: impl 'a + Iterator<Item = &'a Element<T>>,
-) -> impl Iterator<Item = &'a T> {
-    iter.flat_map(|rle| {
-        let run_length = rle.run_length as usize;
-        std::iter::repeat(&rle.element).take(run_length)
+```rust
+pub fn encode_iter<I>(iter: I) -> impl Iterator<Item = Element<I::Item>>
+where
+    I: Iterator,
+    I::Item: PartialEq,
+{
+    iter.peekable().batching(|iter| {
+        let element = match iter.next() {
+            Some(e) => e,
+            None => return None,
+        };
+        let mut run_length = 1;
+        while iter.next_if_eq(&element).is_some() {
+            run_length += 1;
+        }
+        Some(Element {
+            element,
+            run_length,
+        })
     })
 }
 ```
 
 
-#### Tests {#tests}
+#### Tests {#DataEncodingRunLengthEncodingTests-xhn696o03tj0}
 
 ```rust
 #[test]
-fn test_encode_data_compacts_repeated_elements() {
+fn test_encode_data_without_elements_produces_no_elements() {
+    let data: Vec<String> = vec![];
+    assert_equal(encode_iter(data.into_iter()), []);
+}
+
+#[test]
+fn test_encode_data_combines_repeated_elements() {
     let data = [
         "repeated-3",
         "repeated-3",
@@ -332,71 +530,32 @@ fn test_encode_data_compacts_repeated_elements() {
         "repeated-3",
         "repeated-3",
     ];
-    assert_eq!(
-        encode_data(data.into_iter()).collect::<Vec<_>>(),
-        vec![
+    assert_equal(
+        encode_iter(data.into_iter()),
+        [
             Element {
                 run_length: 3,
-                element: "repeated-3"
+                element: "repeated-3",
             },
             Element {
                 run_length: 1,
-                element: "no-repeat"
+                element: "no-repeat",
             },
             Element {
                 run_length: 2,
-                element: "repeated-2"
+                element: "repeated-2",
             },
             Element {
                 run_length: 3,
-                element: "repeated-3"
+                element: "repeated-3",
             },
         ],
     );
 }
 ```
 
-```rust
-#[test]
-fn test_decode_repeats_elements_by_run_length() {
-    let data = vec![
-        Element {
-            run_length: 3,
-            element: "repeated-3",
-        },
-        Element {
-            run_length: 1,
-            element: "no-repeat",
-        },
-        Element {
-            run_length: 2,
-            element: "repeated-2",
-        },
-        Element {
-            run_length: 3,
-            element: "repeated-3",
-        },
-    ];
-    let decoded_data: Vec<&str> = decode_data(data.iter()).cloned().collect();
-    assert_eq!(
-        decoded_data,
-        [
-            "repeated-3",
-            "repeated-3",
-            "repeated-3",
-            "no-repeat",
-            "repeated-2",
-            "repeated-2",
-            "repeated-3",
-            "repeated-3",
-            "repeated-3",
-        ]
-    );
-}
-```
 
-
-## Source Code {#source-code}
+## Source Code {#SourceCode-45o696o03tj0}
 
 The source code is stored at
 <https://github.com/wmedrano/wills-columnar-format>. The main source file is

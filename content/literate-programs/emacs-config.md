@@ -2,11 +2,11 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-24T09:22:38-07:00
+lastmod = 2023-04-25T07:53:51-07:00
 draft = false
 +++
 
-## Introduction {#introduction}
+## Introduction {#Introduction-g4g72r913tj0}
 
 This page describes my (will.s.medrano@gmail.com) Emacs configuration. Emacs is
 a highly customizable text editor that can be customized with Emacs Lisp. This
@@ -14,7 +14,7 @@ page is written in Org and is the primary [source code](https://github.com/wmedr
 configuration!
 
 
-### Org Mode {#org-mode}
+### Org Mode {#IntroductionOrgMode-c5h72r913tj0}
 
 My Emacs configuration is written with Emacs Org Mode.
 
@@ -42,13 +42,13 @@ code. However, the main drawback is reduced "IDE" support. Standard code
 documentation and auto-complete packages are broken out of the box.
 
 
-#### Coding Conventions {#coding-conventions}
+#### Coding Conventions {#IntroductionOrgModeCodingConventions-hwh72r913tj0}
 
 All custom functions are prefixed with `w/` since Emacs lisp does not support
 officially support name-spacing.
 
 
-#### Bootstrapping {#bootstrapping}
+#### Bootstrapping {#IntroductionOrgModeBootstrapping-0ni72r913tj0}
 
 To use this configuration, load the source code from the main Emacs config. This
 can be done by creating a file named `~/.emacs.d/init.el` and placing the
@@ -61,7 +61,7 @@ following:
 Following this, dependencies should be (re)installed.
 
 
-#### Dependencies {#dependencies}
+#### Dependencies {#IntroductionOrgModeDependencies-3fj72r913tj0}
 
 `M-x w/install-dependencies` installs all the dependencies.
 
@@ -87,6 +87,7 @@ Following this, dependencies should be (re)installed.
                                   evil-terminal-cursor-changer
                                   flyspell-correct
                                   flyspell-correct-ivy
+                                  graphviz-dot-mode
                                   htmlize
                                   ivy
                                   ivy-emoji
@@ -95,6 +96,7 @@ Following this, dependencies should be (re)installed.
                                   markdown-mode
                                   monokai-pro-theme
                                   nord-theme
+                                  org-unique-id
                                   ox-gfm
                                   ox-hugo
                                   powerline
@@ -103,6 +105,7 @@ Following this, dependencies should be (re)installed.
                                   rust-mode
                                   spacemacs-theme
                                   swiper
+                                  toml-mode
                                   which-key
                                   yaml-mode
                                   ))
@@ -120,10 +123,10 @@ Following this, dependencies should be (re)installed.
 ```
 
 
-## Basics {#basics}
+## Basics {#Basics-g7k72r913tj0}
 
 
-### Theme {#theme}
+### Theme {#BasicsTheme-1tk72r913tj0}
 
 {{< figure src="/ox-hugo/theme.png" >}}
 
@@ -147,12 +150,12 @@ Emacs. See <https://nordtheme.com> for more details.
 ```
 
 
-### Line Numbering {#line-numbering}
+### Line Numbering {#BasicsLineNumbering-efl72r913tj0}
 
 ```emacs-lisp
 ;; Show the line number on the left of the editor with a minimum of 3
 ;; characters.
-(setq display-line-numbers-width 3)
+(setq display-line-numbers-width 4)
 (global-display-line-numbers-mode t)
 (global-hl-line-mode t)
 ;; Display the column number in the modeline.
@@ -163,7 +166,7 @@ Emacs. See <https://nordtheme.com> for more details.
 ```
 
 
-### Mode Line {#mode-line}
+### Mode Line {#BasicsModeLine-i2m72r913tj0}
 
 ```emacs-lisp
 (require 'powerline)
@@ -172,7 +175,7 @@ Emacs. See <https://nordtheme.com> for more details.
 ```
 
 
-#### In Editor Help and Documentation {#in-editor-help-and-documentation}
+#### In Editor Help and Documentation {#BasicsModeLineInEditorHelpandDocumentation-1rm72r913tj0}
 
 Emacs provides plenty of built in help. There are several functions that can be
 activated with `M-x`.
@@ -202,7 +205,7 @@ intrusive as the pop-up only comes up when a small delay is detected.
 ```
 
 
-#### Noise Reduction {#noise-reduction}
+#### Noise Reduction {#BasicsModeLineNoiseReduction-lgn72r913tj0}
 
 This section contains configuration that removes noisy elements from the UI.
 
@@ -245,7 +248,7 @@ This section contains configuration that removes noisy elements from the UI.
 ```
 
 
-### Key Bindings {#key-bindings}
+### Key Bindings {#BasicsKeyBindings-m5o72r913tj0}
 
 The keybindings are based around the [Evil](https://www.emacswiki.org/emacs/Evil) package. Evil is the most popular
 Emacs package that implements VIM key bindings. The key bindings present in this
@@ -253,7 +256,7 @@ section are basic bindings. More specific bindings are littered throughout this
 document.
 
 
-#### Bindings {#bindings}
+#### Bindings {#BasicsKeyBindingsBindings-muo72r913tj0}
 
 Enable Evil mode globally to use VIM like modal editing.
 
@@ -336,7 +339,7 @@ whole word but I prefer to just type `y` or `n`.
 ```
 
 
-#### Mini-Buffer Completions {#mini-buffer-completions}
+#### Mini-Buffer Completions {#BasicsKeyBindingsMiniBufferCompletions-8lp72r913tj0}
 
 By default Emacs does not show completions in the minibuffer unless Tab is
 pressed. And even then, the completions could be improved. Ivy is used for fuzzy
@@ -364,10 +367,10 @@ Unicode values instead, run `M-x all-the-icons-install-fonts`.
 ```
 
 
-## Text and Formatting {#text-and-formatting}
+## Text and Formatting {#TextandFormatting-r9q72r913tj0}
 
 
-### Refreshing {#refreshing}
+### Refreshing {#TextandFormattingRefreshing-4xq72r913tj0}
 
 Files changed on disk are automatically reloaded. Changes are detected every
 second. To manually refresh, call `C-c r`. Technically, this calls
@@ -390,7 +393,7 @@ second. To manually refresh, call `C-c r`. Technically, this calls
 ```
 
 
-### Spell Correction {#spell-correction}
+### Spell Correction {#TextandFormattingSpellCorrection-qlr72r913tj0}
 
 Flyspell is used to assist in spell correction. It assists in both general spell
 correction for text modes (like Markdown and Org) as well as spell correction
@@ -408,7 +411,7 @@ click or with `C-c a`.
 ```
 
 
-### Auto Fill {#auto-fill}
+### Auto Fill {#TextandFormattingAutoFill-mas72r913tj0}
 
 Auto fill mode implements automatic line breaking. That is, lines will
 automatically be formatted to fit within (by default) 80 characters.
@@ -420,7 +423,7 @@ automatically be formatted to fit within (by default) 80 characters.
 ```
 
 
-### Tabs &amp; Spaces {#tabs-and-spaces}
+### Tabs &amp; Spaces {#TextandFormattingTabsSpaces-m0t72r913tj0}
 
 By default, spaces are preferred over tabs. Additionally, pressing the tab key
 does not insert a tab. Instead, it auto-formats the indentation on the current
@@ -434,7 +437,7 @@ line/region.
 ```
 
 
-### Parenthesis and Braces {#parenthesis-and-braces}
+### Parenthesis and Braces {#TextandFormattingParenthesisandBraces-uqt72r913tj0}
 
 Matching end parenthesis and braces are automatically inserted.
 
@@ -443,7 +446,7 @@ Matching end parenthesis and braces are automatically inserted.
 ```
 
 
-### Emojis {#emojis}
+### Emojis {#TextandFormattingEmojis-0fu72r913tj0}
 
 Emoji's can be inserted by running `M-x ivy-emoji` to select an emoji and insert
 it.
@@ -453,10 +456,10 @@ it.
 ```
 
 
-## Advanced {#advanced}
+## Advanced {#Advanced-o1v72r913tj0}
 
 
-### Project Management {#project-management}
+### Project Management {#AdvancedProjectManagement-6pv72r913tj0}
 
 <https://github.com/bbatsov/projectile> is used to manage projects. This involves
 do things within the scope of a project (usually git). Actions include:
@@ -505,7 +508,7 @@ functions.
 ```
 
 
-#### Hugo Projects {#hugo-projects}
+#### Hugo Projects {#AdvancedProjectManagementHugoProjects-sfw72r913tj0}
 
 Hugo is a framework for making static websites out of Markdown. To bring up a
 demo for Hugo, the Hugo command is used. This is the perfect use case for using
@@ -528,7 +531,7 @@ automatically export on save. It must be manually run.
 ```
 
 
-#### Literate Programming {#literate-programming}
+#### Literate Programming {#AdvancedProjectManagementLiterateProgramming-i6x72r913tj0}
 
 ```emacs-lisp
 (defun w/tangle-on-save ()
@@ -538,7 +541,7 @@ automatically export on save. It must be manually run.
 ```
 
 
-### Version Control {#version-control}
+### Version Control {#AdvancedVersionControl-oux72r913tj0}
 
 ```emacs-lisp
 (require 'diff-hl)
@@ -550,10 +553,10 @@ automatically export on save. It must be manually run.
 ```
 
 
-#### <span class="org-todo todo TODO">TODO</span> Git {#git}
+#### <span class="org-todo todo TODO">TODO</span> Git {#AdvancedVersionControlGit-5jy72r913tj0}
 
 
-### Disable File Backups {#disable-file-backups}
+### Disable File Backups {#AdvancedDisableFileBackups-d7z72r913tj0}
 
 Emacs creates backup files by default. This is accomplished by creating a backup
 of file `<file>` as `<file>~`. Although this seems good in theory, it is
@@ -571,7 +574,7 @@ as:
 ```
 
 
-### Eglot {#eglot}
+### Eglot {#AdvancedEglot-1wz72r913tj0}
 
 Code refactoring depends on `eglot`. Eglot is an Emacs package that supports
 interfacing with LSPs. See the
@@ -586,7 +589,7 @@ configurations sections to see if the Major Mode supports Eglot. For example,
 `rust-mode` supports Eglot for enhanced functionality.
 
 
-#### Code Refactoring {#code-refactoring}
+#### Code Refactoring {#AdvancedEglotCodeRefactoring-xk082r913tj0}
 
 ```emacs-lisp
 (require 'eglot)
@@ -595,7 +598,7 @@ configurations sections to see if the Major Mode supports Eglot. For example,
 ```
 
 
-#### Auto-Complete {#auto-complete}
+#### Auto-Complete {#AdvancedEglotAutoComplete-7a182r913tj0}
 
 The [Company](https://company-mode.github.io) Emacs Lisp package is used to handle auto complete. By default,
 Company mode provides a simple completion engine. However, if an Eglot is
@@ -619,7 +622,7 @@ Keybindings when in completion:
 ```
 
 
-#### Syntax Checking {#syntax-checking}
+#### Syntax Checking {#AdvancedEglotSyntaxChecking-80282r913tj0}
 
 Syntax checking is exposed through the flymake package which is bundled with
 Emacs. To get improved syntax checking, Eglot needs to be enabled for the major
@@ -641,7 +644,7 @@ mode.
 ```
 
 
-### Extra Utility Functions {#extra-utility-functions}
+### Extra Utility Functions {#AdvancedExtraUtilityFunctions-op282r913tj0}
 
 ```emacs-lisp
 (setq w/emacs-org-config (expand-file-name "emacs-config.org" user-emacs-directory))
@@ -662,10 +665,10 @@ mode.
 ```
 
 
-## Language Specific Configurations {#language-specific-configurations}
+## Language Specific Configurations {#LanguageSpecificConfigurations-he382r913tj0}
 
 
-### Rust Mode {#rust-mode}
+### Rust Mode {#LanguageSpecificConfigurationsRustMode-93482r913tj0}
 
 Properly supporting requires installing the `rust-analyzer` LSP. Proper support
 enables things like smart auto-complete, compile checking, code refactors, and
@@ -690,17 +693,26 @@ rustup component add rust-analyzer
 ```
 
 
-## Text Specific Configurations {#text-specific-configurations}
+## Text Specific Configurations {#TextSpecificConfigurations-qr482r913tj0}
 
 
-### Markdown Mode {#markdown-mode}
+### Graphviz Dot Mode {#TextSpecificConfigurationsGraphvizDotMode-y1tf32a13tj0}
+
+Support for graphviz dot files. [Graphviz](https://graphviz.org/) is a graph visualization software.
+
+```emacs-lisp
+(require 'graphviz-dot-mode)
+```
+
+
+### Markdown Mode {#TextSpecificConfigurationsMarkdownMode-rg582r913tj0}
 
 ```emacs-lisp
 (require 'markdown-mode)
 ```
 
 
-### Org Mode {#org-mode}
+### Org Mode {#TextSpecificConfigurationsOrgMode-y5682r913tj0}
 
 Org Mode is a mode for general writing, organizing, planning, and literate
 programming.
@@ -715,6 +727,7 @@ programming.
 
 -   Saving the configuration (`"emacs-config.org"`) reloads the Emacs configuration and
     exports the corresponding html file.
+-   Saving any file creates unique IDs for any headers without an ID.
 
 <!--listend-->
 
@@ -727,20 +740,20 @@ programming.
     (message "Emacs config reloaded.")))
 
 (defun w/setup-org-mode ()
-  ;; Saving a file in org mode will export the corresponding HTML file by
-  ;; default.
+  (require 'org-unique-id)
+  (add-hook 'before-save-hook #'org-unique-id 0 t)
   (add-hook 'after-save-hook #'w/org-after-save 0 t))
 (add-hook 'org-mode-hook #'w/setup-org-mode)
 ```
 
 
-#### Useful Keybindings {#useful-keybindings}
+#### Useful Keybindings {#TextSpecificConfigurationsOrgModeUsefulKeybindings-uv682r913tj0}
 
 -   `C-c C-l` - Insert or update a link.
 -   `TAB` on header - Expand or collapse the section.
 
 
-#### Static Site Generation - Hugo {#static-site-generation-hugo}
+#### Static Site Generation - Hugo {#TextSpecificConfigurationsOrgModeStaticSiteGenerationHugo-8m782r913tj0}
 
 Hugo is a static site generator. I use it for my blog at [wmedrano.dev.](https://www.wmedrano.dev) Hugo
 supports Markdown and Org Mode. However, the Org Mode support is not quite
@@ -773,7 +786,7 @@ Markdown for my blog. The workflow for `ox-hugo` and Emacs is:
 ```
 
 
-#### GitHub Markdown {#github-markdown}
+#### GitHub Markdown {#TextSpecificConfigurationsOrgModeGitHubMarkdown-jd882r913tj0}
 
 GitHub markdown is known as GitHub flavored Markdown. The `ox-gfm` package
 provides `M-x org-gfm-export-as-markdown` to export to this specific flavor of
@@ -784,7 +797,7 @@ Markdown.
 ```
 
 
-#### <span class="org-todo todo TODO">TODO</span> Graphviz Support {#graphviz-support}
+#### <span class="org-todo todo TODO">TODO</span> Graphviz Support {#TextSpecificConfigurationsOrgModeGraphvizSupport-g5982r913tj0}
 
 Graphviz is not fully supported yet. The desired behavior is to be able to
 export graphs by adding `dot` source blocks within Org files.
@@ -792,18 +805,20 @@ export graphs by adding `dot` source blocks within Org files.
 ```emacs-lisp
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((dot . t))) ; this line activates dot
+ '((emacs-lisp . t)
+   (python . t)
+   (dot . t)))
 ```
 
 
-### YAML Mode {#yaml-mode}
+### YAML Mode {#TextSpecificConfigurationsYAMLMode-5x982r913tj0}
 
 ```emacs-lisp
 (require 'yaml-mode)
 ```
 
 
-#### <span class="org-todo todo TODO">TODO</span> YAML Language Server {#yaml-language-server}
+#### <span class="org-todo todo TODO">TODO</span> YAML Language Server {#TextSpecificConfigurationsYAMLModeYAMLLanguageServer-3qa82r913tj0}
 
 Warning: I have not gotten the YAML language server to run yet. I have been able
 to install it, but encounter a crash at runtime. The crash has the error
@@ -831,10 +846,10 @@ npm install -g yaml-language-server --prefix ~/.local/npm
 ```
 
 
-## Other Modes {#other-modes}
+## Other Modes {#OtherModes-kgb82r913tj0}
 
 
-### File Explorer - Dired Mode {#file-explorer-dired-mode}
+### File Explorer - Dired Mode {#OtherModesFileExplorerDiredMode-o6c82r913tj0}
 
 `Dired Mode` is used for exploring the file system. It works well enough out of
 the box but needs some tweaks for a better experience with Evil.
@@ -848,6 +863,6 @@ the box but needs some tweaks for a better experience with Evil.
 ```
 
 
-## Source Code {#source-code}
+## Source Code {#SourceCode-1wc82r913tj0}
 
 Source Code: <https://github.com/wmedrano/emacs-config/blob/main/emacs-config.org>
