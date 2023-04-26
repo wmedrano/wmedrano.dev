@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-26T02:13:58-07:00
+lastmod = 2023-04-26T08:54:12-07:00
 draft = false
 +++
 
@@ -52,10 +52,14 @@ The following code snippets may be evaluated with `C-c C-c`.
 ```emacs-lisp
 ;; Execute blocks in this file without asking for confirmation.
 (setq-local org-confirm-babel-evaluate nil)
+```
 
+```emacs-lisp
 ;; Export the org file as a Hugo markdown post.
 (add-hook 'after-save-hook #'org-hugo-export-to-md 0 t)
+```
 
+```emacs-lisp
 ;; Automatically regenerate Rust code after editing this file.
 (add-hook 'after-save-hook #'org-babel-tangle 0 t)
 ```
@@ -79,9 +83,6 @@ itertools = "0.10"
 
 #### V0 Features {#FeaturesV0Features-81e696o03tj0}
 
-V0 is roughly implemented but still requires graceful error handling, and
-bench-marking.
-
 Supports:
 
 -   Only a single column per encode/decode.
@@ -89,14 +90,19 @@ Supports:
 -   Run length encoding.
 
 
-#### Tentative V1 Features {#FeaturesTentativeV1Features-ppe696o03tj0}
+#### V1 Features [WIP] {#FeaturesV1FeaturesWIP]-spd05de05tj0}
 
+-   Benchmarking suite.
+-   Efficient row skipping.
+-   Multiple pages per column, required for efficient row skipping.
+
+
+#### Tentative V2 Features {#FeaturesTentativeV1Features-ppe696o03tj0}
+
+-   Support multiple columns.
 -   Automatically determine if RLE should be applied.
 -   Dictionary encoding for better string compression.
 -   Compression (like zstd or snappy) for data.
--   Multiple columns.
--   Push down filtering.
--   Split column data into blocks. Required to implement effective push down filtering.
 
 
 ## API {#API-6ef696o03tj0}
@@ -108,7 +114,7 @@ Supports:
 true, then run length encoding will be used.
 
 ```rust
-pub fn encode_column<Iter, T>(data: Iter, use_rle: bool) -> Vec<u8>
+pub fn encode_column<Iter, T>(data: Iter, use_rle: bool) -> Result<Vec<u8>>
 where
     Iter: ExactSizeIterator + Iterator<Item = T>,
     T: 'static + bincode::Encode + Eq,
@@ -124,7 +130,9 @@ where
 `rle::Element<T>`. See [Run Length Encoding](#DataEncodingRunLengthEncoding-0vm696o03tj0).
 
 ```rust
-pub fn decode_column<T>(r: &'_ mut impl std::io::Read) -> impl '_ + Iterator<Item = rle::Element<T>>
+pub fn decode_column<T>(
+    r: &'_ mut impl std::io::Read,
+) -> Result<impl '_ + Iterator<Item = Result<rle::Element<T>>>>
 where
     T: 'static + bincode::Decode,
 {
@@ -171,7 +179,7 @@ elements. "rle" is actually strictly worse since it has to encode the value
 #[test]
 fn test_encoding_prefixed_by_magic_bytes() {
     let data: Vec<i64> = vec![1, 2, 3, 4];
-    let encoded_data: Vec<u8> = encode_column(data.into_iter(), false);
+    let encoded_data: Vec<u8> = encode_column(data.into_iter(), false).unwrap();
     assert_eq!(&encoded_data[0..MAGIC_BYTES_LEN], b"wmedrano0");
 }
 ```
@@ -195,7 +203,7 @@ fn test_encode_decode_several() {
 #[test]
 fn test_encode_decode_integer() {
     let data: Vec<i64> = vec![-1, 10, 10, 10, 11, 12, 12, 10];
-    let encoded_data = encode_column(data.into_iter(), false);
+    let encoded_data = encode_column(data.into_iter(), false).unwrap();
     assert_eq!(
         encoded_data.len(),
         [
@@ -212,7 +220,9 @@ fn test_encode_decode_integer() {
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
     assert_equal(
-        decode_column::<i64>(&mut encoded_data_cursor),
+        decode_column::<i64>(&mut encoded_data_cursor)
+            .unwrap()
+            .map(Result::unwrap),
         [
             rle::Element {
                 element: -1,
@@ -255,7 +265,7 @@ fn test_encode_decode_integer() {
 #[test]
 fn test_encode_decode_string() {
     let data: Vec<&'static str> = vec!["foo", "foo", "foo", "bar", "baz", "foo"];
-    let encoded_data = encode_column(data.into_iter(), false);
+    let encoded_data = encode_column(data.into_iter(), false).unwrap();
     assert_eq!(
         encoded_data.len(),
         [
@@ -272,7 +282,9 @@ fn test_encode_decode_string() {
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
     assert_equal(
-        decode_column::<String>(&mut encoded_data_cursor),
+        decode_column::<String>(&mut encoded_data_cursor)
+            .unwrap()
+            .map(Result::unwrap),
         [
             rle::Element {
                 element: "foo".to_string(),
@@ -307,7 +319,7 @@ fn test_encode_decode_string() {
 #[test]
 fn test_encode_decode_string_with_rle() {
     let data = ["foo", "foo", "foo", "bar", "baz", "foo"];
-    let encoded_data = encode_column(data.into_iter(), true);
+    let encoded_data = encode_column(data.into_iter(), true).unwrap();
     assert_eq!(
         encoded_data.len(),
         [
@@ -331,7 +343,9 @@ fn test_encode_decode_string_with_rle() {
 
     let mut encoded_data_cursor = std::io::Cursor::new(encoded_data);
     assert_equal(
-        decode_column::<String>(&mut encoded_data_cursor),
+        decode_column::<String>(&mut encoded_data_cursor)
+            .unwrap()
+            .map(Result::unwrap),
         [
             rle::Element {
                 element: "foo".to_string(),
@@ -366,16 +380,16 @@ fn test_encode_decode_string_with_rle() {
 fn encode_column_impl<T>(
     data: impl ExactSizeIterator + Iterator<Item = T>,
     use_rle: bool,
-) -> Vec<u8>
+) -> Result<Vec<u8>>
 where
     T: 'static + bincode::Encode + Eq,
 {
     let elements = data.len();
     let encoded_data = if use_rle {
         let rle_data /*: impl Iterator<Item=rle::Element<T>>*/ = rle::encode_iter(data);
-        encode_elements_as_bincode(rle_data)
+        encode_elements_as_bincode(rle_data)?
     } else {
-        encode_elements_as_bincode(data)
+        encode_elements_as_bincode(data)?
     };
     let header = Header {
         data_type: DataType::from_type::<T>().unwrap(),
@@ -383,7 +397,7 @@ where
         elements,
         data_size: encoded_data.len(),
     };
-    encode_header_and_data(MAGIC_BYTES, header, encoded_data)
+    Ok(encode_header_and_data(MAGIC_BYTES, header, encoded_data))
 }
 ```
 
@@ -432,26 +446,27 @@ The data consists of a sequence of encoded data. Encoding happens using the Rust
 ```rust
 fn encode_elements_as_bincode<T: 'static + bincode::Encode>(
     data: impl Iterator<Item = T>,
-) -> Vec<u8> {
+) -> Result<Vec<u8>> {
     let mut encoded = Vec::new();
     for element in data {
-        bincode::encode_into_std_write(element, &mut encoded, BINCODE_DATA_CONFIG).unwrap();
+        bincode::encode_into_std_write(element, &mut encoded, BINCODE_DATA_CONFIG)?;
     }
-    encoded
+    Ok(encoded)
 }
 
 fn decode_bincode_as_elements<T: bincode::Decode>(
     elements: usize,
     r: &'_ mut impl Read,
-) -> impl '_ + Iterator<Item = T> {
+) -> impl '_ + Iterator<Item = Result<T>> {
     let mut elements = elements;
-    std::iter::from_fn(move || -> Option<T> {
+    std::iter::from_fn(move || -> Option<Result<T>> {
         if elements == 0 {
             return None;
         }
         elements -= 1;
-        let element: T = bincode::decode_from_std_read(r, BINCODE_DATA_CONFIG).unwrap();
-        Some(element)
+        let element_or_err: Result<T> =
+            bincode::decode_from_std_read(r, BINCODE_DATA_CONFIG).map_err(std::convert::Into::into);
+        Some(element_or_err)
     })
 }
 ```
@@ -530,7 +545,9 @@ iterator of type `rle::Element<T>`. It is then used to encode the run length
 encoded vector into bytes.
 
 ```rust
-pub fn encode_iter<T: 'static + bincode::Encode + Eq>(data: impl Iterator<Item = T>) -> impl Iterator<Item=Element<T>> {
+pub fn encode_iter<T: 'static + bincode::Encode + Eq>(
+    data: impl Iterator<Item = T>,
+) -> impl Iterator<Item = Element<T>> {
     data.peekable().batching(|iter| -> Option<Element<T>> {
         let element = iter.next()?;
         let mut run_length = 1;
@@ -549,17 +566,27 @@ pub fn encode_iter<T: 'static + bincode::Encode + Eq>(data: impl Iterator<Item =
 pub fn decode_rle_data<T: 'static + bincode::Decode>(
     elements: usize,
     r: &'_ mut impl Read,
-) -> impl '_ + Iterator<Item = Element<T>> {
-    let mut elements = elements;
+) -> impl '_ + Iterator<Item = Result<Element<T>>> {
+    let mut elements_left_to_read = elements;
     std::iter::from_fn(move || {
-        if elements == 0 {
+        if elements_left_to_read == 0 {
             return None;
         }
         let rle_element: Element<T> =
-            bincode::decode_from_std_read(r, crate::BINCODE_DATA_CONFIG).unwrap();
-        assert!(rle_element.run_length as usize <= elements,);
-        elements -= rle_element.run_length as usize;
-        Some(rle_element)
+            match bincode::decode_from_std_read(r, crate::BINCODE_DATA_CONFIG) {
+                Ok(e) => e,
+                Err(err) => return Some(Err(err.into())),
+            };
+        if rle_element.run_length as usize > elements_left_to_read {
+            let actual_total = elements - elements_left_to_read + rle_element.run_length as usize;
+            let err = RleDecodeErr::NotEnoughElementsInReader {
+                expected_total: elements,
+                actual_total,
+            };
+            return Some(Err(err.into()));
+        }
+        elements_left_to_read -= rle_element.run_length as usize;
+        Some(Ok(rle_element))
     })
 }
 ```
