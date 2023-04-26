@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-26T01:57:37-07:00
+lastmod = 2023-04-26T02:10:26-07:00
 draft = false
 +++
 
@@ -374,7 +374,8 @@ where
 {
     let elements = data.len();
     let encoded_data = if use_rle {
-        encode_data_rle_impl(data.into_iter())
+        let rle_data /*: impl Iterator<Item=rle::Element<T>>*/ = rle::encode_iter(data);
+        encode_elements_as_bincode(rle_data)
     } else {
         encode_elements_as_bincode(data.into_iter())
     };
@@ -529,15 +530,6 @@ pub struct Element<T> {
 To encode an iterator of type `T` with RLE, it is first converted into an
 iterator of type `rle::Element<T>`. It is then used to encode the run length
 encoded vector into bytes.
-
-```rust
-fn encode_data_rle_impl<T: 'static + bincode::Encode + Eq>(
-    data: impl Iterator<Item = T>,
-) -> Vec<u8> {
-    let rle_data /*: impl Iterator<Item=rle::Element<T>>*/ = rle::encode_iter(data);
-    encode_elements_as_bincode(rle_data)
-}
-```
 
 ```rust
 pub fn encode_iter<T: 'static + bincode::Encode + Eq>(data: impl Iterator<Item = T>) -> impl Iterator<Item=Element<T>> {
