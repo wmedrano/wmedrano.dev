@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-26T02:10:26-07:00
+lastmod = 2023-04-26T02:13:58-07:00
 draft = false
 +++
 
@@ -34,12 +34,7 @@ blocks. Compiling requires:
 2.  Cargo - The Rust package manager.
 
 To generate the Rust source code, run `M-x org-babel-tangle` for
-`wills-columnar-format.org` within Emacs. To automatically tangle the current
-file on save, run:
-
-```emacs-lisp
-(add-hook 'after-save-hook #'org-babel-tangle 0 t)
-```
+`wills-columnar-format.org` within Emacs.
 
 Building and testing relies on Cargo.
 
@@ -60,6 +55,9 @@ The following code snippets may be evaluated with `C-c C-c`.
 
 ;; Export the org file as a Hugo markdown post.
 (add-hook 'after-save-hook #'org-hugo-export-to-md 0 t)
+
+;; Automatically regenerate Rust code after editing this file.
+(add-hook 'after-save-hook #'org-babel-tangle 0 t)
 ```
 
 
@@ -377,7 +375,7 @@ where
         let rle_data /*: impl Iterator<Item=rle::Element<T>>*/ = rle::encode_iter(data);
         encode_elements_as_bincode(rle_data)
     } else {
-        encode_elements_as_bincode(data.into_iter())
+        encode_elements_as_bincode(data)
     };
     let header = Header {
         data_type: DataType::from_type::<T>().unwrap(),
