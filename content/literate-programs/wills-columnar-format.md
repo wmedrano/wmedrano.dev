@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-25T10:11:11-07:00
+lastmod = 2023-04-26T01:29:42-07:00
 draft = false
 +++
 
@@ -47,6 +47,19 @@ Building and testing relies on Cargo.
 cargo build
 cargo test
 cargo test $FN_TO_TEST
+```
+
+
+#### Emacs Utility Blocks {#IntroductionBuildingandTestingLibraryEmacsUtilityBlocks-l6zkn7714tj0}
+
+The following code snippets may be evaluated with `C-c C-c`.
+
+```emacs-lisp
+;; Execute blocks in this file without asking for confirmation.
+(setq-local org-confirm-babel-evaluate nil)
+
+;; Export the org file as a Hugo markdown post.
+(add-hook 'after-save-hook #'org-hugo-export-to-md 0 t)
 ```
 
 
@@ -136,6 +149,22 @@ If the above are true, try sorting and enabling run length encoding. Run length
 encoding is efficient at storing data that is heavily repeated. By sorting, the
 data will have longer runs of consecutive repeated values. See [Run Length
 Encoding](#DataEncodingRunLengthEncoding-0vm696o03tj0) for technical details.
+
+
+#### RLE {#APIOptimizationTipsRLE-0w1ln7714tj0}
+
+Run length encoding is used to compress data that is heavily repeated.
+
+Example with benefits:
+
+{{< figure src="/ox-hugo/rle-good-example.png" >}}
+
+In the worst case when there are no runs, RLE is actually worse. In the example
+below, notice how both "no rle" and "rle" have the same number of
+elements. "rle" is actually strictly worse since it has to encode the value
+**and** the run length.
+
+{{< figure src="/ox-hugo/rle-bad-example.png" >}}
 
 
 ### Tests {#APITests-vfh696o03tj0}
@@ -333,7 +362,7 @@ fn test_encode_decode_string_with_rle() {
 
 ### Format Overview {#FormatSpecificationFormatOverview-j3k696o03tj0}
 
-{{< figure src="/ox-hugo/format-overview.png" >}}
+{{< figure src="/ox-hugo/format-diagram.png" >}}
 
 ```rust
 fn encode_column_impl<T>(
@@ -399,6 +428,8 @@ pub enum DataType {
 The data consists of a sequence of encoded data. Encoding happens using the Rust
 [Bincode](https:github.com/bincode-org/bincode) package to encode/decode each data element.
 
+{{< figure src="/ox-hugo/basic-encoding.png" >}}
+
 ```rust
 fn encode_data_base_impl<T: 'static + bincode::Encode>(data: impl Iterator<Item = T>) -> Vec<u8> {
     let mut encoded = Vec::new();
@@ -408,6 +439,9 @@ fn encode_data_base_impl<T: 'static + bincode::Encode>(data: impl Iterator<Item 
     encoded
 }
 ```
+
+
+#### Tests {#DataEncodingBasicEncodingTests-sfz7wx714tj0}
 
 ```rust
 #[test]
@@ -455,9 +489,13 @@ fn test_encoding_size() {
 
 ### Run Length Encoding {#DataEncodingRunLengthEncoding-0vm696o03tj0}
 
-Run length encoding [[Wikipedia](https://en.wikipedia.org/wiki/Run-length_encoding#:~:text=Run%2Dlength%20encoding%20(RLE),than%20as%20the%20original%20run.)] is a compression technique for repeated values.
+Run length encoding [[Wikipedia](https://en.wikipedia.org/wiki/Run-length_encoding#:~:text=Run%2Dlength%20encoding%20(RLE),than%20as%20the%20original%20run.)] is a compression technique for repeated
+values. For RLE encoding, instead of storing each element, we store a
+tuple. `(element, run_length)` where `element` contains the data and the
+`run_length` stores how many times the value is repeated. To easily determine if
+a column benefits from RLE, try to measure the encoding with and without rle.
 
-TODO: Add visualization.
+{{< figure src="/ox-hugo/rle-encoding.png" >}}
 
 ```rust
 #[derive(Encode, Decode, Copy, Clone, PartialEq, Debug)]
@@ -485,24 +523,35 @@ fn encode_data_rle_impl<T: 'static + bincode::Encode + Eq>(
 ```
 
 ```rust
-pub fn encode_iter<I>(iter: I) -> impl Iterator<Item = Element<I::Item>>
-where
-    I: Iterator,
-    I::Item: PartialEq,
-{
-    iter.peekable().batching(|iter| {
-        let element = match iter.next() {
-            Some(e) => e,
-            None => return None,
-        };
-        let mut run_length = 1;
-        while iter.next_if_eq(&element).is_some() {
-            run_length += 1;
+fn decode_rle_data<T: 'static + bincode::Decode>(
+    elements: usize,
+    r: &'_ mut impl Read,
+) -> impl '_ + Iterator<Item = rle::Element<T>> {
+    let mut elements = elements;
+    std::iter::from_fn(move || {
+        if elements == 0 {
+            return None;
         }
-        Some(Element {
-            element,
-            run_length,
-        })
+        let rle_element: rle::Element<T> =
+            bincode::decode_from_std_read(r, BINCODE_DATA_CONFIG).unwrap();
+        assert!(rle_element.run_length as usize <= elements,);
+        elements -= rle_element.run_length as usize;
+        Some(rle_element)
+    })
+}
+
+fn decode_bincode_data<T: bincode::Decode>(
+    elements: usize,
+    r: &'_ mut impl Read,
+) -> impl '_ + Iterator<Item = T> {
+    let mut elements = elements;
+    std::iter::from_fn(move || -> Option<T> {
+        if elements == 0 {
+            return None;
+        }
+        elements -= 1;
+        let element: T = bincode::decode_from_std_read(r, BINCODE_DATA_CONFIG).unwrap();
+        Some(element)
     })
 }
 ```

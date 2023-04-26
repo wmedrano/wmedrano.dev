@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-25T07:53:51-07:00
+lastmod = 2023-04-25T23:40:47-07:00
 draft = false
 +++
 
@@ -267,7 +267,7 @@ Enable Evil mode globally to use VIM like modal editing.
 ;; to find the definition.
 (w/define-motion-key (kbd "gd") #'evil-goto-definition)
 ;; Fuzzy search through all open buffers.
-(w/define-motion-key (kbd "g/") #'swiper-swiper)
+(w/define-motion-key (kbd "g/") #'swiper)
 ;; Paste contents into the current cursor. This is used to keep consistency of
 ;; the paste command in terminal and GUI modes. Most terminal emulators paste
 ;; the current clipboard text on C-S-v.
@@ -693,26 +693,7 @@ rustup component add rust-analyzer
 ```
 
 
-## Text Specific Configurations {#TextSpecificConfigurations-qr482r913tj0}
-
-
-### Graphviz Dot Mode {#TextSpecificConfigurationsGraphvizDotMode-y1tf32a13tj0}
-
-Support for graphviz dot files. [Graphviz](https://graphviz.org/) is a graph visualization software.
-
-```emacs-lisp
-(require 'graphviz-dot-mode)
-```
-
-
-### Markdown Mode {#TextSpecificConfigurationsMarkdownMode-rg582r913tj0}
-
-```emacs-lisp
-(require 'markdown-mode)
-```
-
-
-### Org Mode {#TextSpecificConfigurationsOrgMode-y5682r913tj0}
+## Org Mode {#TextSpecificConfigurationsOrgMode-y5682r913tj0}
 
 Org Mode is a mode for general writing, organizing, planning, and literate
 programming.
@@ -732,28 +713,72 @@ programming.
 <!--listend-->
 
 ```emacs-lisp
-(defun w/org-after-save ()
+(defun w/org-after-save-emacs-config ()
   (when (w/is-emacs-org-config)
     (org-gfm-export-to-markdown nil)
     (rename-file "emacs-config.md" "README.md" t)
     (w/reload-emacs-config)
-    (message "Emacs config reloaded.")))
+    (message "Emacs config reloaded.")
+    (w/export-to-hugo-on-save)))
 
 (defun w/setup-org-mode ()
   (require 'org-unique-id)
   (add-hook 'before-save-hook #'org-unique-id 0 t)
-  (add-hook 'after-save-hook #'w/org-after-save 0 t))
+  (when (w/is-emacs-org-config)
+    (add-hook 'after-save-hook #'w/org-after-save-emacs-config)))
 (add-hook 'org-mode-hook #'w/setup-org-mode)
 ```
 
 
-#### Useful Keybindings {#TextSpecificConfigurationsOrgModeUsefulKeybindings-uv682r913tj0}
+### Useful Keybindings {#TextSpecificConfigurationsOrgModeUsefulKeybindings-uv682r913tj0}
 
+-   `C-c C-c` - Run the code block at the cursor.
 -   `C-c C-l` - Insert or update a link.
 -   `TAB` on header - Expand or collapse the section.
+-   `Shift + TAB` - Collapse all headers.
 
 
-#### Static Site Generation - Hugo {#TextSpecificConfigurationsOrgModeStaticSiteGenerationHugo-8m782r913tj0}
+### Code Blocks {#OrgModeCodeBlocks-omqb0u114tj0}
+
+Code blocks can be inserted in Org Mode using the `#+begin_src`.
+
+```org
+#+begin_src <language> <header-args...>
+  <source code>
+#+end_src
+```
+
+See [Header Arguments](https://orgmode.org/manual/Using-Header-Arguments.html) documentation. Some popular header args:
+
+-   `:tangle <filename>` - Where to tangle the file. TODO: Explain tangling.
+-   `:results replace|silent` - If the results of code evaluating (C-c C-c) should
+    be shown.
+-   `:exports code|results|none` - If the code block should be exported as a code
+    block, results only, or not at all.
+
+Header arguments may be set file wide. To do this, use `:PROPERTIES:` as the
+first line in the file. Example:
+
+```org
+:PROPERTIES:
+:header-args: :results silent
+:END:
+```
+
+
+#### Executing Code Blocks {#OrgModeCodeBlocksExecutingCodeBlocks-7vvf5e314tj0}
+
+Code blocks can be executed by selecting them with the cursor and running `C-c
+C-c`. This prompts for y-or-n if the code should be evaluated and evaluates the
+code if it is requested. The prompt can also be disabled for the file by setting
+a local variable:
+
+```emacs-lisp
+(setq-local org-confirm-babel-evaluate nil)
+```
+
+
+### Static Site Generation - Hugo {#TextSpecificConfigurationsOrgModeStaticSiteGenerationHugo-8m782r913tj0}
 
 Hugo is a static site generator. I use it for my blog at [wmedrano.dev.](https://www.wmedrano.dev) Hugo
 supports Markdown and Org Mode. However, the Org Mode support is not quite
@@ -778,15 +803,11 @@ Markdown for my blog. The workflow for `ox-hugo` and Emacs is:
  org-hugo-base-dir "~/src/wmedrano.dev"
  ;; Automatically set the "last modified" property.
  org-hugo-auto-set-lastmod t)
-(defun w/setup-hugo-autoexport ()
-  (when (w/is-emacs-org-config)
-    (message (format "Setting up autoexport for %s" buffer-file-name))
-    (w/export-to-hugo-on-save)))
 (add-hook 'org-mode-hook #'w/setup-hugo-autoexport)
 ```
 
 
-#### GitHub Markdown {#TextSpecificConfigurationsOrgModeGitHubMarkdown-jd882r913tj0}
+### GitHub Markdown {#TextSpecificConfigurationsOrgModeGitHubMarkdown-jd882r913tj0}
 
 GitHub markdown is known as GitHub flavored Markdown. The `ox-gfm` package
 provides `M-x org-gfm-export-as-markdown` to export to this specific flavor of
@@ -797,7 +818,7 @@ Markdown.
 ```
 
 
-#### <span class="org-todo todo TODO">TODO</span> Graphviz Support {#TextSpecificConfigurationsOrgModeGraphvizSupport-g5982r913tj0}
+### <span class="org-todo todo TODO">TODO</span> Graphviz Support {#TextSpecificConfigurationsOrgModeGraphvizSupport-g5982r913tj0}
 
 Graphviz is not fully supported yet. The desired behavior is to be able to
 export graphs by adding `dot` source blocks within Org files.
@@ -808,6 +829,25 @@ export graphs by adding `dot` source blocks within Org files.
  '((emacs-lisp . t)
    (python . t)
    (dot . t)))
+```
+
+
+## Text Specific Configurations {#TextSpecificConfigurations-qr482r913tj0}
+
+
+### Graphviz Dot Mode {#TextSpecificConfigurationsGraphvizDotMode-y1tf32a13tj0}
+
+Support for graphviz dot files. [Graphviz](https://graphviz.org/) is a graph visualization software.
+
+```emacs-lisp
+(require 'graphviz-dot-mode)
+```
+
+
+### Markdown Mode {#TextSpecificConfigurationsMarkdownMode-rg582r913tj0}
+
+```emacs-lisp
+(require 'markdown-mode)
 ```
 
 
