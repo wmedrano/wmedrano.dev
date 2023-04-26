@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-26T01:45:16-07:00
+lastmod = 2023-04-26T01:57:37-07:00
 draft = false
 +++
 
@@ -376,7 +376,7 @@ where
     let encoded_data = if use_rle {
         encode_data_rle_impl(data.into_iter())
     } else {
-        encode_data_base_impl(data.into_iter())
+        encode_elements_as_bincode(data.into_iter())
     };
     let header = Header {
         data_type: DataType::from_type::<T>().unwrap(),
@@ -431,7 +431,9 @@ The data consists of a sequence of encoded data. Encoding happens using the Rust
 {{< figure src="/ox-hugo/basic-encoding.png" >}}
 
 ```rust
-fn encode_data_base_impl<T: 'static + bincode::Encode>(data: impl Iterator<Item = T>) -> Vec<u8> {
+fn encode_elements_as_bincode<T: 'static + bincode::Encode>(
+    data: impl Iterator<Item = T>,
+) -> Vec<u8> {
     let mut encoded = Vec::new();
     for element in data {
         bincode::encode_into_std_write(element, &mut encoded, BINCODE_DATA_CONFIG).unwrap();
@@ -439,7 +441,7 @@ fn encode_data_base_impl<T: 'static + bincode::Encode>(data: impl Iterator<Item 
     encoded
 }
 
-fn decode_bincode_data<T: bincode::Decode>(
+fn decode_bincode_as_elements<T: bincode::Decode>(
     elements: usize,
     r: &'_ mut impl Read,
 ) -> impl '_ + Iterator<Item = T> {
@@ -533,22 +535,38 @@ fn encode_data_rle_impl<T: 'static + bincode::Encode + Eq>(
     data: impl Iterator<Item = T>,
 ) -> Vec<u8> {
     let rle_data /*: impl Iterator<Item=rle::Element<T>>*/ = rle::encode_iter(data);
-    encode_data_base_impl(rle_data)
+    encode_elements_as_bincode(rle_data)
 }
 ```
 
 ```rust
-fn decode_rle_data<T: 'static + bincode::Decode>(
+pub fn encode_iter<T: 'static + bincode::Encode + Eq>(data: impl Iterator<Item = T>) -> impl Iterator<Item=Element<T>> {
+    data.peekable().batching(|iter| -> Option<Element<T>> {
+        let element = iter.next()?;
+        let mut run_length = 1;
+        while iter.next_if_eq(&element).is_some() {
+            run_length += 1;
+        }
+        Some(Element {
+            element,
+            run_length,
+        })
+    })
+}
+```
+
+```rust
+pub fn decode_rle_data<T: 'static + bincode::Decode>(
     elements: usize,
     r: &'_ mut impl Read,
-) -> impl '_ + Iterator<Item = rle::Element<T>> {
+) -> impl '_ + Iterator<Item = Element<T>> {
     let mut elements = elements;
     std::iter::from_fn(move || {
         if elements == 0 {
             return None;
         }
-        let rle_element: rle::Element<T> =
-            bincode::decode_from_std_read(r, BINCODE_DATA_CONFIG).unwrap();
+        let rle_element: Element<T> =
+            bincode::decode_from_std_read(r, crate::BINCODE_DATA_CONFIG).unwrap();
         assert!(rle_element.run_length as usize <= elements,);
         elements -= rle_element.run_length as usize;
         Some(rle_element)
