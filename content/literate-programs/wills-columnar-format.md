@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-26T01:29:42-07:00
+lastmod = 2023-04-26T01:45:16-07:00
 draft = false
 +++
 
@@ -438,6 +438,21 @@ fn encode_data_base_impl<T: 'static + bincode::Encode>(data: impl Iterator<Item 
     }
     encoded
 }
+
+fn decode_bincode_data<T: bincode::Decode>(
+    elements: usize,
+    r: &'_ mut impl Read,
+) -> impl '_ + Iterator<Item = T> {
+    let mut elements = elements;
+    std::iter::from_fn(move || -> Option<T> {
+        if elements == 0 {
+            return None;
+        }
+        elements -= 1;
+        let element: T = bincode::decode_from_std_read(r, BINCODE_DATA_CONFIG).unwrap();
+        Some(element)
+    })
+}
 ```
 
 
@@ -537,21 +552,6 @@ fn decode_rle_data<T: 'static + bincode::Decode>(
         assert!(rle_element.run_length as usize <= elements,);
         elements -= rle_element.run_length as usize;
         Some(rle_element)
-    })
-}
-
-fn decode_bincode_data<T: bincode::Decode>(
-    elements: usize,
-    r: &'_ mut impl Read,
-) -> impl '_ + Iterator<Item = T> {
-    let mut elements = elements;
-    std::iter::from_fn(move || -> Option<T> {
-        if elements == 0 {
-            return None;
-        }
-        elements -= 1;
-        let element: T = bincode::decode_from_std_read(r, BINCODE_DATA_CONFIG).unwrap();
-        Some(element)
     })
 }
 ```
