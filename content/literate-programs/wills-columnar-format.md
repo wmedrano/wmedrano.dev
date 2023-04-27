@@ -2,13 +2,11 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-26T23:41:51-07:00
+lastmod = 2023-04-26T23:57:52-07:00
 draft = false
 +++
 
 ## Introduction {#Introduction-h6a696o03tj0}
-
-\#+toc
 
 **Will's Columnar Format V0**
 
@@ -147,19 +145,6 @@ where
 ### Optimization Tips {#OptimizationTips-45i696o03tj0}
 
 
-#### Sorting Data {#OptimizationTipsSortingData-rsi696o03tj0}
-
-If:
-
--   Order does not matter.
--   There are lots of repeated values.
-
-If the above are true, try sorting and enabling run length encoding. Run length
-encoding is efficient at storing data that is heavily repeated. By sorting, the
-data will have longer runs of consecutive repeated values. See [Run Length
-Encoding](#DataEncodingRunLengthEncoding-0vm696o03tj0) for technical details.
-
-
 #### RLE {#APIOptimizationTipsRLE-0w1ln7714tj0}
 
 Run length encoding is used to compress data that is heavily repeated. If data
@@ -175,6 +160,17 @@ elements. run length encoding is actually strictly worse since it has to encode
 the value **and** the run length.
 
 {{< figure src="/ox-hugo/rle-bad-example.png" >}}
+
+
+#### Sorting Data {#OptimizationTipsSortingData-rsi696o03tj0}
+
+-   Order does not matter.
+-   There are lots of repeated values.
+
+If the above are true, try sorting and enabling run length encoding. Run length
+encoding is efficient at storing data that is heavily repeated. By sorting, the
+data will have longer runs of consecutive repeated values. See [Run Length
+Encoding](#DataEncodingRunLengthEncoding-0vm696o03tj0) for technical details.
 
 
 ### Tests {#APITests-vfh696o03tj0}
