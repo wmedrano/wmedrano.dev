@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-25T23:40:47-07:00
+lastmod = 2023-04-26T22:07:14-07:00
 draft = false
 +++
 
@@ -134,11 +134,10 @@ The Nord theme is a clean theme that is available in many places, including
 Emacs. See <https://nordtheme.com> for more details.
 
 ```emacs-lisp
-(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
 (when (display-graphic-p)
   (require 'monokai-pro-theme)
   (load-theme 'monokai-pro-octagon t)
-  (set-frame-parameter (selected-frame) 'alpha '(95 . 95))
+  (set-frame-parameter (selected-frame) 'alpha '(98 . 98))
   (set-frame-font "Fira Code 12"))
 (unless (display-graphic-p)
   (require 'nord-theme)
@@ -803,7 +802,6 @@ Markdown for my blog. The workflow for `ox-hugo` and Emacs is:
  org-hugo-base-dir "~/src/wmedrano.dev"
  ;; Automatically set the "last modified" property.
  org-hugo-auto-set-lastmod t)
-(add-hook 'org-mode-hook #'w/setup-hugo-autoexport)
 ```
 
 
