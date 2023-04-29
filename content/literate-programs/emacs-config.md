@@ -2,9 +2,12 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-26T22:07:14-07:00
+lastmod = 2023-04-29T12:43:57-07:00
 draft = false
 +++
+
+{{< figure src="/ox-hugo/gnu.png" >}}
+
 
 ## Introduction {#Introduction-g4g72r913tj0}
 
@@ -30,10 +33,10 @@ and more --- in a fast and effective plain text system.<br />
 
 The primary data flows are:
 
--   config.org &rarr; config.html for displaying in a website.
--   config.org &rarr; config.el for use with Emacs. This is done by running
-    Emacs Lisp function `org-babel-load-file`. This automatically runs all the
-    `emacs-lisp` code blocks within `config.org`.
+-   emacs-config.org &rarr; emacs-config.html for displaying in a website.
+-   emacs-config.org &rarr; init.el for use with Emacs. This is done by running
+    Emacs Lisp function `org-babel-tangle` with `emacs-config` in the `~.emacs.d`
+    directory. This exports the code blocks to file.
 
 Using Org Mode to write an Emacs configuration is a form of Literate
 Programming. Literate Programming is a paradigm that combines the code and
@@ -50,9 +53,9 @@ officially support name-spacing.
 
 #### Bootstrapping {#IntroductionOrgModeBootstrapping-0ni72r913tj0}
 
-To use this configuration, load the source code from the main Emacs config. This
-can be done by creating a file named `~/.emacs.d/init.el` and placing the
-following:
+To use this configuration, load the source code from the main Emacs config and
+run `M-x org-babel-tangle`. This will generate `init.el` which can be placed in
+`~/.emacs.d/`.
 
 ```emacs-lisp-code
 (org-babel-load-file (expand-file-name "emacs-config.org" user-emacs-directory))
@@ -63,16 +66,13 @@ Following this, dependencies should be (re)installed.
 
 #### Dependencies {#IntroductionOrgModeDependencies-3fj72r913tj0}
 
-`M-x w/install-dependencies` installs all the dependencies.
+Several packages are installed from [Melpa](https://melpa.org/#/). Check out the website for any recent
+package updates or
 
 ```emacs-lisp
 (require 'package)
 ;; Taken from https://melpa.org/#/getting-started
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;; This is required to obtain the htmlize package. htmlize is used to improve
-;; the output of Org Mode to html.
-(add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/")
-             t)
 (setq package-selected-packages '(
                                   ace-window
                                   all-the-icons-ivy-rich
@@ -81,9 +81,12 @@ Following this, dependencies should be (re)installed.
                                   counsel-projectile
                                   diff-hl
                                   diminish
+                                  dracula-theme
+                                  doom-modeline
                                   eglot
                                   evil
                                   evil-commentary
+                                  evil-surround
                                   evil-terminal-cursor-changer
                                   flyspell-correct
                                   flyspell-correct-ivy
@@ -94,23 +97,25 @@ Following this, dependencies should be (re)installed.
                                   ivy-rich
                                   magit
                                   markdown-mode
-                                  monokai-pro-theme
                                   nord-theme
+                                  org-sidebar
                                   org-unique-id
                                   ox-gfm
                                   ox-hugo
-                                  powerline
-                                  powerline-evil
                                   projectile
                                   rust-mode
-                                  spacemacs-theme
                                   swiper
                                   toml-mode
                                   which-key
                                   yaml-mode
                                   ))
 (package-initialize)
+```
 
+`M-x w/install-dependencies` installs all the dependencies and prunes any that
+are no longer needed.
+
+```emacs-lisp
 (defun w/install-dependencies ()
   "Install all dependencies and remove any unused dependencies. If you wish to
   only install new dependencies and not refresh the index and clean up old
@@ -128,24 +133,17 @@ Following this, dependencies should be (re)installed.
 
 ### Theme {#BasicsTheme-1tk72r913tj0}
 
-{{< figure src="/ox-hugo/theme.png" >}}
-
-The Nord theme is a clean theme that is available in many places, including
-Emacs. See <https://nordtheme.com> for more details.
-
 ```emacs-lisp
+(require 'dracula-theme)
+(custom-set-variables
+ '(custom-safe-themes
+   ;; Enable loading the Dracula theme without a prompt.
+   '("f681100b27d783fefc3b62f44f84eb7fa0ce73ec183ebea5903df506eb314077" default)))
+(custom-set-faces)
+(load-theme 'dracula)
+(set-frame-font "Fira Code 12")
 (when (display-graphic-p)
-  (require 'monokai-pro-theme)
-  (load-theme 'monokai-pro-octagon t)
-  (set-frame-parameter (selected-frame) 'alpha '(98 . 98))
-  (set-frame-font "Fira Code 12"))
-(unless (display-graphic-p)
-  (require 'nord-theme)
-  (load-theme 'nord t)
-  ;; Allow the terminal's default background to shine through. This is
-  ;; required in order for Nord theme to not override the terminal's
-  ;; transparency settings.
-  (set-face-attribute 'default nil :background "unspecified-bg"))
+  (set-frame-parameter (selected-frame) 'alpha '(97 . 97)))
 ```
 
 
@@ -153,11 +151,13 @@ Emacs. See <https://nordtheme.com> for more details.
 
 ```emacs-lisp
 ;; Show the line number on the left of the editor with a minimum of 3
-;; characters.
-(setq display-line-numbers-width 4)
+;; characters. The default minimum is too low
+(setq display-line-numbers-grow-only t)
 (global-display-line-numbers-mode t)
 (global-hl-line-mode t)
-;; Display the column number in the modeline.
+;; Display the column number in the modeline. Admittedly, the number appears all
+;; the way to the right in the modeline. This means that it is not visible for
+;; smaller windows.
 (column-number-mode t)
 (unless (display-graphic-p)
   (require 'evil-terminal-cursor-changer)
@@ -167,10 +167,21 @@ Emacs. See <https://nordtheme.com> for more details.
 
 ### Mode Line {#BasicsModeLine-i2m72r913tj0}
 
+[Doom Modeline](https://github.com/seagle0128/doom-modeline#customize) is used to create a pretty modeline. See the [documentation for
+more options.](https://github.com/seagle0128/doom-modeline#customize)
+
 ```emacs-lisp
-(require 'powerline)
-(require 'powerline-evil)
-(powerline-evil-vim-color-theme)
+(require 'doom-modeline)
+(doom-modeline-mode t)
+(setq
+ ;; Make the modeline as small as possible. This usually shrinks it down to be
+ ;; slightly larger than the font size.
+ doom-modeline-height 0
+ ;; Don't show the word count. This is the default since it may cause
+ ;; slowness.
+ doom-modeline-enable-word-count nil
+ doom-modeline-battery t
+ )
 ```
 
 
@@ -180,22 +191,18 @@ Emacs provides plenty of built in help. There are several functions that can be
 activated with `M-x`.
 
 -   `describe-variable` - Open the documentation and source code for an Emacs Lisp
-    variable.
+    variable. Also accessible with `C-h v`.
 -   `describe-function` - Open the documentation and source code for an Emacs Lisp
-    function.
+    function. Also accessible with `C-h f`.
 -   `describe-key` - After running, the next key map action will be recorded. This
     will then open the documentation for the function that runs when that key is
     pressed. For example, in the default normal state of Evil, pressing
-    `describe-key` followed by `j` opens the documentation for `evil-next-line`.
+    `describe-key` followed by `j` opens the documentation for
+    `evil-next-line`. Also accessible with `C-h k`.
 
 `which-key-mode` is used to print out the available keys in scenarios where keys
-are changed. For example, in normal mode, the "g" key is used as a prefix for
-several commands like "gd" (go to definition) and "gg" (go to top of
-file). Enabling which-key-mode will show a small popup with the available
-actions if the prefix "g" is pressed. This is very convinient and is not
-intrusive as the pop-up only comes up when a small delay is detected.
-
-{{< figure src="/ox-hugo/which-key.png" >}}
+are changed. For example, when pressing `C-h`, a small popup with help
+information will show after a small delay.
 
 ```emacs-lisp
 (require 'which-key)
@@ -227,10 +234,10 @@ This section contains configuration that removes noisy elements from the UI.
   (diminish 'evil-commentary-mode "")
   (diminish 'ivy-mode "")
   (diminish 'which-key-mode ""))
-(add-hook 'emacs-startup-hook #'w/diminish-noisy-modes)
+;; (add-hook 'emacs-startup-hook #'w/diminish-noisy-modes)
 ;; Diminish needs to run after startup, but we also run it here in case the
 ;; list has been updated and reload config has been requested.
-(w/diminish-noisy-modes)
+;; (w/diminish-noisy-modes)
 ```
 
 ```emacs-lisp
@@ -310,6 +317,10 @@ for the entire line.
 (evil-commentary-mode t)
 ```
 
+```emacs-lisp
+(global-evil-surround-mode t)
+```
+
 To navigate windows, `gw` is used to bring up an interactive menu that supports
 the following commands:
 
@@ -319,6 +330,8 @@ the following commands:
 -   `x <number>` - Close the window.
 -   `v <number>` - Split the window vertically.
 -   `b <number>` - Split the window horizontally.
+-   `F <number>` - Split the window either vertically or horizontally, whichever
+    is more fair.
 -   `o <number>` - Maximize the selected window.
 -   `?` - Show help menu. This reveals tons of other prefix keys.
 
@@ -327,7 +340,10 @@ the following commands:
 ```emacs-lisp
 ;; Always show the dispatch menu even if there are only 2 options.
 (setq aw-dispatch-always t)
+(global-set-key (kbd "C-w") #'ace-window)
 (w/define-motion-key (kbd "gw") #'ace-window)
+;; Required to override Evil's window switching functionality.
+(w/define-motion-key (kbd "C-w") #'ace-window)
 ```
 
 Emacs has a habit of asking `yes` or `no` questions. This requires entering the
@@ -345,7 +361,7 @@ pressed. And even then, the completions could be improved. Ivy is used for fuzzy
 minibuffer completions. Counsel is also used to wrap common built in Emacs
 methods to use Ivy minibuffer completion. See <https://github.com/abo-abo/swiper>.
 
-{{< figure src="/ox-hugo/minibuffer.png" >}}
+{{< figure src="./screenshots/minibuffer.png" >}}
 
 ```emacs-lisp
 (require 'ivy)
@@ -363,6 +379,13 @@ Unicode values instead, run `M-x all-the-icons-install-fonts`.
 (require 'all-the-icons-ivy-rich)
 (ivy-rich-mode t)
 (all-the-icons-ivy-rich-mode t)
+```
+
+
+#### Terminal Mouse Support {#BasicsKeyBindingsTerminalMouseSupport-5hygwil09tj0}
+
+```emacs-lisp
+(xterm-mouse-mode t)
 ```
 
 
@@ -389,6 +412,7 @@ second. To manually refresh, call `C-c r`. Technically, this calls
 ;; modern a modern SSD or NVMe drive.
 (setq auto-revert-interval 1)
 (global-set-key (kbd "C-c r") #'revert-buffer-quick)
+(w/define-motion-key (kbd "gr") #'revert-buffer-quick)
 ```
 
 
@@ -516,28 +540,12 @@ run or else it will prompt the user every time. We allow list running Hugo
 projects to reduce the friction.
 
 ```emacs-lisp
-(add-to-list 'safe-local-variable-values '(projectile-project-run-cmd . "hugo server --buildDrafts"))
+(add-to-list 'safe-local-variable-values
+             '(projectile-project-run-cmd . "hugo server --buildDrafts"))
 ```
 
-It's also useful to export on save. `w/export-to-hugo-on-save` can be used to
-automatically export on save. It must be manually run.
-
-```emacs-lisp
-(defun w/export-to-hugo-on-save ()
-  "Export to Hugo on save."
-  (interactive)
-  (add-hook 'after-save-hook #'org-hugo-export-to-md 0 t))
-```
-
-
-#### Literate Programming {#AdvancedProjectManagementLiterateProgramming-i6x72r913tj0}
-
-```emacs-lisp
-(defun w/tangle-on-save ()
-  "Run tangle command on save."
-  (interactive)
-  (add-hook 'after-save-hook #'org-babel-tangle 0 t))
-```
+It's also useful to export on save. `org-hugo-auto-export-mode` can be enabled
+for this.
 
 
 ### Version Control {#AdvancedVersionControl-oux72r913tj0}
@@ -652,7 +660,6 @@ mode.
   (interactive)
   (load-file (expand-file-name "init.el" user-emacs-directory))
   (message "Emacs config reloaded."))
-
 (defun w/open-emacs-config ()
   "Open the Emacs configuration."
   (interactive)
@@ -714,11 +721,8 @@ programming.
 ```emacs-lisp
 (defun w/org-after-save-emacs-config ()
   (when (w/is-emacs-org-config)
-    (org-gfm-export-to-markdown nil)
-    (rename-file "emacs-config.md" "README.md" t)
     (w/reload-emacs-config)
-    (message "Emacs config reloaded.")
-    (w/export-to-hugo-on-save)))
+    (message "Emacs config reloaded.")))
 
 (defun w/setup-org-mode ()
   (require 'org-unique-id)
@@ -735,6 +739,15 @@ programming.
 -   `C-c C-l` - Insert or update a link.
 -   `TAB` on header - Expand or collapse the section.
 -   `Shift + TAB` - Collapse all headers.
+-   Evil normal state + `gl` - Open the Org reference This works in all modes, not
+    just Org mode. Org references look like:
+    `[[file:emacs-config.org::#something][Something:1]]`
+
+<!--listend-->
+
+```emacs-lisp
+(w/define-motion-key (kbd "gl") #'org-open-at-point-global)
+```
 
 
 ### Code Blocks {#OrgModeCodeBlocks-omqb0u114tj0}
@@ -749,11 +762,14 @@ Code blocks can be inserted in Org Mode using the `#+begin_src`.
 
 See [Header Arguments](https://orgmode.org/manual/Using-Header-Arguments.html) documentation. Some popular header args:
 
--   `:tangle <filename>` - Where to tangle the file. TODO: Explain tangling.
+-   `:tangle <filename>` - Where to tangle the file.
+-   `:comments link` - If tangled source code should include references to the Org
+    document. This allows detangling the code to incorporate it back into the org
+    document.
 -   `:results replace|silent` - If the results of code evaluating (C-c C-c) should
     be shown.
 -   `:exports code|results|none` - If the code block should be exported as a code
-    block, results only, or not at all.
+    block, the results only, or not at all.
 
 Header arguments may be set file wide. To do this, use `:PROPERTIES:` as the
 first line in the file. Example:
@@ -774,6 +790,53 @@ a local variable:
 
 ```emacs-lisp
 (setq-local org-confirm-babel-evaluate nil)
+```
+
+
+#### Tangling {#OrgModeCodeBlocksTangling-9rog60i09tj0}
+
+Tangling takes the Org document and writes any blocks with `:tangle <filename>`
+to their file. The inverse of this is detangling. Detangling in a tangled source
+file updates the Org document contents according to the source code. Note that
+detangling requires that the `:comments link` property is set and that all the
+code in the source file is surrounded by valid Org links.
+
+-   `org-babel-tangle` - Tangle the current Org document.
+-   `org-babel-detangle` - Detangle the current source code.
+
+<!--listend-->
+
+```emacs-lisp
+(require 'ob-tangle)
+(defun org-babel-detangle-keep-window ()
+  "Detangles the current source file while staying on the current window. This
+  is as opposed to the default behavior of detangling and opening the tangled
+  file."
+  (interactive)
+  (let* ((keep-window (selected-window))
+         (keep-buffer (window-buffer keep-window)))
+    (org-babel-detangle)
+    (set-window-buffer keep-window keep-buffer)
+    (select-window keep-window)))
+(org-babel-detangle-keep-window)
+```
+
+```emacs-lisp
+(define-minor-mode org-babel-auto-tangle-mode
+  "Toggle auto tangling on save."
+  :global nil
+  :lighter "autotangle"
+  (if org-babel-auto-tangle-mode
+      (add-hook 'after-save-hook #'org-babel-tangle :append :local)
+    (remove-hook 'after-save-hook #'org-babel-tangle :local)))
+
+(define-minor-mode org-babel-auto-detangle-mode
+  "Toggle auto detangling on save."
+  :global nil
+  :lighter "autodetangle"
+  (if org-babel-auto-detangle-mode
+      (add-hook 'after-save-hook #'org-babel-detangle-keep-window :append :local)
+    (remove-hook 'after-save-hook #'org-babel-detangle-keep-window :local)))
 ```
 
 
