@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-30T13:27:50-07:00
+lastmod = 2023-04-30T14:58:42-07:00
 draft = false
 +++
 
@@ -177,16 +177,6 @@ Encoding](#DataEncodingRunLengthEncoding-0vm696o03tj0) for technical details.
 
 ```rust
 #[test]
-fn test_encoding_prefixed_by_magic_bytes() {
-    let data: Vec<i64> = vec![1, 2, 3, 4];
-    let mut encoded_data = Vec::new();
-    encode_column(data.into_iter(), &mut encoded_data, false).unwrap();
-    assert_eq!(&encoded_data[0..MAGIC_BYTES_LEN], b"wmedrano0");
-}
-```
-
-```rust
-#[test]
 fn test_encode_decode_several() {
     test_can_encode_and_decode_for_type::<i8>([-1, -1]);
     test_can_encode_and_decode_for_type::<u8>([1, 2]);
@@ -209,10 +199,9 @@ fn test_encode_decode_integer() {
     assert_eq!(
         encoded_data.len(),
         [
-            9, // magic_bytes
-            1, // u8 header:data_type
-            1, // u8 header:use_rle
             8, // data contains 8 values of varint with size 1.
+            1, // u8 footer:data_type
+            1, // u8 footer:use_rle
             1, // varint footer:pages_count
             1, // varint footer:page1:file_offset
             1, // varint footer:page1:values_count
@@ -275,10 +264,9 @@ fn test_encode_decode_string() {
     assert_eq!(
         encoded_data.len(),
         [
-            9,  // magic_bytes
-            1,  // u8 header:data_type
-            1,  // u8 header:use_rle
             24, // data contains 6 values of varint with size 4.
+            1,  // u8 footer:data_type
+            1,  // u8 footer:use_rle
             1,  // varint footer:pages_count
             1,  // varint footer:page1:file_offset
             1,  // varint footer:page1:values_count
@@ -333,9 +321,6 @@ fn test_encode_decode_string_with_rle() {
     assert_eq!(
         encoded_data.len(),
         [
-            9, // magic_bytes
-            1, // u8 header:data_type
-            1, // u8 header:use_rle
             4, // page1:element1:rle_element string "foo" of encoding size 4.
             1, // page1:element1:rle_run_length varint of size 1.
             4, // page1:element2:rle_element string "bar" of encoding size 4.
@@ -344,6 +329,8 @@ fn test_encode_decode_string_with_rle() {
             1, // page1:element3:rle_run_length varint of size 1.
             4, // page1:element3:rle_element string "foo" of encoding size 4.
             1, // page1:element3:rle_run_length varint of size 1.
+            1, // u8 footer:data_type
+            1, // u8 footer:use_rle
             1, // varint footer:pages_count
             1, // varint footer:page1:file_offset
             1, // varint footer:page1:values_count
@@ -404,28 +391,35 @@ where
     T: 'static + bincode::Encode + Eq,
 {
     let values = values_iter.len();
-    let mut file_offset = w.write(MAGIC_BYTES)?;
-    file_offset += bincode::encode_into_std_write(
-        Header {
-            data_type: DataType::from_type::<T>().unwrap(),
-            use_rle,
-        },
-        w,
-        BINCODE_DATA_CONFIG,
-    )?;
+    // TODO: Return an error.
+    let data_type = DataType::from_type::<T>().unwrap();
     // TODO: Use multiple pages instead of writing to a single page.
-    let encoding = if use_rle {
-        let rle_data /*: impl Iterator<Item=rle::Values<T>>*/ = rle::encode_iter(values_iter);
-        encode_values_as_bincode(rle_data)?
-    } else {
-        encode_values_as_bincode(values_iter)?
-    };
-    file_offset += w.write(encoding.encoded_values.as_slice())?;
-    let page_offset = file_offset;
+    let mut file_offset = 0;
+    let pages = std::iter::from_fn(|| {
+        let encoding = if use_rle {
+            let rle_data /*: impl Iterator<Item=rle::Values<T>>*/ = rle::encode_iter(values_iter);
+            encode_values_as_bincode(rle_data, 2048)?
+        } else {
+            encode_values_as_bincode(values_iter, 2048)?
+        };
+        if encoding.encoded_values.is_empty() {
+            return None;
+        }
+        let page_offset = file_offset;
+        file_offset += encoding.encoded_values.len();
+        Some(PageInfo {
+            file_offset: page_offset as i64,
+            values_count: encoding.values_count,
+            encoded_values_count: encoding.encoded_values_count,
+        })
+    });
+    w.write(encoding.encoded_values.as_slice())?;
     let footer_size = bincode::encode_into_std_write(
         Footer {
+            data_type,
+            use_rle,
             pages: vec![PageInfo {
-                file_offset: page_offset as i64,
+                file_offset: 0,
                 values_count: values,
                 encoded_values_count: encoding.values_count,
             }],
@@ -435,39 +429,6 @@ where
     )? as u64;
     w.write(&footer_size.to_le_bytes())?;
     Ok(())
-}
-```
-
-
-### Magic Bytes {#FormatSpecificationMagicBytes-iyl7tna13tj0}
-
-The magic bytes are 9 bytes long with the contents being "wmedrano0".
-
-{{< figure src="/ox-hugo/wills-columnar-format/format-diagram-magicbytes.png" >}}
-
-```rust
-const MAGIC_BYTES: &[u8; MAGIC_BYTES_LEN] = b"wmedrano0";
-const MAGIC_BYTES_LEN: usize = 9;
-```
-
-
-### File Header {#FormatSpecificationHeader-3tk696o03tj0}
-
-The header contains a Bincode encoded struct.
-
-{{< figure src="/ox-hugo/wills-columnar-format/format-diagram-header.png" >}}
-
-```rust
-#[derive(Encode, Decode, PartialEq, Eq, Copy, Clone, Debug)]
-pub struct Header {
-    pub data_type: DataType,
-    pub use_rle: bool,
-}
-
-#[derive(Encode, Decode, PartialEq, Eq, Copy, Clone, Debug)]
-pub enum DataType {
-    Integer = 0,
-    String = 1,
 }
 ```
 
@@ -482,7 +443,9 @@ Bincode. The number of elements within the page are stored in the footer.
 
 ### File Footer {#FormatSpecificationFileFooter-nn404df05tj0}
 
-The footer contains information about the pages. The details for pages are:
+The footer contains information about the columns like the data type, if run
+length encoding is enabled and information for each page. The details for pages
+are:
 
 -   **file_offset** - Where the page starts relative to position 0 in the file.
 -   **values_count** - The number of values stored within the page. This is the
@@ -498,7 +461,15 @@ The footer contains information about the pages. The details for pages are:
 ```rust
 #[derive(Encode, Decode, PartialEq, Eq, Clone, Debug)]
 pub struct Footer {
+    pub data_type: DataType,
+    pub use_rle: bool,
     pub pages: Vec<PageInfo>,
+}
+
+#[derive(Encode, Decode, PartialEq, Eq, Copy, Clone, Debug)]
+pub enum DataType {
+    Integer = 0,
+    String = 1,
 }
 
 #[derive(Encode, Decode, PartialEq, Eq, Copy, Clone, Debug)]
@@ -528,12 +499,16 @@ struct Encoding {
 
 fn encode_values_as_bincode<T: 'static + bincode::Encode>(
     values: impl Iterator<Item = T>,
+    target_encoded_size: usize,
 ) -> Result<Encoding> {
     let mut encoded_values = Vec::new();
     let mut values_count = 0;
     for element in values {
         bincode::encode_into_std_write(element, &mut encoded_values, BINCODE_DATA_CONFIG)?;
         values_count += 1;
+        if encoded_values.len() >= target_encoded_size {
+            break;
+        }
     }
     Ok(Encoding {
         encoded_values,
