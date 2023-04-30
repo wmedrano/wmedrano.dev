@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-29T12:43:57-07:00
+lastmod = 2023-04-29T18:34:03-07:00
 draft = false
 +++
 
@@ -13,13 +13,13 @@ draft = false
 
 This page describes my (will.s.medrano@gmail.com) Emacs configuration. Emacs is
 a highly customizable text editor that can be customized with Emacs Lisp. This
-page is written in Org and is the primary [source code](https://github.com/wmedrano/emacs-config) for my actual Emacs
+page is written in Org and is the primary [source code](https://github.com/wmedrano/emacs-config) for the actual Emacs
 configuration!
 
 
 ### Org Mode {#IntroductionOrgMode-c5h72r913tj0}
 
-My Emacs configuration is written with Emacs Org Mode.
+This Emacs configuration is written with Emacs Org Mode.
 
 <div class="verse">
 
@@ -80,7 +80,6 @@ package updates or
                                   counsel
                                   counsel-projectile
                                   diff-hl
-                                  diminish
                                   dracula-theme
                                   doom-modeline
                                   eglot
@@ -97,6 +96,7 @@ package updates or
                                   ivy-rich
                                   magit
                                   markdown-mode
+                                  monokai-pro-theme
                                   nord-theme
                                   org-sidebar
                                   org-unique-id
@@ -106,7 +106,6 @@ package updates or
                                   rust-mode
                                   swiper
                                   toml-mode
-                                  which-key
                                   yaml-mode
                                   ))
 (package-initialize)
@@ -134,13 +133,25 @@ are no longer needed.
 ### Theme {#BasicsTheme-1tk72r913tj0}
 
 ```emacs-lisp
-(require 'dracula-theme)
+(require 'monokai-pro-theme)
 (custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   ;; Enable loading the Dracula theme without a prompt.
-   '("f681100b27d783fefc3b62f44f84eb7fa0ce73ec183ebea5903df506eb314077" default)))
-(custom-set-faces)
-(load-theme 'dracula)
+   '("24168c7e083ca0bbc87c68d3139ef39f072488703dcdd82343b8cab71c0f62a7" "f681100b27d783fefc3b62f44f84eb7fa0ce73ec183ebea5903df506eb314077" default))
+ '(safe-local-variable-values
+   '((org-confirm-babel-evaluate)
+     (org-hugo-auto-export-mode . t)
+     (projectile-project-run-cmd . "hugo server --buildDrafts"))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(load-theme 'monokai-pro)
 (set-frame-font "Fira Code 12")
 (when (display-graphic-p)
   (set-frame-parameter (selected-frame) 'alpha '(97 . 97)))
@@ -221,23 +232,6 @@ This section contains configuration that removes noisy elements from the UI.
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
-```
-
-```emacs-lisp
-(defun w/diminish-noisy-modes ()
-  "Diminish all modes that are not worth showing."
-  (require 'diminish)
-  (diminish 'auto-fill-function "")
-  (diminish 'company-mode "")
-  (diminish 'counsel-mode "")
-  (diminish 'eldoc-mode "")
-  (diminish 'evil-commentary-mode "")
-  (diminish 'ivy-mode "")
-  (diminish 'which-key-mode ""))
-;; (add-hook 'emacs-startup-hook #'w/diminish-noisy-modes)
-;; Diminish needs to run after startup, but we also run it here in case the
-;; list has been updated and reload config has been requested.
-;; (w/diminish-noisy-modes)
 ```
 
 ```emacs-lisp
@@ -712,23 +706,14 @@ programming.
 (setq org-src-fontify-natively t)
 ```
 
--   Saving the configuration (`"emacs-config.org"`) reloads the Emacs configuration and
-    exports the corresponding html file.
 -   Saving any file creates unique IDs for any headers without an ID.
 
 <!--listend-->
 
 ```emacs-lisp
-(defun w/org-after-save-emacs-config ()
-  (when (w/is-emacs-org-config)
-    (w/reload-emacs-config)
-    (message "Emacs config reloaded.")))
-
 (defun w/setup-org-mode ()
   (require 'org-unique-id)
-  (add-hook 'before-save-hook #'org-unique-id 0 t)
-  (when (w/is-emacs-org-config)
-    (add-hook 'after-save-hook #'w/org-after-save-emacs-config)))
+  (add-hook 'before-save-hook #'org-unique-id 0 t))
 (add-hook 'org-mode-hook #'w/setup-org-mode)
 ```
 
@@ -736,6 +721,7 @@ programming.
 ### Useful Keybindings {#TextSpecificConfigurationsOrgModeUsefulKeybindings-uv682r913tj0}
 
 -   `C-c C-c` - Run the code block at the cursor.
+-   `C-c C-j` - Jump to a section within the Org file.
 -   `C-c C-l` - Insert or update a link.
 -   `TAB` on header - Expand or collapse the section.
 -   `Shift + TAB` - Collapse all headers.
@@ -746,6 +732,8 @@ programming.
 <!--listend-->
 
 ```emacs-lisp
+(require 'org)
+(define-key org-mode-map (kbd "C-c C-j") #'counsel-org-goto)
 (w/define-motion-key (kbd "gl") #'org-open-at-point-global)
 ```
 
@@ -781,7 +769,7 @@ first line in the file. Example:
 ```
 
 
-#### Executing Code Blocks {#OrgModeCodeBlocksExecutingCodeBlocks-7vvf5e314tj0}
+#### Executing {#OrgModeCodeBlocksExecutingCodeBlocks-7vvf5e314tj0}
 
 Code blocks can be executed by selecting them with the cursor and running `C-c
 C-c`. This prompts for y-or-n if the code should be evaluated and evaluates the
@@ -793,7 +781,19 @@ a local variable:
 ```
 
 
-#### Tangling {#OrgModeCodeBlocksTangling-9rog60i09tj0}
+#### Editing {#OrgModeCodeBlocksEditing-2hvafd119tj0}
+
+Source code blocks can be edited in a different buffer and window with `C-c
+C-'`. To save the contents and return to the Org document, save the file or use
+`C-c C-'`.
+
+```emacs-lisp
+(define-key org-src-mode-map (kbd "C-s") #'org-edit-src-exit)
+(define-key org-src-mode-map (kbd "C-c C-'") #'org-edit-src-exit)
+```
+
+
+#### Tangling/Untangling {#OrgModeCodeBlocksTangling-9rog60i09tj0}
 
 Tangling takes the Org document and writes any blocks with `:tangle <filename>`
 to their file. The inverse of this is detangling. Detangling in a tangled source
@@ -804,7 +804,8 @@ code in the source file is surrounded by valid Org links.
 -   `org-babel-tangle` - Tangle the current Org document.
 -   `org-babel-detangle` - Detangle the current source code.
 
-<!--listend-->
+Org files may automatically be tangled on save with
+`org-babel-auto-tangle-mode`.
 
 ```emacs-lisp
 (require 'ob-tangle)
@@ -814,26 +815,35 @@ code in the source file is surrounded by valid Org links.
   file."
   (interactive)
   (let* ((keep-window (selected-window))
-         (keep-buffer (window-buffer keep-window)))
+         (keep-buffer (window-buffer keep-window))
+         (keep-window-count (length (window-list)))
+         (point-before-tangle (point)))
     (org-babel-detangle)
     (set-window-buffer keep-window keep-buffer)
-    (select-window keep-window)))
+    ;; Close a newly opened window the state originally only had a single window
+    ;; open.
+    (if (eq keep-window-count 1)
+        (delete-other-windows keep-window)
+      (select-window keep-window))
+    (goto-char point-before-tangle)))
 (org-babel-detangle-keep-window)
 ```
 
 ```emacs-lisp
+;;;###autoload
 (define-minor-mode org-babel-auto-tangle-mode
   "Toggle auto tangling on save."
   :global nil
-  :lighter "autotangle"
+  :lighter "tangle"
   (if org-babel-auto-tangle-mode
       (add-hook 'after-save-hook #'org-babel-tangle :append :local)
     (remove-hook 'after-save-hook #'org-babel-tangle :local)))
 
+;;;###autoload
 (define-minor-mode org-babel-auto-detangle-mode
   "Toggle auto detangling on save."
   :global nil
-  :lighter "autodetangle"
+  :lighter "detangle"
   (if org-babel-auto-detangle-mode
       (add-hook 'after-save-hook #'org-babel-detangle-keep-window :append :local)
     (remove-hook 'after-save-hook #'org-babel-detangle-keep-window :local)))
@@ -957,13 +967,28 @@ the box but needs some tweaks for a better experience with Evil.
 
 ```emacs-lisp
 (add-to-list 'evil-motion-state-modes 'dired-mode)
-(defun w/wmedrano-dired-mode-setup ()
-  "Set up dired mode."
-  (define-key evil-motion-state-local-map (kbd "RET") #'dired-find-file))
-(add-hook 'dired-mode-hook #'w/wmedrano-dired-mode-setup)
+(evil-define-key 'motion dired-mode-map (kbd "RET") #'dired-find-file)
 ```
 
 
 ## Source Code {#SourceCode-1wc82r913tj0}
 
 Source Code: <https://github.com/wmedrano/emacs-config/blob/main/emacs-config.org>
+
+
+### Directory Local Variables {#SourceCodeDirectoryLocalVariables-pqcla5019tj0}
+
+Directory local variables can be used to set Emacs variables for all files
+within a directory. To make use of this, create a `.dir-locals.el` file. The
+directory local variables for this repo help in auto exporting to Hugo as well
+as keeping the Org and Emacs Lisp in sync.
+
+```lisp-data
+;;; Directory Local Variables
+;;; For more information see (info "(emacs) Directory Variables")
+((emacs-lisp-mode . ((mode . org-babel-auto-detangle)))
+ (org-mode . ((org-hugo-section . "literate-programs")
+              (mode . org-babel-auto-tangle)
+              (mode . org-hugo-auto-export)
+              )))
+```
