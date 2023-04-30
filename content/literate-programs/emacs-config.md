@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-29T18:34:03-07:00
+lastmod = 2023-04-30T14:03:29-07:00
 draft = false
 +++
 
@@ -77,6 +77,7 @@ package updates or
                                   ace-window
                                   all-the-icons-ivy-rich
                                   company
+                                  company-box
                                   counsel
                                   counsel-projectile
                                   diff-hl
@@ -84,6 +85,7 @@ package updates or
                                   doom-modeline
                                   eglot
                                   evil
+                                  evil-anzu
                                   evil-commentary
                                   evil-surround
                                   evil-terminal-cursor-changer
@@ -94,6 +96,7 @@ package updates or
                                   ivy
                                   ivy-emoji
                                   ivy-rich
+                                  ivy-posframe
                                   magit
                                   markdown-mode
                                   monokai-pro-theme
@@ -106,6 +109,7 @@ package updates or
                                   rust-mode
                                   swiper
                                   toml-mode
+                                  which-key
                                   yaml-mode
                                   ))
 (package-initialize)
@@ -141,10 +145,8 @@ are no longer needed.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    '("24168c7e083ca0bbc87c68d3139ef39f072488703dcdd82343b8cab71c0f62a7" "f681100b27d783fefc3b62f44f84eb7fa0ce73ec183ebea5903df506eb314077" default))
- '(safe-local-variable-values
-   '((org-confirm-babel-evaluate)
-     (org-hugo-auto-export-mode . t)
-     (projectile-project-run-cmd . "hugo server --buildDrafts"))))
+ '(package-selected-packages
+   '(evil-anzu company-quickhelp ace-window all-the-icons-ivy-rich company company-box counsel counsel-projectile diff-hl dracula-theme doom-modeline eglot evil evil-commentary evil-surround evil-terminal-cursor-changer flyspell-correct flyspell-correct-ivy graphviz-dot-mode htmlize ivy ivy-emoji ivy-rich ivy-posframe magit markdown-mode monokai-pro-theme nord-theme org-sidebar org-unique-id ox-gfm ox-hugo projectile rust-mode swiper toml-mode which-key yaml-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -155,6 +157,19 @@ are no longer needed.
 (set-frame-font "Fira Code 12")
 (when (display-graphic-p)
   (set-frame-parameter (selected-frame) 'alpha '(97 . 97)))
+```
+
+Use a posframe for ivy completion. By default, completions are at the bottom of
+the frame. Posframes allow these to move anywhere on the frame. I move it to
+`point` to prevent having to focus on a different part of the screen.
+
+```emacs-lisp
+(require 'ivy-posframe)
+(setq ivy-posframe-style 'point
+      ivy-posframe-font "Fira Code 13"
+      ivy-posframe-border-width 4
+      ivy-height 20)
+(ivy-posframe-mode t)
 ```
 
 
@@ -191,8 +206,10 @@ more options.](https://github.com/seagle0128/doom-modeline#customize)
  ;; Don't show the word count. This is the default since it may cause
  ;; slowness.
  doom-modeline-enable-word-count nil
+ ;; Use doom to show the battery. This does not enabling displaying batter and
+ ;; requires entering display-battery-mode.
  doom-modeline-battery t
- )
+ doom-modeline-unicode-fallback t)
 ```
 
 
@@ -254,6 +271,13 @@ The keybindings are based around the [Evil](https://www.emacswiki.org/emacs/Evil
 Emacs package that implements VIM key bindings. The key bindings present in this
 section are basic bindings. More specific bindings are littered throughout this
 document.
+
+```emacs-lisp
+(defun w/define-motion-key (keys fn)
+  "Define a new motion key binding on KEYS that runs function FN."
+  (define-key evil-normal-state-map keys nil)
+  (define-key evil-motion-state-map keys fn))
+```
 
 
 #### Bindings {#BasicsKeyBindingsBindings-muo72r913tj0}
@@ -376,14 +400,42 @@ Unicode values instead, run `M-x all-the-icons-install-fonts`.
 ```
 
 
-#### Terminal Mouse Support {#BasicsKeyBindingsTerminalMouseSupport-5hygwil09tj0}
+#### Mouse and Scrolling {#BasicsKeyBindingsTerminalMouseSupport-5hygwil09tj0}
+
+Enable using the mouse in terminal mode.
 
 ```emacs-lisp
 (xterm-mouse-mode t)
 ```
 
+When scrolling, the cursor generally stays on the same position. However, if we
+scroll out of the range of the cursor, then the cursor it clamped to the nearest
+point; this is usually the first or last visible point in the window. However,
+this behavior is disorienting so scroll lock is enabled to keep the cursor on
+the same spot on the screen.
+
+```emacs-lisp
+(scroll-lock-mode t)
+```
+
 
 ## Text and Formatting {#TextandFormatting-r9q72r913tj0}
+
+
+### Search {#TextandFormattingSearch-fq73xbx0atj0}
+
+```emacs-lisp
+(define-key evil-motion-state-map (kbd "/") #'evil-search-forward)
+```
+
+Evil anzu is used to display the current candidate number and the total
+candidates at the bottom left.
+
+```emacs-lisp
+(require 'evil-anzu)
+(global-anzu-mode t)
+(setq anzu-minimum-input-length 2)
+```
 
 
 ### Refreshing {#TextandFormattingRefreshing-4xq72r913tj0}
@@ -622,6 +674,18 @@ Keybindings when in completion:
 (define-key company-active-map (kbd "RET") nil)
 ```
 
+Company box mode is used since it looks a little bit better. However, it is only
+compatible with GUI mode. Additionally, the help/documentation background shows
+up as white with sometimes white text, depending on the theme. The issue is
+mitigated by hardcoding the background color.
+
+```emacs-lisp
+(when (display-graphic-p)
+  (require 'company-box)
+  (setq company-quickhelp-color-background "dim gray")
+  (add-hook 'company-mode #'company-box-mode))
+```
+
 
 #### Syntax Checking {#AdvancedEglotSyntaxChecking-80282r913tj0}
 
@@ -826,24 +890,23 @@ Org files may automatically be tangled on save with
         (delete-other-windows keep-window)
       (select-window keep-window))
     (goto-char point-before-tangle)))
-(org-babel-detangle-keep-window)
 ```
 
 ```emacs-lisp
-;;;###autoload
+;; Declare variables to prevent warning:
+;; File local-variables error: (void-function org-babel-auto-detangle-mode)
 (define-minor-mode org-babel-auto-tangle-mode
   "Toggle auto tangling on save."
-  :global nil
   :lighter "tangle"
+  (defvar org-babel-auto-tangle-mode)
   (if org-babel-auto-tangle-mode
       (add-hook 'after-save-hook #'org-babel-tangle :append :local)
     (remove-hook 'after-save-hook #'org-babel-tangle :local)))
 
-;;;###autoload
 (define-minor-mode org-babel-auto-detangle-mode
   "Toggle auto detangling on save."
-  :global nil
   :lighter "detangle"
+  (defvar org-babel-auto-detangle-mode nil)
   (if org-babel-auto-detangle-mode
       (add-hook 'after-save-hook #'org-babel-detangle-keep-window :append :local)
     (remove-hook 'after-save-hook #'org-babel-detangle-keep-window :local)))
@@ -986,7 +1049,8 @@ as keeping the Org and Emacs Lisp in sync.
 ```lisp-data
 ;;; Directory Local Variables
 ;;; For more information see (info "(emacs) Directory Variables")
-((emacs-lisp-mode . ((mode . org-babel-auto-detangle)))
+(("init.el" . ((mode . org-babel-auto-detangle)))
+ (".dir-locals.el" . ((mode . org-babel-auto-detangle)))
  (org-mode . ((org-hugo-section . "literate-programs")
               (mode . org-babel-auto-tangle)
               (mode . org-hugo-auto-export)
