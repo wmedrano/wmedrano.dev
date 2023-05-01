@@ -2,19 +2,20 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-30T14:03:29-07:00
+lastmod = 2023-04-30T22:15:40-07:00
 draft = false
 +++
 
-{{< figure src="/ox-hugo/gnu.png" >}}
-
-
 ## Introduction {#Introduction-g4g72r913tj0}
+
+{{< figure src="/ox-hugo/emacs-config/gnu-small.png" link="/ox-hugo/emacs-config/gnu.png" >}}
 
 This page describes my (will.s.medrano@gmail.com) Emacs configuration. Emacs is
 a highly customizable text editor that can be customized with Emacs Lisp. This
 page is written in Org and is the primary [source code](https://github.com/wmedrano/emacs-config) for the actual Emacs
 configuration!
+
+{{< figure src="/ox-hugo/emacs-config/screenshot-small.png" link="/ox-hugo/emacs-config/screenshot.png" >}}
 
 
 ### Org Mode {#IntroductionOrgMode-c5h72r913tj0}
@@ -76,6 +77,7 @@ package updates or
 (setq package-selected-packages '(
                                   ace-window
                                   all-the-icons-ivy-rich
+                                  avy
                                   company
                                   company-box
                                   counsel
@@ -86,6 +88,7 @@ package updates or
                                   eglot
                                   evil
                                   evil-anzu
+                                  evil-avy
                                   evil-commentary
                                   evil-surround
                                   evil-terminal-cursor-changer
@@ -109,6 +112,7 @@ package updates or
                                   rust-mode
                                   swiper
                                   toml-mode
+                                  treemacs
                                   which-key
                                   yaml-mode
                                   ))
@@ -299,11 +303,28 @@ Enable Evil mode globally to use VIM like modal editing.
 ```
 
 Use "J" and "K" to scroll up and down the buffer as opposed to the standard
-"Ctrl+u" and "Ctrl+d" that VIM uses.
+"Ctrl+u" and "Ctrl+d" that VIM uses. This parallels how "j" and "k" go down and
+up a single line.
 
 ```emacs-lisp
 (w/define-motion-key (kbd "J") #'evil-scroll-down)
 (w/define-motion-key (kbd "K") #'evil-scroll-up)
+```
+
+To jump around quicker to something on the screen though, `evil-avy` can be
+used. The workflow for this is to
+
+-   Find the spot on the screen to jump to.
+-   Press `gw`.
+-   Avy will no tag all word sequences with a chord.
+-   Enter the 2-4 letter chord.
+
+<!--listend-->
+
+```emacs-lisp
+(require 'avy)
+(require 'evil-avy)
+(w/define-motion-key (kbd "gw") #'evil-avy-goto-word-0)
 ```
 
 Disable the VIM TAB key. This allows TAB to pass through to the underlying
@@ -339,8 +360,8 @@ for the entire line.
 (global-evil-surround-mode t)
 ```
 
-To navigate windows, `gw` is used to bring up an interactive menu that supports
-the following commands:
+To navigate windows, `C-c w` is used to bring up an interactive menu that
+supports the following commands:
 
 -   `<number>` - Each window is given a number. Selecting a number will jump to
     that window.
@@ -359,7 +380,6 @@ the following commands:
 ;; Always show the dispatch menu even if there are only 2 options.
 (setq aw-dispatch-always t)
 (global-set-key (kbd "C-w") #'ace-window)
-(w/define-motion-key (kbd "gw") #'ace-window)
 ;; Required to override Evil's window switching functionality.
 (w/define-motion-key (kbd "C-w") #'ace-window)
 ```
@@ -420,22 +440,6 @@ the same spot on the screen.
 
 
 ## Text and Formatting {#TextandFormatting-r9q72r913tj0}
-
-
-### Search {#TextandFormattingSearch-fq73xbx0atj0}
-
-```emacs-lisp
-(define-key evil-motion-state-map (kbd "/") #'evil-search-forward)
-```
-
-Evil anzu is used to display the current candidate number and the total
-candidates at the bottom left.
-
-```emacs-lisp
-(require 'evil-anzu)
-(global-anzu-mode t)
-(setq anzu-minimum-input-length 2)
-```
 
 
 ### Refreshing {#TextandFormattingRefreshing-4xq72r913tj0}
@@ -607,6 +611,29 @@ for this.
 
 
 #### <span class="org-todo todo TODO">TODO</span> Git {#AdvancedVersionControlGit-5jy72r913tj0}
+
+
+### Search {#TextandFormattingSearch-fq73xbx0atj0}
+
+```emacs-lisp
+(define-key evil-motion-state-map (kbd "/") #'evil-search-forward)
+```
+
+Evil anzu is used to display the current candidate number and the total
+candidates at the bottom left.
+
+```emacs-lisp
+(require 'evil-anzu)
+(global-anzu-mode t)
+(setq anzu-minimum-input-length 2)
+```
+
+To do a realtime search over the project, `counsel-projectile-rg` is used.
+
+```emacs-lisp
+(require 'counsel-projectile)
+(w/define-motion-key (kbd "g/") #'counsel-projectile-rg)
+```
 
 
 ### Disable File Backups {#AdvancedDisableFileBackups-d7z72r913tj0}
