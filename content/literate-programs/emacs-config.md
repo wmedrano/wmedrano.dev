@@ -2,20 +2,20 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-04-30T22:15:40-07:00
+lastmod = 2023-05-04T08:24:36-07:00
 draft = false
 +++
 
 ## Introduction {#Introduction-g4g72r913tj0}
 
-{{< figure src="/ox-hugo/emacs-config/gnu-small.png" link="/ox-hugo/emacs-config/gnu.png" >}}
+{{< figure src="/ox-hugo/gnu-small.png" link="/ox-hugo/gnu.png" >}}
 
 This page describes my (will.s.medrano@gmail.com) Emacs configuration. Emacs is
 a highly customizable text editor that can be customized with Emacs Lisp. This
 page is written in Org and is the primary [source code](https://github.com/wmedrano/emacs-config) for the actual Emacs
 configuration!
 
-{{< figure src="/ox-hugo/emacs-config/screenshot-small.png" link="/ox-hugo/emacs-config/screenshot.png" >}}
+{{< figure src="/ox-hugo/screenshot-small.png" link="/ox-hugo/screenshot.png" >}}
 
 
 ### Org Mode {#IntroductionOrgMode-c5h72r913tj0}
@@ -314,9 +314,10 @@ up a single line.
 To jump around quicker to something on the screen though, `evil-avy` can be
 used. The workflow for this is to
 
--   Find the spot on the screen to jump to.
+-   Find a character on the screen to jump to.
 -   Press `gw`.
--   Avy will no tag all word sequences with a chord.
+-   Press the character to jump to.
+-   Avy will tag all sequences starting with said character with a chord.
 -   Enter the 2-4 letter chord.
 
 <!--listend-->
@@ -324,7 +325,7 @@ used. The workflow for this is to
 ```emacs-lisp
 (require 'avy)
 (require 'evil-avy)
-(w/define-motion-key (kbd "gw") #'evil-avy-goto-word-0)
+(w/define-motion-key (kbd "gw") #'evil-avy-goto-word-1)
 ```
 
 Disable the VIM TAB key. This allows TAB to pass through to the underlying
@@ -874,11 +875,16 @@ a local variable:
 
 #### Editing {#OrgModeCodeBlocksEditing-2hvafd119tj0}
 
-Source code blocks can be edited in a different buffer and window with `C-c
+Source code blocks can be edited in a different buffer (same window) with `C-c
 C-'`. To save the contents and return to the Org document, save the file or use
 `C-c C-'`.
 
 ```emacs-lisp
+(setq-default org-src-window-setup 'current-window)
+(add-hook 'org-mode-hook (lambda ()
+                           (setq-local electric-pair-inhibit-predicate
+                                       `(lambda (c)
+                                          (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
 (define-key org-src-mode-map (kbd "C-s") #'org-edit-src-exit)
 (define-key org-src-mode-map (kbd "C-c C-'") #'org-edit-src-exit)
 ```

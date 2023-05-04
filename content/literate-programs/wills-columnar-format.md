@@ -2,7 +2,7 @@
 title = "Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-04-30T16:48:08-07:00
+lastmod = 2023-05-04T08:21:43-07:00
 draft = false
 +++
 
