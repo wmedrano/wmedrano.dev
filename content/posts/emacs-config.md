@@ -2,7 +2,7 @@
 title = "Literate Program - Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-08T04:23:15-07:00
+lastmod = 2023-05-08T16:44:38-07:00
 draft = false
 +++
 
@@ -48,7 +48,7 @@ documentation and auto-complete packages are broken out of the box.
 
 #### Coding Conventions {#IntroductionOrgModeCodingConventions-hwh72r913tj0}
 
-All custom functions are prefixed with `w/` since Emacs lisp does not support
+All custom functions are prefixed with `wm-` since Emacs lisp does not support
 officially support name-spacing.
 
 
@@ -76,7 +76,8 @@ package updates or
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (setq package-selected-packages '(ace-window
                                   all-the-icons-ivy-rich avy
-                                  company company-box counsel
+                                  cattpuccin-theme company
+                                  company-box counsel
                                   counsel-projectile diff-hl
                                   dracula-theme doom-modeline
                                   eglot evil evil-anzu evil-avy
@@ -96,11 +97,11 @@ package updates or
 (package-initialize)
 ```
 
-`M-x w/install-dependencies` installs all the dependencies and prunes any that
+`M-x wm-install-dependencies` installs all the dependencies and prunes any that
 are no longer needed.
 
 ```emacs-lisp
-(defun w/install-dependencies ()
+(defun wm-install-dependencies ()
   "Install all dependencies and remove any unused dependencies. If you wish to
   only install new dependencies and not refresh the index and clean up old
   dependencies, use (package-install-selected-packages) instead."
@@ -126,13 +127,17 @@ are no longer needed.
 
 (defun set-up-dark-theme ()
   (require 'nord-theme)
-  (load-theme 'nord t))
+  (setq catppuccin-flavor 'frappe)
+  (load-theme 'catppuccin t))
 
 (set-up-light-theme)
 (set-frame-font "Fira Code 12")
 (when (display-graphic-p)
   (set-frame-parameter (selected-frame) 'alpha '(97 . 97)))
 ```
+
+
+### Completion UI {#BasicsCompletionUI-x240c6j0ltj0}
 
 Use a posframe for ivy completion. By default, completions are at the bottom of
 the frame. Posframes allow these to move anywhere on the frame. I move it to
@@ -193,15 +198,11 @@ more options.](https://github.com/seagle0128/doom-modeline#customize)
 Emacs provides plenty of built in help. There are several functions that can be
 activated with `M-x`.
 
--   `describe-variable` - Open the documentation and source code for an Emacs Lisp
-    variable. Also accessible with `C-h v`.
--   `describe-function` - Open the documentation and source code for an Emacs Lisp
-    function. Also accessible with `C-h f`.
--   `describe-key` - After running, the next key map action will be recorded. This
-    will then open the documentation for the function that runs when that key is
-    pressed. For example, in the default normal state of Evil, pressing
-    `describe-key` followed by `j` opens the documentation for
-    `evil-next-line`. Also accessible with `C-h k`.
+| Key              | Function            | Description                                                                                                                                     |
+|------------------|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `C-h f`          | `describe-function` | Open the documentation and source code for an Emacs Lisp variable                                                                               |
+| `C-h v`          | `describe-variable` | Open the documentation and source code for an Emacs Lisp variable.                                                                              |
+| `C-h k + <keys>` | `describe-key`      | Open the documentation for a key binding. This gives the key that was pressed, the keymap that activated, and the function that will be called. |
 
 `which-key-mode` is used to print out the available keys in scenarios where keys
 are changed. For example, when pressing `C-h`, a small popup with help
@@ -229,7 +230,7 @@ This section contains configuration that removes noisy elements from the UI.
 ```
 
 ```emacs-lisp
-(defun w/command-error-fn (data context caller)
+(defun wm-command-error-fn (data context caller)
   "Ignore several (noisy) signals and pass the rest to the default handler."
   (when (not (memq (car data) '(buffer-read-only
                                 beginning-of-buffer
@@ -238,7 +239,7 @@ This section contains configuration that removes noisy elements from the UI.
                                 end-of-line)))
     (command-error-default-function data context caller)))
 
-(setq command-error-function #'w/command-error-fn)
+(setq command-error-function #'wm-command-error-fn)
 ```
 
 
@@ -250,7 +251,7 @@ section are basic bindings. More specific bindings are littered throughout this
 document.
 
 ```emacs-lisp
-(defun w/define-motion-key (keys fn)
+(defun wm-define-motion-key (keys fn)
   "Define a new motion key binding on KEYS that runs function FN."
   (define-key evil-normal-state-map keys nil)
   (define-key evil-motion-state-map keys fn))
@@ -266,9 +267,9 @@ Enable Evil mode globally to use VIM like modal editing.
 (defalias 'forward-evil-word 'forward-evil-symbol)
 ;; Jumps to definition. If Eglot is active, then the language server is used
 ;; to find the definition.
-(w/define-motion-key (kbd "gd") #'evil-goto-definition)
+(wm-define-motion-key (kbd "gd") #'evil-goto-definition)
 ;; Fuzzy search through all open buffers.
-(w/define-motion-key (kbd "g/") #'swiper)
+(wm-define-motion-key (kbd "g/") #'swiper)
 ;; Paste contents into the current cursor. This is used to keep consistency of
 ;; the paste command in terminal and GUI modes. Most terminal emulators paste
 ;; the current clipboard text on C-S-v.
@@ -280,8 +281,8 @@ Use "J" and "K" to scroll up and down the buffer as opposed to the standard
 up a single line.
 
 ```emacs-lisp
-(w/define-motion-key (kbd "J") #'evil-scroll-down)
-(w/define-motion-key (kbd "K") #'evil-scroll-up)
+(wm-define-motion-key (kbd "J") #'evil-scroll-down)
+(wm-define-motion-key (kbd "K") #'evil-scroll-up)
 ```
 
 To jump around quicker to something on the screen though, `evil-avy` can be
@@ -297,7 +298,7 @@ used. The workflow for this is to
 ```emacs-lisp
 (require 'avy)
 (require 'evil-avy)
-(w/define-motion-key (kbd "gw") #'evil-avy-goto-word-0)
+(wm-define-motion-key (kbd "gw") #'evil-avy-goto-word-0)
 ```
 
 Disable the VIM TAB key. This allows TAB to pass through to the underlying
@@ -313,12 +314,12 @@ I prefer to use some more standard key bindings. For example, Emacs uses `C-x
 C-s` to save while most other modern tools use just `C-s`.
 
 ```emacs-lisp
-(defun w/save-and-maybe-normal-mode ()
+(defun wm-save-and-maybe-normal-mode ()
   "Saves the buffer and then switches to normal mode if in Evil insert state."
   (interactive)
   (when (evil-insert-state-p) (evil-normal-state))
   (save-buffer))
-(global-set-key (kbd "C-s") #'w/save-and-maybe-normal-mode)
+(global-set-key (kbd "C-s") #'wm-save-and-maybe-normal-mode)
 ```
 
 Evil commentary mode enables VIM style keybindings for commenting out code. The
@@ -354,7 +355,7 @@ supports the following commands:
 (setq aw-dispatch-always t)
 (global-set-key (kbd "C-w") #'ace-window)
 ;; Required to override Evil's window switching functionality.
-(w/define-motion-key (kbd "C-w") #'ace-window)
+(wm-define-motion-key (kbd "C-w") #'ace-window)
 ```
 
 Emacs has a habit of asking `yes` or `no` questions. This requires entering the
@@ -436,7 +437,7 @@ second. To manually refresh, call `C-c r`. Technically, this calls
 ;; modern a modern SSD or NVMe drive.
 (setq auto-revert-interval 1)
 (global-set-key (kbd "C-c r") #'revert-buffer-quick)
-(w/define-motion-key (kbd "gr") #'revert-buffer-quick)
+(wm-define-motion-key (kbd "gr") #'revert-buffer-quick)
 ```
 
 
@@ -521,7 +522,7 @@ do things within the scope of a project (usually git). Actions include:
 (require 'projectile)
 (require 'counsel-projectile)
 (projectile-mode t)
-(w/define-motion-key (kbd "gp") #'projectile-command-map)
+(wm-define-motion-key (kbd "gp") #'projectile-command-map)
 ```
 
 The major key bindings for this are:
@@ -547,11 +548,11 @@ the compiler and navigated to when using "go to definition" of the library
 functions.
 
 ```emacs-lisp
-(defun w/projectile-project-is-ignored (root)
+(defun wm-projectile-project-is-ignored (root)
   "Returns t if the project at the given root should be ignored."
   (or (string-match-p "\.cargo" root)
       (string-match-p "\.rustup" root)))
-(setq projectile-ignored-project-function #'w/projectile-project-is-ignored)
+(setq projectile-ignored-project-function #'wm-projectile-project-is-ignored)
 ```
 
 
@@ -606,7 +607,7 @@ To do a realtime search over the project, `counsel-projectile-rg` is used.
 
 ```emacs-lisp
 (require 'counsel-projectile)
-(w/define-motion-key (kbd "g/") #'counsel-projectile-rg)
+(wm-define-motion-key (kbd "g/") #'counsel-projectile-rg)
 ```
 
 
@@ -647,8 +648,8 @@ configurations sections to see if the Major Mode supports Eglot. For example,
 
 ```emacs-lisp
 (require 'eglot)
-(w/define-motion-key (kbd "<f2>") #'eglot-rename)
-(w/define-motion-key (kbd "g.") #'eglot-code-actions)
+(wm-define-motion-key (kbd "<f2>") #'eglot-rename)
+(wm-define-motion-key (kbd "g.") #'eglot-code-actions)
 ```
 
 
@@ -695,38 +696,38 @@ Emacs. To get improved syntax checking, Eglot needs to be enabled for the major
 mode.
 
 ```emacs-lisp
-(w/define-motion-key (kbd "<f8>") #'flymake-goto-next-error)
+(wm-define-motion-key (kbd "<f8>") #'flymake-goto-next-error)
 ```
 
 ```emacs-lisp
-(defun w/force-eglot-didSave ()
+(defun wm-force-eglot-didSave ()
   "Forces eglot to communicate a didSave signal. This usually kicks off syntax
   checking."
   (when (eglot-managed-p)
     (message "Forcing Eglot to send didSave signal.")
     (message nil)
     (eglot--signal-textDocument/didSave)))
-(add-hook 'after-revert-hook #'w/force-eglot-didSave)
+(add-hook 'after-revert-hook #'wm-force-eglot-didSave)
 ```
 
 
 ### Extra Utility Functions {#AdvancedExtraUtilityFunctions-op282r913tj0}
 
 ```emacs-lisp
-(setq w/emacs-org-config (expand-file-name "emacs-config.org" user-emacs-directory))
-(defun w/reload-emacs-config ()
+(setq wm-emacs-org-config (expand-file-name "emacs-config.org" user-emacs-directory))
+(defun wm-reload-emacs-config ()
   "Reload the emacs config."
   (interactive)
   (load-file (expand-file-name "init.el" user-emacs-directory))
   (message "Emacs config reloaded."))
-(defun w/open-emacs-config ()
+(defun wm-open-emacs-config ()
   "Open the Emacs configuration."
   (interactive)
   (find-file (expand-file-name "emacs-config.org" user-emacs-directory)))
 
-(defun w/is-emacs-org-config ()
+(defun wm-is-emacs-org-config ()
   "Returns t if the current buffer is the primary org config"
-  (string= w/emacs-org-config buffer-file-name))
+  (string= wm-emacs-org-config buffer-file-name))
 ```
 
 
@@ -741,7 +742,7 @@ with `pip install pyright`.
 ```emacs-lisp
 (require 'python-mode)
 (require 'eglot)
-(defun w/set-up-python-mode ()
+(defun wm-set-up-python-mode ()
   (eglot-ensure)
   (add-hook 'before-save-hook #'eglot-format-buffer 0 t))
 (add-hook 'python-mode-hook #'set-up-python-mode)
@@ -765,11 +766,11 @@ rustup component add rust-analyzer
 (add-to-list 'eglot-server-programs
              '((rust-ts-mode rust-mode) . ("rustup" "run" "stable" "rust-analyzer")))
 
-(defun w/set-up-rust-mode ()
+(defun wm-set-up-rust-mode ()
   (setq-local fill-column 100)
   (eglot-ensure)
   (add-hook 'before-save-hook #'eglot-format-buffer 0 t))
-(add-hook 'rust-mode-hook #'w/set-up-rust-mode)
+(add-hook 'rust-mode-hook #'wm-set-up-rust-mode)
 ```
 
 
@@ -791,10 +792,10 @@ programming.
 <!--listend-->
 
 ```emacs-lisp
-(defun w/setup-org-mode ()
+(defun wm-setup-org-mode ()
   (require 'org-unique-id)
   (add-hook 'before-save-hook #'org-unique-id 0 t))
-(add-hook 'org-mode-hook #'w/setup-org-mode)
+(add-hook 'org-mode-hook #'wm-setup-org-mode)
 ```
 
 
@@ -814,7 +815,7 @@ programming.
 ```emacs-lisp
 (require 'org)
 (define-key org-mode-map (kbd "C-c C-j") #'counsel-org-goto)
-(w/define-motion-key (kbd "gl") #'org-open-at-point-global)
+(wm-define-motion-key (kbd "gl") #'org-open-at-point-global)
 ```
 
 
@@ -1025,14 +1026,14 @@ npm install -g yaml-language-server --prefix ~/.local/npm
 (require 'yaml-mode)
 (add-to-list 'eglot-server-programs
              '((yaml-mode) . ("~/.local/npm/bin/yaml-language-server")))
-(defun w/setup-yaml-mode ()
+(defun wm-setup-yaml-mode ()
   "Sets up the YAML major mode."
   ;; Eglot is commented out until the YAML language server is proven to
   ;; successfuly run.
   ;; (eglot-ensure)
   ;; (add-hook 'before-save-hook #'eglot-format-buffer 0 t)
   )
-(add-hook 'yaml-mode-hook #'w/setup-yaml-mode)
+(add-hook 'yaml-mode-hook #'wm-setup-yaml-mode)
 ```
 
 
@@ -1064,11 +1065,11 @@ as keeping the Org and Emacs Lisp in sync.
 
 ```lisp-data
 ;;; Directory Local Variables
+;;; Generated from emacs-config.org
 ;;; For more information see (info "(emacs) Directory Variables")
 (("init.el" . ((mode . org-babel-auto-detangle)))
  (".dir-locals.el" . ((mode . org-babel-auto-detangle)))
- (org-mode . ((org-hugo-section . "literate-programs")
-              (mode . org-babel-auto-tangle)
+ (org-mode . ((mode . org-babel-auto-tangle)
               (mode . org-hugo-auto-export)
               )))
 ```

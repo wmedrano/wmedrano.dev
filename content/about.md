@@ -6,8 +6,8 @@ lastmod = 2023-04-22T23:12:21-07:00
 draft = false
 +++
 
-I'm Will Medrano. I work as a Senior Software Engineer at Google. I deal with
-very big data during my day job, but tinker with a variety of things like:
+I'm Will and I work as a Senior Software Engineer at Google. I deal with very
+big data during my day job, but tinker with a variety of things like:
 
 -   The Rust programming language.
 -   Audio for music creation purposes.
