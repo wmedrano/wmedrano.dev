@@ -7,18 +7,18 @@
 :CUSTOM_ID: Open-guoim171ktj0
 :END:
 
-** TODO Clean up static/ox-hugo
+* Closed
+:PROPERTIES:
+:CUSTOM_ID: Closed-krpim171ktj0
+:END:
+
+** DONE Clean up static/ox-hugo
 :PROPERTIES:
 :CUSTOM_ID: Cleanupstaticoxhugo-zoz7bt41ktj0
 :END:
 
 There are some redundant assets there. Best thing would be to delete everything
 and regenerate the assets.
-
-* Closed
-:PROPERTIES:
-:CUSTOM_ID: Closed-krpim171ktj0
-:END:
 
 ** DONE Use a cleaner theme.
 :PROPERTIES:
@@ -27,7 +27,7 @@ and regenerate the assets.
 
 +The current Hugo theme dedicates too much room for the sidebar.+
 
-Switched to [[https://github.com/canhtran/maverick][Maverick]] theme.
+Done, switched to [[https://github.com/canhtran/maverick][Maverick]] theme.
 
 ** DONE Move literate programs under posts
 :PROPERTIES:

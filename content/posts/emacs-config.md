@@ -2,20 +2,20 @@
 title = "Literate Program - Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-08T04:11:58-07:00
+lastmod = 2023-05-08T04:23:15-07:00
 draft = false
 +++
 
 ## Introduction {#Introduction-g4g72r913tj0}
 
-{{< figure src="/ox-hugo/gnu-small.png" link="/ox-hugo/gnu.png" >}}
+{{< figure src="/ox-hugo/emacs-config/gnu-small.png" link="/ox-hugo/emacs-config/gnu.png" >}}
 
 This page describes my (will.s.medrano@gmail.com) Emacs configuration. Emacs is
 a highly customizable text editor that can be customized with Emacs Lisp. This
 page is written in Org and is the primary [source code](https://github.com/wmedrano/emacs-config) for the actual Emacs
 configuration!
 
-{{< figure src="/ox-hugo/screenshot-small.png" link="/ox-hugo/screenshot.png" >}}
+{{< figure src="/ox-hugo/emacs-config/screenshot-small.png" link="/ox-hugo/emacs-config/screenshot.png" >}}
 
 
 ### Org Mode {#IntroductionOrgMode-c5h72r913tj0}
@@ -140,10 +140,10 @@ the frame. Posframes allow these to move anywhere on the frame. I move it to
 
 ```emacs-lisp
 (require 'ivy-posframe)
-(setq ivy-posframe-style 'point
-      ivy-posframe-font "Fira Code 13"
-      ivy-posframe-border-width 4
-      ivy-height 20)
+(setq-default ivy-posframe-style 'frame-top-center
+              ivy-posframe-font "Fira Code 13"
+              ivy-posframe-border-width 4
+              ivy-height 20)
 (ivy-posframe-mode t)
 ```
 
@@ -379,6 +379,7 @@ methods to use Ivy minibuffer completion. See <https://github.com/abo-abo/swiper
 (require 'counsel)
 (ivy-mode t)
 (counsel-mode t)
+(global-set-key (kbd "C-x b") #'counsel-switch-buffer)
 ```
 
 All the icons integration can also be used to add pretty icons to the

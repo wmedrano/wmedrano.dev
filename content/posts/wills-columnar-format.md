@@ -1,8 +1,8 @@
 +++
-title = "Will's Columnar Format"
+title = "Literate Program - Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
-lastmod = 2023-05-04T08:21:43-07:00
+lastmod = 2023-05-08T04:23:32-07:00
 draft = false
 +++
 

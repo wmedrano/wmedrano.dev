@@ -25,7 +25,7 @@ theme = 'maverick'
     weight = 0
   [[menu.main]]
     identifier = "posts"
-    name = "Post"
+    name = "Posts"
     url = "/posts/"
     weight = 1
   [[menu.main]]
