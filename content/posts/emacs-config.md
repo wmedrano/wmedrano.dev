@@ -1,8 +1,8 @@
 +++
-title = "Emacs Configuration"
+title = "Literate Program - Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-04T08:24:36-07:00
+lastmod = 2023-05-08T04:11:58-07:00
 draft = false
 +++
 
@@ -74,48 +74,25 @@ package updates or
 (require 'package)
 ;; Taken from https://melpa.org/#/getting-started
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(setq package-selected-packages '(
-                                  ace-window
-                                  all-the-icons-ivy-rich
-                                  avy
-                                  company
-                                  company-box
-                                  counsel
-                                  counsel-projectile
-                                  diff-hl
-                                  dracula-theme
-                                  doom-modeline
-                                  eglot
-                                  evil
-                                  evil-anzu
-                                  evil-avy
-                                  evil-commentary
-                                  evil-surround
+(setq package-selected-packages '(ace-window
+                                  all-the-icons-ivy-rich avy
+                                  company company-box counsel
+                                  counsel-projectile diff-hl
+                                  dracula-theme doom-modeline
+                                  eglot evil evil-anzu evil-avy
+                                  evil-commentary evil-surround
                                   evil-terminal-cursor-changer
                                   flyspell-correct
                                   flyspell-correct-ivy
-                                  graphviz-dot-mode
-                                  htmlize
-                                  ivy
-                                  ivy-emoji
-                                  ivy-rich
-                                  ivy-posframe
-                                  magit
-                                  markdown-mode
-                                  monokai-pro-theme
-                                  nord-theme
-                                  org-sidebar
-                                  org-unique-id
-                                  ox-gfm
-                                  ox-hugo
-                                  projectile
-                                  rust-mode
-                                  swiper
-                                  toml-mode
-                                  treemacs
-                                  which-key
-                                  yaml-mode
-                                  ))
+                                  graphviz-dot-mode htmlize ivy
+                                  ivy-emoji ivy-rich ivy-posframe
+                                  magit markdown-mode
+                                  monokai-pro-theme nord-theme
+                                  org-sidebar org-unique-id
+                                  ox-gfm ox-hugo projectile
+                                  python-mode rust-mode swiper
+                                  toml-mode treemacs which-key
+                                  yaml-mode ))
 (package-initialize)
 ```
 
@@ -141,23 +118,17 @@ are no longer needed.
 ### Theme {#BasicsTheme-1tk72r913tj0}
 
 ```emacs-lisp
-(require 'monokai-pro-theme)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("24168c7e083ca0bbc87c68d3139ef39f072488703dcdd82343b8cab71c0f62a7" "f681100b27d783fefc3b62f44f84eb7fa0ce73ec183ebea5903df506eb314077" default))
- '(package-selected-packages
-   '(evil-anzu company-quickhelp ace-window all-the-icons-ivy-rich company company-box counsel counsel-projectile diff-hl dracula-theme doom-modeline eglot evil evil-commentary evil-surround evil-terminal-cursor-changer flyspell-correct flyspell-correct-ivy graphviz-dot-mode htmlize ivy ivy-emoji ivy-rich ivy-posframe magit markdown-mode monokai-pro-theme nord-theme org-sidebar org-unique-id ox-gfm ox-hugo projectile rust-mode swiper toml-mode which-key yaml-mode)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-(load-theme 'monokai-pro)
+(defun set-up-light-theme ()
+  (require 'catppuccin-theme)
+  (setq catppuccin-flavor 'latte)
+  (catppuccin-reload)
+  (load-theme 'catppuccin t))
+
+(defun set-up-dark-theme ()
+  (require 'nord-theme)
+  (load-theme 'nord t))
+
+(set-up-light-theme)
 (set-frame-font "Fira Code 12")
 (when (display-graphic-p)
   (set-frame-parameter (selected-frame) 'alpha '(97 . 97)))
@@ -252,7 +223,9 @@ This section contains configuration that removes noisy elements from the UI.
       ring-bell-function 'ignore)
 (menu-bar-mode 0)
 (tool-bar-mode 0)
+;; The doom scrollbar is cleaner. It appears in the modeline.
 (scroll-bar-mode 0)
+(setq-default doom-modeline-hud t)
 ```
 
 ```emacs-lisp
@@ -314,10 +287,9 @@ up a single line.
 To jump around quicker to something on the screen though, `evil-avy` can be
 used. The workflow for this is to
 
--   Find a character on the screen to jump to.
+-   Find the spot on the screen to jump to.
 -   Press `gw`.
--   Press the character to jump to.
--   Avy will tag all sequences starting with said character with a chord.
+-   Avy will no tag all word sequences with a chord.
 -   Enter the 2-4 letter chord.
 
 <!--listend-->
@@ -325,7 +297,7 @@ used. The workflow for this is to
 ```emacs-lisp
 (require 'avy)
 (require 'evil-avy)
-(w/define-motion-key (kbd "gw") #'evil-avy-goto-word-1)
+(w/define-motion-key (kbd "gw") #'evil-avy-goto-word-0)
 ```
 
 Disable the VIM TAB key. This allows TAB to pass through to the underlying
@@ -760,6 +732,21 @@ mode.
 ## Language Specific Configurations {#LanguageSpecificConfigurations-he382r913tj0}
 
 
+### Python Mode {#LanguageSpecificConfigurationsPythonMode-xyr2znd1htj0}
+
+Properly supporting requires having pyright installed. This can be installed
+with `pip install pyright`.
+
+```emacs-lisp
+(require 'python-mode)
+(require 'eglot)
+(defun w/set-up-python-mode ()
+  (eglot-ensure)
+  (add-hook 'before-save-hook #'eglot-format-buffer 0 t))
+(add-hook 'python-mode-hook #'set-up-python-mode)
+```
+
+
 ### Rust Mode {#LanguageSpecificConfigurationsRustMode-93482r913tj0}
 
 Properly supporting requires installing the `rust-analyzer` LSP. Proper support
@@ -777,11 +764,11 @@ rustup component add rust-analyzer
 (add-to-list 'eglot-server-programs
              '((rust-ts-mode rust-mode) . ("rustup" "run" "stable" "rust-analyzer")))
 
-(defun w/setup-rust-mode ()
+(defun w/set-up-rust-mode ()
   (setq-local fill-column 100)
   (eglot-ensure)
   (add-hook 'before-save-hook #'eglot-format-buffer 0 t))
-(add-hook 'rust-mode-hook #'w/setup-rust-mode)
+(add-hook 'rust-mode-hook #'w/set-up-rust-mode)
 ```
 
 
@@ -875,16 +862,11 @@ a local variable:
 
 #### Editing {#OrgModeCodeBlocksEditing-2hvafd119tj0}
 
-Source code blocks can be edited in a different buffer (same window) with `C-c
+Source code blocks can be edited in a different buffer and window with `C-c
 C-'`. To save the contents and return to the Org document, save the file or use
 `C-c C-'`.
 
 ```emacs-lisp
-(setq-default org-src-window-setup 'current-window)
-(add-hook 'org-mode-hook (lambda ()
-                           (setq-local electric-pair-inhibit-predicate
-                                       `(lambda (c)
-                                          (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
 (define-key org-src-mode-map (kbd "C-s") #'org-edit-src-exit)
 (define-key org-src-mode-map (kbd "C-c C-'") #'org-edit-src-exit)
 ```

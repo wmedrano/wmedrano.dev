@@ -7,8 +7,7 @@ draft = false
 +++
 
 I'm Will Medrano. I work as a Senior Software Engineer at Google. I deal with
-very big data during my day job, but in my spare time I tinker with a variety of
-things like:
+very big data during my day job, but tinker with a variety of things like:
 
 -   The Rust programming language.
 -   Audio for music creation purposes.
@@ -16,7 +15,6 @@ things like:
 
 
 ## Notable Open Source Work {#notable-open-source-work}
-
 
 ### Rust JACK {#rust-jack}
 
@@ -34,7 +32,6 @@ keypresses and parameter changes.
 ### livi-rs {#livi-rs}
 
 <https://github.com/wmedrano-livi-rs> is a Rust library for hosting LV2 plugins.
-
 
 ## Website Source Code {#website-source-code}
 

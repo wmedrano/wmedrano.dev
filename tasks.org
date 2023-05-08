@@ -1,0 +1,37 @@
+#+TITLE: Project Tracking
+#+AUTHOR: Will Medrano
+#+EMAIL: will.s.medrano@gmail.com
+
+* Open
+:PROPERTIES:
+:CUSTOM_ID: Open-guoim171ktj0
+:END:
+
+** TODO Clean up static/ox-hugo
+:PROPERTIES:
+:CUSTOM_ID: Cleanupstaticoxhugo-zoz7bt41ktj0
+:END:
+
+There are some redundant assets there. Best thing would be to delete everything
+and regenerate the assets.
+
+* Closed
+:PROPERTIES:
+:CUSTOM_ID: Closed-krpim171ktj0
+:END:
+
+** DONE Use a cleaner theme.
+:PROPERTIES:
+:CUSTOM_ID: Useacleanertheme-n6y7bt41ktj0
+:END:
+
++The current Hugo theme dedicates too much room for the sidebar.+
+
+Switched to [[https://github.com/canhtran/maverick][Maverick]] theme.
+
+** DONE Move literate programs under posts
+:PROPERTIES:
+:CUSTOM_ID: Moveliterateprogramsunderposts-kyy7bt41ktj0
+:END:
+
+This is to unify things since I will be literate programming less.
