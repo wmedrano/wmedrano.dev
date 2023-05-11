@@ -1,8 +1,9 @@
 +++
-title = "Literate Programming With Org Mode"
+title = "Experience with Literate Programming in Org Mode"
 author = ["Will Medrano"]
 date = 2023-04-20
-lastmod = 2023-05-08T04:32:46-07:00
+lastmod = 2023-05-10T22:43:09-07:00
+tags = ["emacs"]
 draft = false
 +++
 
@@ -16,21 +17,34 @@ Configuration as a literate program.
 
 ## What is Emacs and Org Mode? {#LiterateProgrammingWhatisEmacsandOrgMode-2u91zi71ktj0}
 
+
+### Emacs {#LiterateProgrammingWhatisEmacsandOrgModeEmacs-ykahlbp0otj0}
+
 Emacs is a (very old) text editor that is highly customizable. The configuration
-is one of the main appeals of Emacs. It is configured using Emacs Lisp. Pretty
-much everything in Emacs is extensible. The documentation (and built in editor
-documentation) for Emacs is also fantastic. Don't know what a key will do, type
-`C-h k <key that you want to know>` and Emacs will open up a help window with
-the function that the key will run and where that function is defined. Need to
-know what a function does, type `C-h f <function>` to open up its documentation
-with a link to its source code. Although this means Emacs is very powerful, that
-really isn't the draw for me. As a Software Engineer, I much prefer writing code
-as opposed to writing a config. This is why I have spent countless hours
-configuring Emacs as opposed to the bare minimum configuring VSCode. Emacs also
-has a large community of developers that have created several packages. My main
-source for discovering these is [Melpa](https://melpa.org/#/). Unfortunately I have mostly been off
-Emacs lately. The primary reason being that LSP integration is not quite as good
-as VSCode.
+is one of the main appeals of Emacs. Emacs is configured using Emacs Lisp and
+pretty much everything in Emacs is extensible. The documentation for Emacs is
+also fantastic and built directly into the editor. Don't know what a key will
+do? Use `C-h k <key that you want to know>` and Emacs will open up a help window
+with:
+
+-   The function that is run on that keypress.
+-   Documentation for the function.
+-   The keymap that defines the binding.
+-   A link to the source code for the function.
+
+Need to know what a function does, type `C-h f <function>` to open up its
+documentation. Configuring Emacs feels more like writing code than it does
+writing configuration. This is why I have spent countless hours configuring
+Emacs as opposed to the bare minimum configuring VSCode. Emacs also has a large
+community of developers that have created several packages; most popular
+packages are published on [Melpa](https://melpa.org/#/).
+
+Although I like Emacs, I haven't been using it much recently. This is in part to
+its poor integration into my tools at work and also because its LSP integration
+is not as polished as VSCode.
+
+
+### Org Mode {#LiterateProgrammingWhatisEmacsandOrgModeOrgMode-xjqj3bp0otj0}
 
 Org Mode is a note-taking and list management system. Superficially, it is
 similar to Markdown but predates it by about a year (2003 vs 2004). I am just

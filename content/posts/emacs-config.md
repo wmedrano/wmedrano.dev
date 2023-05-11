@@ -2,7 +2,8 @@
 title = "Literate Program - Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-08T16:44:38-07:00
+lastmod = 2023-05-10T23:01:30-07:00
+tags = ["emacs", "literate-program", "config"]
 draft = false
 +++
 
@@ -119,21 +120,23 @@ are no longer needed.
 ### Theme {#BasicsTheme-1tk72r913tj0}
 
 ```emacs-lisp
-(defun set-up-light-theme ()
+(defun wm-set-up-light-theme ()
   (require 'catppuccin-theme)
   (setq catppuccin-flavor 'latte)
   (catppuccin-reload)
   (load-theme 'catppuccin t))
 
-(defun set-up-dark-theme ()
+(defun wm-set-up-dark-theme ()
   (require 'nord-theme)
   (setq catppuccin-flavor 'frappe)
   (load-theme 'catppuccin t))
 
-(set-up-light-theme)
-(set-frame-font "Fira Code 12")
-(when (display-graphic-p)
-  (set-frame-parameter (selected-frame) 'alpha '(97 . 97)))
+(wm-set-up-dark-theme)
+(defun wm-set-up-frame ()
+  (when (display-graphic-p)
+    (set-frame-font "Fira Code 11")
+    (set-frame-parameter (selected-frame) 'alpha '(97 . 97))))
+(add-hook 'after-init-hook #'wm-set-up-frame)
 ```
 
 
@@ -144,12 +147,13 @@ the frame. Posframes allow these to move anywhere on the frame. I move it to
 `point` to prevent having to focus on a different part of the screen.
 
 ```emacs-lisp
-(require 'ivy-posframe)
-(setq-default ivy-posframe-style 'frame-top-center
-              ivy-posframe-font "Fira Code 13"
-              ivy-posframe-border-width 4
-              ivy-height 20)
-(ivy-posframe-mode t)
+(when (display-graphic-p)
+  (require 'ivy-posframe)
+  (setq-default ivy-posframe-style 'frame-top-center
+                ivy-posframe-font "Fira Code 13"
+                ivy-posframe-border-width 4
+                ivy-height 20)
+  (ivy-posframe-mode t))
 ```
 
 
@@ -745,7 +749,7 @@ with `pip install pyright`.
 (defun wm-set-up-python-mode ()
   (eglot-ensure)
   (add-hook 'before-save-hook #'eglot-format-buffer 0 t))
-(add-hook 'python-mode-hook #'set-up-python-mode)
+(add-hook 'python-mode-hook #'wm-set-up-python-mode)
 ```
 
 
@@ -858,7 +862,7 @@ code if it is requested. The prompt can also be disabled for the file by setting
 a local variable:
 
 ```emacs-lisp
-(setq-local org-confirm-babel-evaluate nil)
+(setq-default org-confirm-babel-evaluate nil)
 ```
 
 
@@ -1069,7 +1073,8 @@ as keeping the Org and Emacs Lisp in sync.
 ;;; For more information see (info "(emacs) Directory Variables")
 (("init.el" . ((mode . org-babel-auto-detangle)))
  (".dir-locals.el" . ((mode . org-babel-auto-detangle)))
- (org-mode . ((mode . org-babel-auto-tangle)
+ (org-mode . ((org-hugo-default-static-subdirectory-for-externals . "ox-hugo/emacs-config")
+              (mode . org-babel-auto-tangle)
               (mode . org-hugo-auto-export)
               )))
 ```

@@ -2,7 +2,8 @@
 title = "Literate Program - Game of Life"
 author = ["Will Medrano"]
 date = 2023-04-24
-lastmod = 2023-05-08T04:27:00-07:00
+lastmod = 2023-05-10T22:57:20-07:00
+tags = ["literate-program", "rust"]
 draft = false
 +++
 

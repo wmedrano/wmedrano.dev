@@ -3,14 +3,19 @@ title = "Literate Program - Will's Columnar Format"
 author = ["Will Medrano"]
 date = 2023-04-23
 lastmod = 2023-05-08T04:23:32-07:00
+tags = ["literate-program", "rust"]
 draft = false
 +++
+
+
+**Status: Abandoned. Maintaining this Rust literate-program with Org mode proved
+to cumbersome.**
 
 ## Introduction {#Introduction-h6a696o03tj0}
 
 **Will's Columnar Format V0**
 
-[Will's Columnar Format](https://wmedrano.dev/literate-programs/wills-columnar-format) is a columnar format made by will.s.medrano@gmail.com. It
+[Will's Columnar Format](https://wmedrano.dev/literate-programs/old-wills-columnar-format) is a columnar format made by will.s.medrano@gmail.com. It
 is primarily implemented for educational purposes. If you are interested in
 using a well supported columnar format, consider using [Apache Parquet](https://parquet.apache.org/).
 
@@ -157,14 +162,14 @@ does not repeat, then it is strictly worse.
 
 Example where run length encoding yields benefits:
 
-{{< figure src="/ox-hugo/wills-columnar-format/rle-good-example.png" >}}
+{{< figure src="/ox-hugo/old-wills-columnar-format/rle-good-example.png" >}}
 
 In the worst case when there are no runs, RLE is actually worse. In the example
 below, notice how both normal and run length encoding have the same number of
 values. run length encoding is actually strictly worse since it has to encode
 the value **and** the run length.
 
-{{< figure src="/ox-hugo/wills-columnar-format/rle-bad-example.png" >}}
+{{< figure src="/ox-hugo/old-wills-columnar-format/rle-bad-example.png" >}}
 
 
 #### Sorting Data {#OptimizationTipsSortingData-rsi696o03tj0}
@@ -418,7 +423,7 @@ Perhaps look to [Wes McKinney's](https://ursalabs.org/blog/2019-10-columnar-perf
 
 ### Format Overview {#FormatSpecificationFormatOverview-j3k696o03tj0}
 
-{{< figure src="/ox-hugo/wills-columnar-format/format-diagram.png" >}}
+{{< figure src="/ox-hugo/old-wills-columnar-format/format-diagram.png" >}}
 
 ```rust
 pub fn encode_column_impl<T>(
@@ -462,7 +467,7 @@ where
 Pages contain actual data for the column. Each page encodes elements using
 Bincode. The number of elements within the page are stored in the footer.
 
-{{< figure src="/ox-hugo/wills-columnar-format/format-diagram-pages.png" >}}
+{{< figure src="/ox-hugo/old-wills-columnar-format/format-diagram-pages.png" >}}
 
 The size of each page is currently not configurable. However, the encoder aims
 for a particular minimum page sizes.
@@ -487,7 +492,7 @@ are:
     run length encoding is used, then **encoded values count** will be `1`. However,
     if run length encoding is not used, then this will be `10`.
 
-{{< figure src="/ox-hugo/wills-columnar-format/format-diagram-footer.png" >}}
+{{< figure src="/ox-hugo/old-wills-columnar-format/format-diagram-footer.png" >}}
 
 ```rust
 #[derive(Encode, Decode, PartialEq, Eq, Clone, Debug)]
@@ -523,7 +528,7 @@ pub struct PageInfo {
 The data consists of a sequence of encoded data. Encoding happens using the Rust
 [Bincode](https:github.com/bincode-org/bincode) package to encode/decode each data element.
 
-{{< figure src="/ox-hugo/wills-columnar-format/basic-encoding.png" >}}
+{{< figure src="/ox-hugo/old-wills-columnar-format/basic-encoding.png" >}}
 
 ```rust
 struct Encoding {
@@ -637,7 +642,7 @@ tuple. `(element, run_length)` where `element` contains the data and the
 to determine if RLE has benefits is to test it in practice. That is to say, try
 using both RLE and no RLE to see which one has the smaller size.
 
-{{< figure src="/ox-hugo/wills-columnar-format/rle-encoding.png" >}}
+{{< figure src="/ox-hugo/old-wills-columnar-format/rle-encoding.png" >}}
 
 ```rust
 #[derive(Encode, Decode, Copy, Clone, PartialEq, Debug)]
@@ -759,6 +764,9 @@ fn test_encode_data_combines_repeated_values() {
 
 
 ## Source Code {#SourceCode-45o696o03tj0}
+
+**Note: Source code has since been updated to not be primarily an Org Mode
+literate programming. The below no longer applies.**
 
 The source code is stored at
 <https://github.com/wmedrano/wills-columnar-format>. The main source file is
