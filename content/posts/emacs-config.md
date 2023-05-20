@@ -2,7 +2,7 @@
 title = "Literate Program - Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-10T23:01:30-07:00
+lastmod = 2023-05-12T23:11:34-07:00
 tags = ["emacs", "literate-program", "config"]
 draft = false
 +++
@@ -81,9 +81,9 @@ package updates or
                                   company-box counsel
                                   counsel-projectile diff-hl
                                   dracula-theme doom-modeline
-                                  eglot evil evil-anzu evil-avy
-                                  evil-commentary evil-surround
-                                  evil-terminal-cursor-changer
+                                  eglot
+
+
                                   flyspell-correct
                                   flyspell-correct-ivy
                                   graphviz-dot-mode htmlize ivy
@@ -91,10 +91,10 @@ package updates or
                                   magit markdown-mode
                                   monokai-pro-theme nord-theme
                                   org-sidebar org-unique-id
-                                  ox-gfm ox-hugo projectile
-                                  python-mode rust-mode swiper
-                                  toml-mode treemacs which-key
-                                  yaml-mode ))
+                                  ox-gfm ox-hugo org-preview-html
+                                  projectile python-mode
+                                  rust-mode swiper toml-mode
+                                  treemacs which-key yaml-mode ))
 (package-initialize)
 ```
 
@@ -169,9 +169,6 @@ the frame. Posframes allow these to move anywhere on the frame. I move it to
 ;; the way to the right in the modeline. This means that it is not visible for
 ;; smaller windows.
 (column-number-mode t)
-(unless (display-graphic-p)
-  (require 'evil-terminal-cursor-changer)
-  (evil-terminal-cursor-changer-activate))
 ```
 
 
@@ -249,26 +246,15 @@ This section contains configuration that removes noisy elements from the UI.
 
 ### Key Bindings {#BasicsKeyBindings-m5o72r913tj0}
 
-The keybindings are based around the [Evil](https://www.emacswiki.org/emacs/Evil) package. Evil is the most popular
-Emacs package that implements VIM key bindings. The key bindings present in this
-section are basic bindings. More specific bindings are littered throughout this
-document.
-
-```emacs-lisp
-(defun wm-define-motion-key (keys fn)
-  "Define a new motion key binding on KEYS that runs function FN."
-  (define-key evil-normal-state-map keys nil)
-  (define-key evil-motion-state-map keys fn))
-```
+The key bindings present in this section are basic bindings. More specific
+bindings are littered throughout this document.
 
 
 #### Bindings {#BasicsKeyBindingsBindings-muo72r913tj0}
 
-Enable Evil mode globally to use VIM like modal editing.
+Some basic global key bindings.
 
 ```emacs-lisp
-(evil-mode)
-(defalias 'forward-evil-word 'forward-evil-symbol)
 ;; Jumps to definition. If Eglot is active, then the language server is used
 ;; to find the definition.
 (wm-define-motion-key (kbd "gd") #'evil-goto-definition)
@@ -277,7 +263,7 @@ Enable Evil mode globally to use VIM like modal editing.
 ;; Paste contents into the current cursor. This is used to keep consistency of
 ;; the paste command in terminal and GUI modes. Most terminal emulators paste
 ;; the current clipboard text on C-S-v.
-(define-key evil-insert-state-map (kbd "C-S-v") #'evil-paste-after)
+(global-set-key (kbd "C-S-v") #'yank)
 ```
 
 Use "J" and "K" to scroll up and down the buffer as opposed to the standard
