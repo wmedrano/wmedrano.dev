@@ -1,7 +1,8 @@
 +++
 title = "Moving Back To Emacs"
 author = ["Will Medrano"]
-lastmod = 2023-05-20T12:09:02-07:00
+date = 2023-05-20
+lastmod = 2023-05-20T14:07:25-07:00
 tags = ["emacs", "literate-programming"]
 draft = false
 +++
@@ -126,8 +127,8 @@ challenges arise:
     Emacs users. Emacs at Google is not a first class citizen.
 2.  The monorepo nature breaks things. Grepping over the whole codebase is not
     feasible and packages like `projectile` break.
-3.  I use Google's version of Mercurial [[reference]​](http://www.primordia.com/blog/2010/01/23/why-google-uses-mercurial-over-git/). Although Mercurial is
-    great, I will miss [`Magit`](https://magit.vc/).
+3.  Google does not use Git.Google's version control is fine but I miss
+    using [`Magit`](https://magit.vc/).
 4.  ... And lots of other small tooling differences that are well supported by
     Google's custom editor but require work in Emacs or are not as polished.
 
