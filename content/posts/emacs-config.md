@@ -1,9 +1,9 @@
 +++
-title = "Literate Program - Emacs Configuration"
+title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-12T23:11:34-07:00
-tags = ["emacs", "literate-program", "config"]
+lastmod = 2023-05-20T11:50:08-07:00
+tags = ["emacs", "literate-programming", "config"]
 draft = false
 +++
 
@@ -49,7 +49,7 @@ documentation and auto-complete packages are broken out of the box.
 
 #### Coding Conventions {#IntroductionOrgModeCodingConventions-hwh72r913tj0}
 
-All custom functions are prefixed with `wm-` since Emacs lisp does not support
+All custom functions are prefixed with `w/` since Emacs lisp does not support
 officially support name-spacing.
 
 
@@ -75,34 +75,60 @@ package updates or
 (require 'package)
 ;; Taken from https://melpa.org/#/getting-started
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(setq package-selected-packages '(ace-window
-                                  all-the-icons-ivy-rich avy
-                                  cattpuccin-theme company
-                                  company-box counsel
-                                  counsel-projectile diff-hl
-                                  dracula-theme doom-modeline
+(setq package-selected-packages '(
+                                  ace-window
+                                  avy
+                                  catppuccin-theme
+                                  company
+                                  company-box
+                                  counsel
+                                  counsel-projectile
+                                  diff-hl
+                                  dracula-theme
+                                  doom-modeline
                                   eglot
-
-
+                                  evil
+                                  evil-anzu
+                                  evil-avy
+                                  evil-commentary
+                                  evil-surround
+                                  evil-terminal-cursor-changer
                                   flyspell-correct
                                   flyspell-correct-ivy
-                                  graphviz-dot-mode htmlize ivy
-                                  ivy-emoji ivy-rich ivy-posframe
-                                  magit markdown-mode
-                                  monokai-pro-theme nord-theme
-                                  org-sidebar org-unique-id
-                                  ox-gfm ox-hugo org-preview-html
-                                  projectile python-mode
-                                  rust-mode swiper toml-mode
-                                  treemacs which-key yaml-mode ))
+                                  graphviz-dot-mode
+                                  htmlize
+                                  ivy
+                                  ivy-emoji
+                                  ivy-rich
+                                  ivy-posframe
+                                  key-chord
+                                  magit
+                                  markdown-mode
+                                  monokai-pro-theme
+                                  nerd-icons-ivy-rich
+                                  nord-theme
+                                  org-sidebar
+                                  org-unique-id
+                                  ox-gfm
+                                  ox-hugo
+                                  org-preview-html
+                                  projectile
+                                  rust-mode
+                                  swiper
+                                  toml-mode
+                                  treemacs
+                                  undo-tree
+                                  which-key
+                                  yaml-mode
+                                  ))
 (package-initialize)
 ```
 
-`M-x wm-install-dependencies` installs all the dependencies and prunes any that
+`M-x w/install-dependencies` installs all the dependencies and prunes any that
 are no longer needed.
 
 ```emacs-lisp
-(defun wm-install-dependencies ()
+(defun w/install-dependencies ()
   "Install all dependencies and remove any unused dependencies. If you wish to
   only install new dependencies and not refresh the index and clean up old
   dependencies, use (package-install-selected-packages) instead."
@@ -120,40 +146,25 @@ are no longer needed.
 ### Theme {#BasicsTheme-1tk72r913tj0}
 
 ```emacs-lisp
-(defun wm-set-up-light-theme ()
-  (require 'catppuccin-theme)
-  (setq catppuccin-flavor 'latte)
-  (catppuccin-reload)
-  (load-theme 'catppuccin t))
-
-(defun wm-set-up-dark-theme ()
-  (require 'nord-theme)
-  (setq catppuccin-flavor 'frappe)
-  (load-theme 'catppuccin t))
-
-(wm-set-up-dark-theme)
-(defun wm-set-up-frame ()
-  (when (display-graphic-p)
-    (set-frame-font "Fira Code 11")
-    (set-frame-parameter (selected-frame) 'alpha '(97 . 97))))
-(add-hook 'after-init-hook #'wm-set-up-frame)
+(require 'catppuccin-theme)
+(setq-default catppuccin-flavor 'frappe)
+(load-theme 'catppuccin t)
+(set-frame-font "Fira Code 12")
+(when (display-graphic-p)
+  (set-frame-parameter (selected-frame) 'alpha '(97 . 97)))
 ```
-
-
-### Completion UI {#BasicsCompletionUI-x240c6j0ltj0}
 
 Use a posframe for ivy completion. By default, completions are at the bottom of
 the frame. Posframes allow these to move anywhere on the frame. I move it to
 `point` to prevent having to focus on a different part of the screen.
 
 ```emacs-lisp
-(when (display-graphic-p)
-  (require 'ivy-posframe)
-  (setq-default ivy-posframe-style 'frame-top-center
-                ivy-posframe-font "Fira Code 13"
-                ivy-posframe-border-width 4
-                ivy-height 20)
-  (ivy-posframe-mode t))
+(require 'ivy-posframe)
+(setq ivy-posframe-style 'point
+      ivy-posframe-font "Fira Code 13"
+      ivy-posframe-border-width 4
+      ivy-height 20)
+(ivy-posframe-mode t)
 ```
 
 
@@ -169,6 +180,9 @@ the frame. Posframes allow these to move anywhere on the frame. I move it to
 ;; the way to the right in the modeline. This means that it is not visible for
 ;; smaller windows.
 (column-number-mode t)
+(unless (display-graphic-p)
+  (require 'evil-terminal-cursor-changer)
+  (evil-terminal-cursor-changer-activate))
 ```
 
 
@@ -199,11 +213,15 @@ more options.](https://github.com/seagle0128/doom-modeline#customize)
 Emacs provides plenty of built in help. There are several functions that can be
 activated with `M-x`.
 
-| Key              | Function            | Description                                                                                                                                     |
-|------------------|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `C-h f`          | `describe-function` | Open the documentation and source code for an Emacs Lisp variable                                                                               |
-| `C-h v`          | `describe-variable` | Open the documentation and source code for an Emacs Lisp variable.                                                                              |
-| `C-h k + <keys>` | `describe-key`      | Open the documentation for a key binding. This gives the key that was pressed, the keymap that activated, and the function that will be called. |
+-   `describe-variable` - Open the documentation and source code for an Emacs Lisp
+    variable. Also accessible with `C-h v`.
+-   `describe-function` - Open the documentation and source code for an Emacs Lisp
+    function. Also accessible with `C-h f`.
+-   `describe-key` - After running, the next key map action will be recorded. This
+    will then open the documentation for the function that runs when that key is
+    pressed. For example, in the default normal state of Evil, pressing
+    `describe-key` followed by `j` opens the documentation for
+    `evil-next-line`. Also accessible with `C-h k`.
 
 `which-key-mode` is used to print out the available keys in scenarios where keys
 are changed. For example, when pressing `C-h`, a small popup with help
@@ -225,13 +243,11 @@ This section contains configuration that removes noisy elements from the UI.
       ring-bell-function 'ignore)
 (menu-bar-mode 0)
 (tool-bar-mode 0)
-;; The doom scrollbar is cleaner. It appears in the modeline.
 (scroll-bar-mode 0)
-(setq-default doom-modeline-hud t)
 ```
 
 ```emacs-lisp
-(defun wm-command-error-fn (data context caller)
+(defun w/command-error-fn (data context caller)
   "Ignore several (noisy) signals and pass the rest to the default handler."
   (when (not (memq (car data) '(buffer-read-only
                                 beginning-of-buffer
@@ -240,30 +256,41 @@ This section contains configuration that removes noisy elements from the UI.
                                 end-of-line)))
     (command-error-default-function data context caller)))
 
-(setq command-error-function #'wm-command-error-fn)
+(setq command-error-function #'w/command-error-fn)
 ```
 
 
 ### Key Bindings {#BasicsKeyBindings-m5o72r913tj0}
 
-The key bindings present in this section are basic bindings. More specific
-bindings are littered throughout this document.
+The keybindings are based around the [Evil](https://www.emacswiki.org/emacs/Evil) package. Evil is the most popular
+Emacs package that implements VIM key bindings. The key bindings present in this
+section are basic bindings. More specific bindings are littered throughout this
+document.
+
+```emacs-lisp
+(defun w/define-motion-key (keys fn)
+  "Define a new motion key binding on KEYS that runs function FN."
+  (define-key evil-normal-state-map keys nil)
+  (define-key evil-motion-state-map keys fn))
+```
 
 
 #### Bindings {#BasicsKeyBindingsBindings-muo72r913tj0}
 
-Some basic global key bindings.
+Enable Evil mode globally to use VIM like modal editing.
 
 ```emacs-lisp
+(evil-mode)
+(defalias 'forward-evil-word 'forward-evil-symbol)
 ;; Jumps to definition. If Eglot is active, then the language server is used
 ;; to find the definition.
-(wm-define-motion-key (kbd "gd") #'evil-goto-definition)
+(w/define-motion-key (kbd "gd") #'evil-goto-definition)
 ;; Fuzzy search through all open buffers.
-(wm-define-motion-key (kbd "g/") #'swiper)
+(w/define-motion-key (kbd "g/") #'swiper)
 ;; Paste contents into the current cursor. This is used to keep consistency of
 ;; the paste command in terminal and GUI modes. Most terminal emulators paste
 ;; the current clipboard text on C-S-v.
-(global-set-key (kbd "C-S-v") #'yank)
+(define-key evil-insert-state-map (kbd "C-S-v") #'evil-paste-after)
 ```
 
 Use "J" and "K" to scroll up and down the buffer as opposed to the standard
@@ -271,8 +298,8 @@ Use "J" and "K" to scroll up and down the buffer as opposed to the standard
 up a single line.
 
 ```emacs-lisp
-(wm-define-motion-key (kbd "J") #'evil-scroll-down)
-(wm-define-motion-key (kbd "K") #'evil-scroll-up)
+(w/define-motion-key (kbd "J") #'evil-scroll-down)
+(w/define-motion-key (kbd "K") #'evil-scroll-up)
 ```
 
 To jump around quicker to something on the screen though, `evil-avy` can be
@@ -288,7 +315,7 @@ used. The workflow for this is to
 ```emacs-lisp
 (require 'avy)
 (require 'evil-avy)
-(wm-define-motion-key (kbd "gw") #'evil-avy-goto-word-0)
+(w/define-motion-key (kbd "gw") #'evil-avy-goto-word-0)
 ```
 
 Disable the VIM TAB key. This allows TAB to pass through to the underlying
@@ -304,12 +331,12 @@ I prefer to use some more standard key bindings. For example, Emacs uses `C-x
 C-s` to save while most other modern tools use just `C-s`.
 
 ```emacs-lisp
-(defun wm-save-and-maybe-normal-mode ()
+(defun w/save-and-maybe-normal-mode ()
   "Saves the buffer and then switches to normal mode if in Evil insert state."
   (interactive)
   (when (evil-insert-state-p) (evil-normal-state))
   (save-buffer))
-(global-set-key (kbd "C-s") #'wm-save-and-maybe-normal-mode)
+(global-set-key (kbd "C-s") #'w/save-and-maybe-normal-mode)
 ```
 
 Evil commentary mode enables VIM style keybindings for commenting out code. The
@@ -345,7 +372,7 @@ supports the following commands:
 (setq aw-dispatch-always t)
 (global-set-key (kbd "C-w") #'ace-window)
 ;; Required to override Evil's window switching functionality.
-(wm-define-motion-key (kbd "C-w") #'ace-window)
+(w/define-motion-key (kbd "C-w") #'ace-window)
 ```
 
 Emacs has a habit of asking `yes` or `no` questions. This requires entering the
@@ -363,25 +390,22 @@ pressed. And even then, the completions could be improved. Ivy is used for fuzzy
 minibuffer completions. Counsel is also used to wrap common built in Emacs
 methods to use Ivy minibuffer completion. See <https://github.com/abo-abo/swiper>.
 
-{{< figure src="./screenshots/minibuffer.png" >}}
-
 ```emacs-lisp
 (require 'ivy)
 (require 'counsel)
 (ivy-mode t)
 (counsel-mode t)
-(global-set-key (kbd "C-x b") #'counsel-switch-buffer)
 ```
 
-All the icons integration can also be used to add pretty icons to the
-completions when in GUI (not terminal) mode. If the icons are displaying their
-Unicode values instead, run `M-x all-the-icons-install-fonts`.
+Nerd icons integration can also be used to add pretty icons to the completions
+when in GUI (not terminal) mode. If the icons are displaying their Unicode
+values instead, run `M-x nerd-icons-install-fonts`.
 
 ```emacs-lisp
 (require 'ivy-rich)
-(require 'all-the-icons-ivy-rich)
+(require 'nerd-icons-ivy-rich)
 (ivy-rich-mode t)
-(all-the-icons-ivy-rich-mode t)
+(nerd-icons-ivy-rich-mode t)
 ```
 
 
@@ -400,6 +424,7 @@ this behavior is disorienting so scroll lock is enabled to keep the cursor on
 the same spot on the screen.
 
 ```emacs-lisp
+(setq-default scroll-conservatively 10)
 (scroll-lock-mode t)
 ```
 
@@ -427,7 +452,7 @@ second. To manually refresh, call `C-c r`. Technically, this calls
 ;; modern a modern SSD or NVMe drive.
 (setq auto-revert-interval 1)
 (global-set-key (kbd "C-c r") #'revert-buffer-quick)
-(wm-define-motion-key (kbd "gr") #'revert-buffer-quick)
+(w/define-motion-key (kbd "gr") #'revert-buffer-quick)
 ```
 
 
@@ -494,6 +519,18 @@ it.
 ```
 
 
+### Undo Tree {#TextandFormattingUndoTree-tro34k800uj0}
+
+Undo tree is a more visual way of undo. Use `C-x u` to start undo tree. `j` and
+`k` are used navigate the tree and `q` is used to exit undo tree.
+
+```emacs-lisp
+(require 'undo-tree)
+(setq-default undo-tree-visualizer-diff t)
+(undo-tree-mode t)
+```
+
+
 ## Advanced {#Advanced-o1v72r913tj0}
 
 
@@ -512,7 +549,7 @@ do things within the scope of a project (usually git). Actions include:
 (require 'projectile)
 (require 'counsel-projectile)
 (projectile-mode t)
-(wm-define-motion-key (kbd "gp") #'projectile-command-map)
+(w/define-motion-key (kbd "gp") #'projectile-command-map)
 ```
 
 The major key bindings for this are:
@@ -538,11 +575,11 @@ the compiler and navigated to when using "go to definition" of the library
 functions.
 
 ```emacs-lisp
-(defun wm-projectile-project-is-ignored (root)
+(defun w/projectile-project-is-ignored (root)
   "Returns t if the project at the given root should be ignored."
   (or (string-match-p "\.cargo" root)
       (string-match-p "\.rustup" root)))
-(setq projectile-ignored-project-function #'wm-projectile-project-is-ignored)
+(setq projectile-ignored-project-function #'w/projectile-project-is-ignored)
 ```
 
 
@@ -597,7 +634,7 @@ To do a realtime search over the project, `counsel-projectile-rg` is used.
 
 ```emacs-lisp
 (require 'counsel-projectile)
-(wm-define-motion-key (kbd "g/") #'counsel-projectile-rg)
+(w/define-motion-key (kbd "g/") #'counsel-projectile-rg)
 ```
 
 
@@ -638,8 +675,8 @@ configurations sections to see if the Major Mode supports Eglot. For example,
 
 ```emacs-lisp
 (require 'eglot)
-(wm-define-motion-key (kbd "<f2>") #'eglot-rename)
-(wm-define-motion-key (kbd "g.") #'eglot-code-actions)
+(w/define-motion-key (kbd "<f2>") #'eglot-rename)
+(w/define-motion-key (kbd "g.") #'eglot-code-actions)
 ```
 
 
@@ -686,57 +723,42 @@ Emacs. To get improved syntax checking, Eglot needs to be enabled for the major
 mode.
 
 ```emacs-lisp
-(wm-define-motion-key (kbd "<f8>") #'flymake-goto-next-error)
+(w/define-motion-key (kbd "<f8>") #'flymake-goto-next-error)
 ```
 
 ```emacs-lisp
-(defun wm-force-eglot-didSave ()
+(defun w/force-eglot-didSave ()
   "Forces eglot to communicate a didSave signal. This usually kicks off syntax
   checking."
   (when (eglot-managed-p)
     (message "Forcing Eglot to send didSave signal.")
     (message nil)
     (eglot--signal-textDocument/didSave)))
-(add-hook 'after-revert-hook #'wm-force-eglot-didSave)
+(add-hook 'after-revert-hook #'w/force-eglot-didSave)
 ```
 
 
 ### Extra Utility Functions {#AdvancedExtraUtilityFunctions-op282r913tj0}
 
 ```emacs-lisp
-(setq wm-emacs-org-config (expand-file-name "emacs-config.org" user-emacs-directory))
-(defun wm-reload-emacs-config ()
+(setq w/emacs-org-config (expand-file-name "emacs-config.org" user-emacs-directory))
+(defun w/reload-emacs-config ()
   "Reload the emacs config."
   (interactive)
   (load-file (expand-file-name "init.el" user-emacs-directory))
   (message "Emacs config reloaded."))
-(defun wm-open-emacs-config ()
+(defun w/open-emacs-config ()
   "Open the Emacs configuration."
   (interactive)
   (find-file (expand-file-name "emacs-config.org" user-emacs-directory)))
 
-(defun wm-is-emacs-org-config ()
+(defun w/is-emacs-org-config ()
   "Returns t if the current buffer is the primary org config"
-  (string= wm-emacs-org-config buffer-file-name))
+  (string= w/emacs-org-config buffer-file-name))
 ```
 
 
 ## Language Specific Configurations {#LanguageSpecificConfigurations-he382r913tj0}
-
-
-### Python Mode {#LanguageSpecificConfigurationsPythonMode-xyr2znd1htj0}
-
-Properly supporting requires having pyright installed. This can be installed
-with `pip install pyright`.
-
-```emacs-lisp
-(require 'python-mode)
-(require 'eglot)
-(defun wm-set-up-python-mode ()
-  (eglot-ensure)
-  (add-hook 'before-save-hook #'eglot-format-buffer 0 t))
-(add-hook 'python-mode-hook #'wm-set-up-python-mode)
-```
 
 
 ### Rust Mode {#LanguageSpecificConfigurationsRustMode-93482r913tj0}
@@ -756,11 +778,11 @@ rustup component add rust-analyzer
 (add-to-list 'eglot-server-programs
              '((rust-ts-mode rust-mode) . ("rustup" "run" "stable" "rust-analyzer")))
 
-(defun wm-set-up-rust-mode ()
+(defun w/setup-rust-mode ()
   (setq-local fill-column 100)
   (eglot-ensure)
   (add-hook 'before-save-hook #'eglot-format-buffer 0 t))
-(add-hook 'rust-mode-hook #'wm-set-up-rust-mode)
+(add-hook 'rust-mode-hook #'w/setup-rust-mode)
 ```
 
 
@@ -771,7 +793,8 @@ programming.
 
 -   Source code blocks should be syntax highlighted.
 
-<!--listend-->
+
+### Basic Org Mode {#OrgModeBasicOrgMode-7czdjo71rtj0}
 
 ```emacs-lisp
 (setq org-src-fontify-natively t)
@@ -782,10 +805,10 @@ programming.
 <!--listend-->
 
 ```emacs-lisp
-(defun wm-setup-org-mode ()
+(defun w/setup-org-mode ()
   (require 'org-unique-id)
   (add-hook 'before-save-hook #'org-unique-id 0 t))
-(add-hook 'org-mode-hook #'wm-setup-org-mode)
+(add-hook 'org-mode-hook #'w/setup-org-mode)
 ```
 
 
@@ -805,7 +828,7 @@ programming.
 ```emacs-lisp
 (require 'org)
 (define-key org-mode-map (kbd "C-c C-j") #'counsel-org-goto)
-(wm-define-motion-key (kbd "gl") #'org-open-at-point-global)
+(w/define-motion-key (kbd "gl") #'org-open-at-point-global)
 ```
 
 
@@ -843,11 +866,10 @@ first line in the file. Example:
 #### Executing {#OrgModeCodeBlocksExecutingCodeBlocks-7vvf5e314tj0}
 
 Code blocks can be executed by selecting them with the cursor and running `C-c
-C-c`. This prompts for y-or-n if the code should be evaluated and evaluates the
-code if it is requested. The prompt can also be disabled for the file by setting
-a local variable:
+C-c`.
 
 ```emacs-lisp
+;; Disable confirmation prompt for evaluating code.
 (setq-default org-confirm-babel-evaluate nil)
 ```
 
@@ -875,8 +897,7 @@ code in the source file is surrounded by valid Org links.
 -   `org-babel-tangle` - Tangle the current Org document.
 -   `org-babel-detangle` - Detangle the current source code.
 
-Org files may automatically be tangled on save with
-`org-babel-auto-tangle-mode`.
+<!--listend-->
 
 ```emacs-lisp
 (require 'ob-tangle)
@@ -897,26 +918,6 @@ Org files may automatically be tangled on save with
         (delete-other-windows keep-window)
       (select-window keep-window))
     (goto-char point-before-tangle)))
-```
-
-```emacs-lisp
-;; Declare variables to prevent warning:
-;; File local-variables error: (void-function org-babel-auto-detangle-mode)
-(define-minor-mode org-babel-auto-tangle-mode
-  "Toggle auto tangling on save."
-  :lighter "tangle"
-  (defvar org-babel-auto-tangle-mode)
-  (if org-babel-auto-tangle-mode
-      (add-hook 'after-save-hook #'org-babel-tangle :append :local)
-    (remove-hook 'after-save-hook #'org-babel-tangle :local)))
-
-(define-minor-mode org-babel-auto-detangle-mode
-  "Toggle auto detangling on save."
-  :lighter "detangle"
-  (defvar org-babel-auto-detangle-mode nil)
-  (if org-babel-auto-detangle-mode
-      (add-hook 'after-save-hook #'org-babel-detangle-keep-window :append :local)
-    (remove-hook 'after-save-hook #'org-babel-detangle-keep-window :local)))
 ```
 
 
@@ -1016,14 +1017,14 @@ npm install -g yaml-language-server --prefix ~/.local/npm
 (require 'yaml-mode)
 (add-to-list 'eglot-server-programs
              '((yaml-mode) . ("~/.local/npm/bin/yaml-language-server")))
-(defun wm-setup-yaml-mode ()
+(defun w/setup-yaml-mode ()
   "Sets up the YAML major mode."
   ;; Eglot is commented out until the YAML language server is proven to
   ;; successfuly run.
   ;; (eglot-ensure)
   ;; (add-hook 'before-save-hook #'eglot-format-buffer 0 t)
   )
-(add-hook 'yaml-mode-hook #'wm-setup-yaml-mode)
+(add-hook 'yaml-mode-hook #'w/setup-yaml-mode)
 ```
 
 
@@ -1055,12 +1056,10 @@ as keeping the Org and Emacs Lisp in sync.
 
 ```lisp-data
 ;;; Directory Local Variables
-;;; Generated from emacs-config.org
 ;;; For more information see (info "(emacs) Directory Variables")
-(("init.el" . ((mode . org-babel-auto-detangle)))
- (".dir-locals.el" . ((mode . org-babel-auto-detangle)))
- (org-mode . ((org-hugo-default-static-subdirectory-for-externals . "ox-hugo/emacs-config")
-              (mode . org-babel-auto-tangle)
-              (mode . org-hugo-auto-export)
+(("init.el" . ())
+ (".dir-locals.el" . ())
+ (org-mode . ((mode . org-hugo-auto-export)
+              (org-hugo-default-static-subdirectory-for-externals . "ox-hugo/emacs-config")
               )))
 ```

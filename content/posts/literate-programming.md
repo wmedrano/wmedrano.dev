@@ -1,11 +1,12 @@
 +++
-title = "Experience with Literate Programming in Org Mode"
+title = "Literate Programming"
 author = ["Will Medrano"]
-date = 2023-04-20
-lastmod = 2023-05-10T22:43:09-07:00
-tags = ["emacs"]
+lastmod = 2023-05-20T12:01:04-07:00
+tags = ["emacs", "literate-programming"]
 draft = false
 +++
+
+## Literate Programming {#LiterateProgramming-7cxbcx401uj0}
 
 <div class="SUMMARY">
 
@@ -15,52 +16,24 @@ Configuration as a literate program.
 </div>
 
 
-## What is Emacs and Org Mode? {#LiterateProgrammingWhatisEmacsandOrgMode-2u91zi71ktj0}
-
-
-### Emacs {#LiterateProgrammingWhatisEmacsandOrgModeEmacs-ykahlbp0otj0}
+### What is Emacs and Org Mode? {#LiterateProgrammingWhatisEmacsandOrgMode-2u91zi71ktj0}
 
 Emacs is a (very old) text editor that is highly customizable. The configuration
-is one of the main appeals of Emacs. Emacs is configured using Emacs Lisp and
-pretty much everything in Emacs is extensible. The documentation for Emacs is
-also fantastic and built directly into the editor. Don't know what a key will
-do? Use `C-h k <key that you want to know>` and Emacs will open up a help window
-with:
-
--   The function that is run on that keypress.
--   Documentation for the function.
--   The keymap that defines the binding.
--   A link to the source code for the function.
-
-Need to know what a function does, type `C-h f <function>` to open up its
-documentation. Configuring Emacs feels more like writing code than it does
-writing configuration. This is why I have spent countless hours configuring
-Emacs as opposed to the bare minimum configuring VSCode. Emacs also has a large
-community of developers that have created several packages; most popular
-packages are published on [Melpa](https://melpa.org/#/).
-
-Although I like Emacs, I haven't been using it much recently. This is in part to
-its poor integration into my tools at work and also because its LSP integration
-is not as polished as VSCode.
-
-
-### Org Mode {#LiterateProgrammingWhatisEmacsandOrgModeOrgMode-xjqj3bp0otj0}
+is one of the main appeals of Emacs.
 
 Org Mode is a note-taking and list management system. Superficially, it is
 similar to Markdown but predates it by about a year (2003 vs 2004). I am just
 now beginning to look into Org Mode to organize my life, but I plan to
 incorporate it into most aspects of my note taking and task tracking.
 
-
-## Journey To Literate Programming {#LiterateProgrammingJourneyToLiterateProgramming-fba1zi71ktj0}
-
 For my recent return to Emacs, I wanted to focus on learning Org Mode. However,
-I first needed to remake my Emacs configuration! Conveniently, it turns out that
-Org Mode is one of the supported ways of writing an Emacs configuration. Writing
-in Org Mode is also often considered a form of literate programming.
+I first needed to remake my Emacs configuration! It turns out that it is
+somewhat fashionable to write Emacs configuration in Org Mode!
+
+{{< figure src="/ox-hugo/literate-programming-emacs-org-config.png" >}}
 
 
-## What Is Literate Programming? {#LiterateProgrammingWhatIsLiterateProgramming-5ra1zi71ktj0}
+### What Is Literate Programming? {#LiterateProgrammingWhatIsLiterateProgramming-5ra1zi71ktj0}
 
 Literate programming  is a methodology that focuses on create a literate
 document. This is opposed to the traditional paradigm in which the code is a
@@ -74,29 +47,29 @@ From [literateprogramming.com](https://www.literateprogramming.com) by Donald Kn
 > computer to do.
 
 
-## Emacs Lisp in Org Mode Experience {#LiterateProgrammingEmacsLispinOrgModeExperience-77b1zi71ktj0}
+### Emacs Lisp in Org Mode Experience {#LiterateProgrammingEmacsLispinOrgModeExperience-77b1zi71ktj0}
 
 At first, writing an Emacs Lisp program with Org Mode felt pretty normal and
 everything worked as expected. However, I noticed a deficiency once I exported
-the Org file to HTML. Although I thought that the layout of my code made sense,
-the final HTML didn't feel high quality. After some refactoring the document
-started to become more readable. And then, it clicked. When adding a new feature
-to my configuration, I started thinking more in terms of the literate part. When
-adding a new feature, my first thought is now to take a look at the outline and
-find the place where it fits best.
+the Org file to HTML. Although the layout of my code made sense, the final HTML
+artifact didn't feel high quality, it was not very readable. Adding more code
+made the document even more unreadable which led me down the rabbit hole of
+refactoring around the HTML until... At some point I learned my lesson. Instead
+of just making code changes to start, I instead skimmed the document to find the
+perfect place for the code to fit into the narrative.
 
 
-## Result {#LiterateProgrammingResult-nmb1zi71ktj0}
+### Result {#LiterateProgrammingResult-nmb1zi71ktj0}
 
 The final literate program can be read at
-<https://www.wmedrano.dev/literate-programs/emacs-config> with the source code
+<https://www.wmedrano.dev/posts/emacs-config> with the source code
 residing in <https://github.com/wmedrano/emacs-config>.
 
 
-## Observations {#LiterateProgrammingObservations-h1c1zi71ktj0}
+### Observations {#LiterateProgrammingObservations-h1c1zi71ktj0}
 
 
-### Narrative {#LiterateProgrammingObservationsNarrative-ygc1zi71ktj0}
+#### Narrative {#LiterateProgrammingObservationsNarrative-ygc1zi71ktj0}
 
 Literate programming focuses on readability front and foremost. When adding
 features to my Emacs configuration, I first have to envision how it fits into
@@ -114,17 +87,18 @@ programming further. For people like my younger self that saw documentation as a
 chore, I expect that literate programming is utterly unappealing.
 
 
-### Refactoring {#LiterateProgrammingObservationsRefactoring-mwc1zi71ktj0}
+#### Refactoring {#LiterateProgrammingObservationsRefactoring-mwc1zi71ktj0}
 
 Due to having to create a narrative, literate programming requires knowing more
 up front. Since I have written my Emacs configuration from scratch several
 times, I was able to come up with something cohesive. However, moving around
-pieces required significantly more refactoring effort. In areas that I'm less
-familiar with, I would imagine that creating a fully literate program may not be
-feasible or worth it.
+pieces required significantly more refactoring effort. This could be a problem
+when prototyping in a new space. Overall, I would say that the increased effort
+required to refactor is the biggest weakness in going all in on literate
+programming.
 
 
-### Tooling {#LiterateProgrammingObservationsTooling-ecd1zi71ktj0}
+#### Tooling {#LiterateProgrammingObservationsTooling-ecd1zi71ktj0}
 
 Org Mode has great tooling to export Org Mode files. There's support for Emacs
 Lisp, markdown, and HTML. Writing an Org file is also a great literary
@@ -137,7 +111,7 @@ functionality that I'm accustomed to was broken out of the box. This includes:
 -   Refactoring support like renaming a variable.
 
 
-## Future Work {#LiterateProgrammingFutureWork-brd1zi71ktj0}
+### Future Work {#LiterateProgrammingFutureWork-brd1zi71ktj0}
 
 **Will I migrate any of my real work to literate programming?**
 
@@ -162,7 +136,7 @@ Definitely. I will
 -   read some literate programs.
 
 
-## References {#LiterateProgrammingReferences-57e1zi71ktj0}
+### References {#LiterateProgrammingReferences-57e1zi71ktj0}
 
 -   [Dynamic Notebooks and Literate Programming - Sam Ritchie](https://www.youtube.com/watch?v=UCEzBNh9ufs) - London Clojurians
     YouTube channel.
