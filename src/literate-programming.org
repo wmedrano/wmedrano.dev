@@ -1,12 +1,12 @@
 #+TITLE: Literate Programming
 #+AUTHOR: Will Medrano
 #+HUGO_BASE_DIR: ./..
-#+HUGO_EXPORT_DATE: 2023-04-20
+#+DATE: 2023-04-20
 #+EXPORT_TITLE: Experience with Literate Programming in Org Mode
 #+EXPORT_FILE_NAME: literate-programming
 #+FILETAGS: emacs literate-programming
 
-* Literate Programming
+* TLDR
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgramming-7cxbcx401uj0
 :END:
@@ -16,7 +16,7 @@ By looking into Org Mode, I managed to sidetrack myself into writing my Emacs
 Configuration as a literate program.
 #+END_SUMMARY
 
-** What is Emacs and Org Mode?
+* What is Emacs and Org Mode?
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgrammingWhatisEmacsandOrgMode-2u91zi71ktj0
 :END:
@@ -46,7 +46,7 @@ somewhat fashionable to write Emacs configuration in Org Mode!
 #+RESULTS:
 [[file:literate-programming-emacs-org-config.png]]
 
-** What Is Literate Programming?
+* What Is Literate Programming?
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgrammingWhatIsLiterateProgramming-5ra1zi71ktj0
 :END:
@@ -64,7 +64,7 @@ do, let us concentrate rather on explaining to human beings what we want a
 computer to do.
 #+END_QUOTE
 
-** Emacs Lisp in Org Mode Experience
+* Emacs Lisp in Org Mode Experience
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgrammingEmacsLispinOrgModeExperience-77b1zi71ktj0
 :END:
@@ -78,7 +78,7 @@ refactoring around the HTML until... At some point I learned my lesson. Instead
 of just making code changes to start, I instead skimmed the document to find the
 perfect place for the code to fit into the narrative.
 
-** Result
+* Result
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgrammingResult-nmb1zi71ktj0
 :END:
@@ -87,7 +87,7 @@ The final literate program can be read at
 [[https://www.wmedrano.dev/posts/emacs-config]] with the source code
 residing in [[https://github.com/wmedrano/emacs-config]].
 
-** Observations
+* Observations
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgrammingObservations-h1c1zi71ktj0
 :END:
@@ -114,7 +114,7 @@ writing documentation, I am very interested in pursuing the ideas of literate
 programming further. For people like my younger self that saw documentation as a
 chore, I expect that literate programming is utterly unappealing.
 
-*** Refactoring
+** Refactoring
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgrammingObservationsRefactoring-mwc1zi71ktj0
 :END:
@@ -127,7 +127,7 @@ when prototyping in a new space. Overall, I would say that the increased effort
 required to refactor is the biggest weakness in going all in on literate
 programming.
 
-*** Tooling
+** Tooling
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgrammingObservationsTooling-ecd1zi71ktj0
 :END:
@@ -142,7 +142,7 @@ functionality that I'm accustomed to was broken out of the box. This includes:
 - Go to definition.
 - Refactoring support like renaming a variable.
 
-** Future Work
+* Future Work
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgrammingFutureWork-brd1zi71ktj0
 :END:
@@ -169,7 +169,7 @@ Definitely. I will
 - read some literate programs.
 
 
-** References
+* References
 :PROPERTIES:
 :CUSTOM_ID: LiterateProgrammingReferences-57e1zi71ktj0
 :END:

@@ -1,10 +1,17 @@
 +++
 title = "Moving Back To Emacs"
 author = ["Will Medrano"]
-lastmod = 2023-05-20T12:00:24-07:00
+lastmod = 2023-05-20T12:09:02-07:00
 tags = ["emacs", "literate-programming"]
 draft = false
 +++
+
+## TLDR {#TLDR-szbezj301uj0}
+
+Emacs is a great editor and a joy to configure. Since I’m in no rush to be
+productive, it's a great time to have fun configuring my Emacs and honing my
+Emacs Lisp skills.
+
 
 ## Strengths of Emacs {#EmacsStrengthsofEmacs-24ufo2101uj0}
 
@@ -123,12 +130,6 @@ challenges arise:
     great, I will miss [`Magit`](https://magit.vc/).
 4.  ... And lots of other small tooling differences that are well supported by
     Google's custom editor but require work in Emacs or are not as polished.
-
-
-## TLDR {#TLDR-szbezj301uj0}
-
-Emacs is a great editor and a joy to configure. Since I'm in no rush to be
-productive, I may as well get to know Emacs and Emacs Lisp better.
 
 [^fn:1]: I've tried (in roughly chronological order with bolding signifying
     significant customization effort in bold): Notepad++, Sublime, Visual Studio,

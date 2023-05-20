@@ -1,12 +1,13 @@
 +++
 title = "Literate Programming"
 author = ["Will Medrano"]
-lastmod = 2023-05-20T12:01:04-07:00
+date = 2023-04-20
+lastmod = 2023-05-20T12:11:11-07:00
 tags = ["emacs", "literate-programming"]
 draft = false
 +++
 
-## Literate Programming {#LiterateProgramming-7cxbcx401uj0}
+## TLDR {#LiterateProgramming-7cxbcx401uj0}
 
 <div class="SUMMARY">
 
@@ -16,7 +17,7 @@ Configuration as a literate program.
 </div>
 
 
-### What is Emacs and Org Mode? {#LiterateProgrammingWhatisEmacsandOrgMode-2u91zi71ktj0}
+## What is Emacs and Org Mode? {#LiterateProgrammingWhatisEmacsandOrgMode-2u91zi71ktj0}
 
 Emacs is a (very old) text editor that is highly customizable. The configuration
 is one of the main appeals of Emacs.
@@ -33,7 +34,7 @@ somewhat fashionable to write Emacs configuration in Org Mode!
 {{< figure src="/ox-hugo/literate-programming-emacs-org-config.png" >}}
 
 
-### What Is Literate Programming? {#LiterateProgrammingWhatIsLiterateProgramming-5ra1zi71ktj0}
+## What Is Literate Programming? {#LiterateProgrammingWhatIsLiterateProgramming-5ra1zi71ktj0}
 
 Literate programming  is a methodology that focuses on create a literate
 document. This is opposed to the traditional paradigm in which the code is a
@@ -47,7 +48,7 @@ From [literateprogramming.com](https://www.literateprogramming.com) by Donald Kn
 > computer to do.
 
 
-### Emacs Lisp in Org Mode Experience {#LiterateProgrammingEmacsLispinOrgModeExperience-77b1zi71ktj0}
+## Emacs Lisp in Org Mode Experience {#LiterateProgrammingEmacsLispinOrgModeExperience-77b1zi71ktj0}
 
 At first, writing an Emacs Lisp program with Org Mode felt pretty normal and
 everything worked as expected. However, I noticed a deficiency once I exported
@@ -59,14 +60,14 @@ of just making code changes to start, I instead skimmed the document to find the
 perfect place for the code to fit into the narrative.
 
 
-### Result {#LiterateProgrammingResult-nmb1zi71ktj0}
+## Result {#LiterateProgrammingResult-nmb1zi71ktj0}
 
 The final literate program can be read at
 <https://www.wmedrano.dev/posts/emacs-config> with the source code
 residing in <https://github.com/wmedrano/emacs-config>.
 
 
-### Observations {#LiterateProgrammingObservations-h1c1zi71ktj0}
+## Observations {#LiterateProgrammingObservations-h1c1zi71ktj0}
 
 
 #### Narrative {#LiterateProgrammingObservationsNarrative-ygc1zi71ktj0}
@@ -87,7 +88,7 @@ programming further. For people like my younger self that saw documentation as a
 chore, I expect that literate programming is utterly unappealing.
 
 
-#### Refactoring {#LiterateProgrammingObservationsRefactoring-mwc1zi71ktj0}
+### Refactoring {#LiterateProgrammingObservationsRefactoring-mwc1zi71ktj0}
 
 Due to having to create a narrative, literate programming requires knowing more
 up front. Since I have written my Emacs configuration from scratch several
@@ -98,7 +99,7 @@ required to refactor is the biggest weakness in going all in on literate
 programming.
 
 
-#### Tooling {#LiterateProgrammingObservationsTooling-ecd1zi71ktj0}
+### Tooling {#LiterateProgrammingObservationsTooling-ecd1zi71ktj0}
 
 Org Mode has great tooling to export Org Mode files. There's support for Emacs
 Lisp, markdown, and HTML. Writing an Org file is also a great literary
@@ -111,7 +112,7 @@ functionality that I'm accustomed to was broken out of the box. This includes:
 -   Refactoring support like renaming a variable.
 
 
-### Future Work {#LiterateProgrammingFutureWork-brd1zi71ktj0}
+## Future Work {#LiterateProgrammingFutureWork-brd1zi71ktj0}
 
 **Will I migrate any of my real work to literate programming?**
 
@@ -136,7 +137,7 @@ Definitely. I will
 -   read some literate programs.
 
 
-### References {#LiterateProgrammingReferences-57e1zi71ktj0}
+## References {#LiterateProgrammingReferences-57e1zi71ktj0}
 
 -   [Dynamic Notebooks and Literate Programming - Sam Ritchie](https://www.youtube.com/watch?v=UCEzBNh9ufs) - London Clojurians
     YouTube channel.

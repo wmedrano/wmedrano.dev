@@ -1,10 +1,19 @@
 #+TITLE: Moving Back To Emacs
 #+AUTHOR: Will Medrano
-#+HUGO_EXPORT_TITLE: Moving Back To Emacs
 #+HUGO_BASE_DIR: ./..
-#+HUGO_EXPORT_DATE: 2023-05-20
+#+HUGO_EXPORT_TITLE: Moving Back To Emacs
+#+DATE: 2023-05-20
 #+EXPORT_FILE_NAME: moving-back-to-emacs
 #+FILETAGS: emacs literate-programming
+
+* TLDR
+:PROPERTIES:
+:CUSTOM_ID: TLDR-szbezj301uj0
+:END:
+
+Emacs is a great editor and a joy to configure. Since I’m in no rush to be
+productive, it's a great time to have fun configuring my Emacs and honing my
+Emacs Lisp skills.
 
 * Strengths of Emacs
 :PROPERTIES:
@@ -138,14 +147,6 @@ challenges arise:
    great, I will miss [[https://magit.vc/][=Magit=]].
 4. ... And lots of other small tooling differences that are well supported by
    Google's custom editor but require work in Emacs or are not as polished.
-
-* TLDR
-:PROPERTIES:
-:CUSTOM_ID: TLDR-szbezj301uj0
-:END:
-
-Emacs is a great editor and a joy to configure. Since I'm in no rush to be
-productive, I may as well get to know Emacs and Emacs Lisp better.
 
 * Footnotes
 :PROPERTIES:
