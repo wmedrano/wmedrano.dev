@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-20T11:50:08-07:00
+lastmod = 2023-05-20T14:31:52-07:00
 tags = ["emacs", "literate-programming", "config"]
 draft = false
 +++
@@ -160,7 +160,7 @@ the frame. Posframes allow these to move anywhere on the frame. I move it to
 
 ```emacs-lisp
 (require 'ivy-posframe)
-(setq ivy-posframe-style 'point
+(setq ivy-posframe-style 'frame-top-center
       ivy-posframe-font "Fira Code 13"
       ivy-posframe-border-width 4
       ivy-height 20)
@@ -395,6 +395,7 @@ methods to use Ivy minibuffer completion. See <https://github.com/abo-abo/swiper
 (require 'counsel)
 (ivy-mode t)
 (counsel-mode t)
+(define-key counsel-mode-map (kbd "C-x b") #'counsel-switch-buffer)
 ```
 
 Nerd icons integration can also be used to add pretty icons to the completions

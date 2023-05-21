@@ -1,0 +1,74 @@
+#+TITLE: Org Mode Cheat Sheet
+#+AUTHOR: Will Medrano
+#+HUGO_BASE_DIR: ./..
+#+DATE: 2023-05-20
+#+FILETAGS: emacs literate-programming cheat-sheet
+
+* TLDR
+:PROPERTIES:
+:CUSTOM_ID: TLDR-szbezj301uj0
+:END:
+
+A reference of useful Org Mode (with a focus on literate programming)
+functionality.
+
+** General Default Key Bindings
+:PROPERTIES:
+:CUSTOM_ID: KeyBindingsGeneralDefaults-atgfelb01uj0
+:END:
+
+The following keybindings are set up by default.
+
+| key     | function            | description                                                                                |
+|---------+---------------------+--------------------------------------------------------------------------------------------|
+| C-c C-l | ~org-insert-link~   | Insert a link. Prompts for the URI and then a description. Links can be to HTML or images. |
+| C-c C-o | ~org-open-at-point~ | Open link, timestamp, footnote, or tag at point. Links are opened in the browser.          |
+
+** Text Blocks
+:PROPERTIES:
+:CUSTOM_ID: TLDRTextBlocks-pszkznb01uj0
+:END:
+
+| key     | function            | description                                                                                                                                                     |
+| C-c C-' | ~org-edit-special~  | Does several things depending on what's at the point. Calls ~org-edit-src-code~ when over a source code block. This opens a new buffer to edit the source code. |
+| C-c C-c | ~org-ctrl-c-ctrl-c~ | Does several things depending on what's at the piont. Calls ~org-confirm-babel-evaluate~ when over a source code block. This runs the code at the block.        |
+
+
+** Python
+:PROPERTIES:
+:CUSTOM_ID: TLDRPiChart-cdb7van01uj0
+:END:
+
+*** Charts with Matplotlib
+:PROPERTIES:
+:CUSTOM_ID: TLDRPythonChartswithMatplotlib-te5f4vn01uj0
+:END:
+
+To create a chart with Matplotlib:
+
+1. Set the ~:results~ to ~file~ and ~:exports~ to ~results~ to show the image or
+   ~values~ to show the image and the code block.
+2. Save the figure to a file.
+3. Return the name of the file.
+
+#+begin_src org
+#+begin_src python :results file :exports results
+  import matplotlib.pyplot as plt
+  plt.pie([30, 40, 30])
+  fname = '/org-mode-cheat-sheet/pie.png'
+  plt.savefig(fname)
+  return fname
+,#+end_src
+#+end_src
+
+#+begin_src python :results file :exports results
+  import matplotlib.pyplot as plt
+  plt.title('My Pie Chart')
+  plt.pie([30, 40, 30])
+  fname = 'org-mode-cheat-sheet-pie.png'
+  plt.savefig(fname)
+  return fname
+#+end_src
+
+#+RESULTS:
+[[file:org-mode-cheat-sheet-pie.png]]
