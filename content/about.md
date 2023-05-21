@@ -33,6 +33,8 @@ keypresses and parameter changes.
 
 <https://github.com/wmedrano-livi-rs> is a Rust library for hosting LV2 plugins.
 
-## Website Source Code {#website-source-code}
+## Links {#link}
 
-[source code](https://github.com/wmedrano/wmedrano.dev)
+- [Source Code](https://github.com/wmedrano/wmedrano.dev)
+- [GitHub profile](https://github.com/wmedrano)
+- [Donate on Ko-Fi](https://ko-fi.com/wmedrano)

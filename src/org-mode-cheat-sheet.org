@@ -1,7 +1,7 @@
 #+TITLE: Org Mode Cheat Sheet
 #+AUTHOR: Will Medrano
 #+HUGO_BASE_DIR: ./..
-#+DATE: 2023-05-20
+#+DATE: 2023-05-21
 #+FILETAGS: emacs literate-programming cheat-sheet
 
 * TLDR
@@ -66,7 +66,7 @@ To create a chart with Matplotlib:
   plt.title('My Pie Chart')
   plt.pie([30, 40, 30])
   fname = 'org-mode-cheat-sheet-pie.png'
-  plt.savefig(fname)
+  plt.savefig(fname, transparent=True)
   return fname
 #+end_src
 

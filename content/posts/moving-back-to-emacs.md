@@ -2,7 +2,7 @@
 title = "Moving Back To Emacs"
 author = ["Will Medrano"]
 date = 2023-05-20
-lastmod = 2023-05-20T14:07:25-07:00
+lastmod = 2023-05-21T16:01:35-07:00
 tags = ["emacs", "literate-programming"]
 draft = false
 +++
@@ -107,10 +107,10 @@ levels.
 
 **So what does this leave me with...**
 
-I still have the bandwidth to focus on smaller efforts. This involves writing
-this blog post and sharpening my Emacs Lisp skills. Weirdly enough, my
-observation has been that I don't have the energy for a large rewarding personal
-project but I do have the energy to muck around with Emacs and Emacs Lisp.
+Weirdly enough, my observation has been that I don't have the energy for a large
+rewarding personal project but I do have the energy to muck around with Emacs
+and Emacs Lisp. So, I'll probably be spending some time with smaller projects,
+which includes maintaining my Emacs setup.
 
 
 ## Challenges {#EmacsChallenges-5m4c0q201uj0}
@@ -119,7 +119,7 @@ My work configuration is significantly different than something I would use at
 home. Google uses several custom tools, some open source and some closed. For
 editing code, I can't even rely on the standard file system! Additionally,
 Google uses a monorepo that stores most of the company's code in a single
-repository [[publication]​](https://research.google/pubs/pub45424/). Lots of tools break at this scale. The following
+repository [(publication)](https://research.google/pubs/pub45424/). Lots of tools break at this scale. The following
 challenges arise:
 
 1.  The main supported text editor for Google is a **heavily** customized version of

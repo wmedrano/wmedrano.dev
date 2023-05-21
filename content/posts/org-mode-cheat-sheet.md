@@ -1,8 +1,8 @@
 +++
 title = "Org Mode Cheat Sheet"
 author = ["Will Medrano"]
-date = 2023-05-20
-lastmod = 2023-05-20T19:06:01-07:00
+date = 2023-05-21
+lastmod = 2023-05-21T16:10:57-07:00
 tags = ["emacs", "literate-programming", "cheat-sheet"]
 draft = false
 +++
