@@ -1,36 +1,47 @@
 baseURL: 'https://wmedrano.dev'
-languageCode: en-us
+theme: salinger
 title: wmedrano dot dev
-theme: archie
-copyright: © will.s.medrano@gmail.com
+copyright: will.s.medrano@gmail.com
 pygmentsstyle: github
 pygmentscodefences: true
 pygmentscodefencesguesssyntax: true
-paginate: 5
+ignoreErrors:
+  - error-remote-getjson
 params:
-  mode: auto
-  useCDN: false
-  subtitle: Will's programming blog
-  mathjax: true
-  katex: true
+  DateFormat: January 01 2006
+  author: Will Medrano
+  description: >-
+    I'm a software engineer.
+  header: "wmedrano dot dev"
+  keywords:
+    - developer
+    - coding
+    - maker
+  showHeaderOnHomepage: true
+  twemoji: true
+  text404: Page not found.
   social:
-    - name: GitHub
-      icon: github
+    - name: github
       url: 'https://github.com/wmedrano'
-    - name: Ko-Fi
-      icon: coffee
+      icon: fa fa-github
+    - name: ko-fi
       url: 'https://ko-fi.com/wmedrano'
+      icon: fa fa-coffee
 menu:
   main:
-    - name: Home
-      url: /
-      weight: 1
     - name: Posts
-      url: /posts
-      weight: 2
+      url: /posts/
+      weight: 1
     - name: Tags
-      url: /tags
-      weight: 3
+      url: /tags/
+      weight: 2
     - name: About
-      url: /about
-      weight: 4
+      url: /about/
+      weight: 3
+taxonomies:
+  tag: tags
+  category: categories
+markup:
+  goldmark:
+    renderer:
+      unsafe: true

@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-21T14:21:21-07:00
+lastmod = 2023-05-21T16:23:23-07:00
 tags = ["emacs", "literate-programming", "config"]
 draft = false
 +++
@@ -544,7 +544,8 @@ Undo tree is a more visual way of undo. Use `C-x u` to start undo tree. `j` and
 
 ```emacs-lisp
 (require 'undo-tree)
-(setq-default undo-tree-visualizer-diff t)
+(setq-default undo-tree-visualizer-diff t
+              undo-tree-auto-save-history nil)
 (undo-tree-mode t)
 ```
 
