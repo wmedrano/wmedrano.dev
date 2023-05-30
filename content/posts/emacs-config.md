@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-21T16:23:23-07:00
+lastmod = 2023-05-29T17:19:29-07:00
 tags = ["emacs", "literate-programming", "config"]
 draft = false
 +++
@@ -79,13 +79,16 @@ package updates or
                                   ace-window
                                   avy
                                   catppuccin-theme
+                                  chat-gptshell
                                   company
-                                  company-box
+                                  company-quickhelp
                                   counsel
                                   counsel-projectile
+                                  dall-e-shell
                                   diff-hl
-                                  dracula-theme
                                   doom-modeline
+                                  dracula-theme
+                                  eglot
                                   evil
                                   evil-anzu
                                   evil-avy
@@ -93,6 +96,7 @@ package updates or
                                   evil-surround
                                   evil-terminal-cursor-changer
                                   flycheck
+                                  flycheck-eglot
                                   flycheck-posframe
                                   flyspell-correct
                                   flyspell-correct-ivy
@@ -101,18 +105,21 @@ package updates or
                                   ivy
                                   ivy-emoji
                                   ivy-rich
-                                  ivy-posframe
                                   key-chord
+                                  ligature
                                   magit
                                   markdown-mode
                                   monokai-pro-theme
                                   nerd-icons-ivy-rich
                                   nord-theme
+                                  ob-async
+                                  ob-chatgpt-shell
+                                  ob-dall-e-shell
+                                  org-preview-html
                                   org-sidebar
                                   org-unique-id
                                   ox-gfm
                                   ox-hugo
-                                  org-preview-html
                                   projectile
                                   python-mode
                                   pyvenv-auto
@@ -133,8 +140,8 @@ are no longer needed.
 ```emacs-lisp
 (defun wm-install-dependencies ()
   "Install all dependencies and remove any unused dependencies. If you wish to
-  only install new dependencies and not refresh the index and clean up old
-  dependencies, use (package-install-selected-packages) instead."
+    only install new dependencies and not refresh the index and clean up old
+    dependencies, use (package-install-selected-packages) instead."
   (interactive)
   (package-initialize)
   (package-refresh-contents)
@@ -152,36 +159,46 @@ are no longer needed.
 (require 'catppuccin-theme)
 (setq-default catppuccin-flavor 'frappe)
 (load-theme 'catppuccin t)
-(set-frame-font "Fira Code 12")
-(when (display-graphic-p)
-  (set-frame-parameter (selected-frame) 'alpha '(97 . 97)))
+(set-frame-font "JetBrainsMono Nerd Font 12")
+(set-frame-parameter (selected-frame) 'alpha '(98 . 98))
 ```
 
 
-#### Posframe {#BasicsThemePosframe-aqtdghk02uj0}
-
-Use a posframe for ivy completion. By default, completions are at the bottom of
-the frame. Posframes allow these to move anywhere on the frame. I move it to
-`frame-top-center`.
-
-```emacs-lisp
-(require 'ivy-posframe)
-(setq ivy-posframe-style 'frame-top-center
-      ivy-posframe-font "Fira Code 13"
-      ivy-posframe-border-width 2
-      ivy-height 20)
-(ivy-posframe-mode t)
-```
+#### Flycheck Posframe {#BasicsThemePosframe-aqtdghk02uj0}
 
 Use posframe for Flycheck errors. By default these show up in the echo area
-which conflicts with eldoc.
+which conflicts with eldoc. Using a posframe resolves the contention.
 
 ```emacs-lisp
 (require 'flycheck-posframe)
+(require 'flycheck-eglot)
 (setq-default flycheck-posframe-border-use-error-face t
               flycheck-posframe-border-width 2
               flycheck-posframe-position 'frame-bottom-right-corner)
 (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
+(global-flycheck-eglot-mode t)
+```
+
+
+### Ligatures {#BasicsLigatures-pxqdplv0auj0}
+
+```emacs-lisp
+(ligature-set-ligatures 't '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "||="
+                          "||>" ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<"
+                          "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---"
+                          "-<<" "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>"
+                          "<=<" "<->" "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>"
+                          "###" "#_(" "..<" "..." "+++" "/==" "///" "_|_" "www"
+                          "&&" "^=" "~~" "~@" "~=" "~>" "~-" "**" "*>" "*/" "||"
+                          "|}" "|]" "|=" "|>" "|-" "{|" "[|" "]#" "::" ":=" ":>"
+                          ":<" "$>" "==" "=>" "!!" ">:" ">>" ">-" "-~" "-|" "->"
+                          "--" "-<" "<~" "<*" "<|" "<:" "<$" "<>" "<-" "<<" "<+"
+                          "</" "#{" "#[" "#:" "#=" "#!"  "##" "#(" "#?" "#_"
+                          "%%" ".=" ".-" ".." ".?" "+>" "++" "?:" "?=" "?." "??"
+                          ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)" "\\\\"
+                          "://" "ff" "fi" "ffi"))
+
+(global-ligature-mode t)
 ```
 
 
@@ -299,8 +316,8 @@ Enable Evil mode globally to use VIM like modal editing.
 ```emacs-lisp
 (evil-mode)
 (defalias 'forward-evil-word 'forward-evil-symbol)
-;; Jumps to definition. If lsp-mode is active, then the language server is
-;; used to find the definition.
+;; Jumps to definition. If eglot is active, then the language server is used
+;; to find the definition.
 (wm-define-motion-key (kbd "gd") #'evil-goto-definition)
 ;; Fuzzy search through all open buffers.
 (wm-define-motion-key (kbd "g/") #'swiper)
@@ -413,6 +430,7 @@ methods to use Ivy minibuffer completion. See <https://github.com/abo-abo/swiper
 (ivy-mode t)
 (counsel-mode t)
 (define-key counsel-mode-map (kbd "C-x b") #'counsel-switch-buffer)
+(define-key ivy-minibuffer-map (kbd "C-v") #'yank)
 ```
 
 Nerd icons integration can also be used to add pretty icons to the completions
@@ -631,7 +649,13 @@ for this.
 ```
 
 
-#### <span class="org-todo todo TODO">TODO</span> Git {#AdvancedVersionControlGit-5jy72r913tj0}
+#### Git {#AdvancedVersionControlGit-5jy72r913tj0}
+
+Automatically start commit messages in insert state.
+
+```emacs-lisp
+(add-hook 'git-commit-mode-hook #'evil-insert-state)
+```
 
 
 ### Search {#TextandFormattingSearch-fq73xbx0atj0}
@@ -675,34 +699,34 @@ as:
 ```
 
 
-### LSP {#AdvancedLSP-1su150g02uj0}
+### Eglot - Language Server Protocol {#AdvancedEglotLanguageServerProtocol-h6pbc0s0auj0}
 
-Code refactoring depends on `lsp-mode`. LSP Mode is an Emacs package that
-supports interfacing with LSPs. See the
-<https://microsoft.github.io/language-server-protocol> for more
-details. Essentially Language Servers are servers that provide smart
-functionality for specific languages. This is typically what people consider to
-be "IDE" functionality. There are a few packages that require LSP Mode or at the
-very least provide a better experience with LSP Mode.
+Code refactoring depends on `eglot`. Eglot is an Emacs package that supports
+interfacing with LSPs. See the
+<https://microsoft.github.io/language-server-protocol> for more details about
+LSP. Essentially Language Servers are servers that provide smart functionality
+for specific languages. This is typically what people consider to be "IDE"
+functionality. There are a few packages that provide a better experience with
+Eglot.
 
-LSP Mode is configured for each major mode separately. See the Language Specific
-configurations sections to see if the Major Mode supports LSP Mode. For example,
-`rust-mode` supports LSP Mode for enhanced functionality.
+Eglot Mode is configured for each major mode separately. See the Language
+Specific configurations sections to see if the Major Mode supports Eglot. For
+example, `rust-mode` supports Eglot for enhanced functionality.
 
 
-#### Code Refactoring {#AdvancedLSPCodeRefactoring-kq0epmf02uj0}
+#### Code Refactoring {#AdvancedEglotLanguageServerProtocolCodeRefactoring-cwwep1s0auj0}
 
 ```emacs-lisp
-(require 'lsp-mode)
-(wm-define-motion-key (kbd "<f2>") #'lsp-rename)
-(wm-define-motion-key (kbd "g.") #'lsp-execute-code-action)
+(require 'eglot)
+(wm-define-motion-key (kbd "<f2>") #'eglot-rename)
+(wm-define-motion-key (kbd "g.") #'eglot-code-actions)
 ```
 
 
-#### Auto-Complete {#AdvancedLSPAutoComplete-ugw6rqf02uj0}
+#### Auto-Complete {#AdvancedEglotLanguageServerProtocolAutoComplete-3xhbr4s0auj0}
 
 The [Company](https://company-mode.github.io) Emacs Lisp package is used to handle auto complete. By default,
-Company mode provides a simple completion engine. However, if an LSP Mode is
+Company mode provides a simple completion engine. However, if an Eglot Mode is
 configured for the major-mode, then the completions should improve.
 
 Keybindings when in completion:
@@ -722,23 +746,19 @@ Keybindings when in completion:
 (define-key company-active-map (kbd "RET") nil)
 ```
 
-Company box mode is used since it looks a little bit better. However, it is only
-compatible with GUI mode. Additionally, the help/documentation background shows
-up as white with sometimes white text, depending on the theme. The issue is
-mitigated by hardcoding the background color.
+Company quickhelp automatically displays help/documentation of the candidate at
+the point.
 
 ```emacs-lisp
-(when (display-graphic-p)
-  (require 'company-box)
-  (setq company-quickhelp-color-background "dim gray")
-  (add-hook 'company-mode-hook #'company-box-mode))
+(require 'company-quickhelp)
+(company-quickhelp-mode t)
 ```
 
 
-#### Syntax Checking {#AdvancedLSPSyntaxChecking-q2x6rqf02uj0}
+#### Syntax Checking {#AdvancedEglotLanguageServerProtocolSyntaxChecking-18jbr4s0auj0}
 
-Syntax checking is exposed through the Flycheck package. To get improved syntax
-checking, LSP Mode needs to be enabled for the major mode.
+Syntax checking is provided through Eglot and exposed through Flycheck +
+Flycheck Posframe.
 
 ```emacs-lisp
 (require 'flycheck)
@@ -782,14 +802,12 @@ rustup component add rust-analyzer
 
 ```emacs-lisp
 (require 'rust-mode)
-
-(setq-default lsp-rust-analyzer-server-command
-              (list "rustup" "run" "stable" "rust-analyzer"))
-
+(add-to-list 'eglot-server-programs
+             '((rust-mode) . ("rustup" "run" "stable" "rust-analyzer")))
 (defun wm-setup-rust-mode ()
   (setq-local fill-column 100)
-  (lsp-mode t)
-  (add-hook 'before-save-hook #'lsp-format-buffer 0 t))
+  (eglot-ensure)
+  (add-hook 'before-save-hook #'eglot-format-buffer 0 t))
 (add-hook 'rust-mode-hook #'wm-setup-rust-mode)
 ```
 
@@ -816,7 +834,8 @@ programming.
 ### Basic Org Mode {#OrgModeBasicOrgMode-7czdjo71rtj0}
 
 ```emacs-lisp
-(setq org-src-fontify-natively t)
+(setq-default org-src-fontify-natively t)
+(setq-default org-src-preserve-indentation t)
 ```
 
 -   Saving any file creates unique IDs for any headers without an ID.
@@ -876,9 +895,9 @@ Header arguments may be set file wide. To do this, use `:PROPERTIES:` as the
 first line in the file. Example:
 
 ```org
-:PROPERTIES:
-:header-args: :results silent
-:END:
+  :PROPERTIES:
+  :header-args: :results silent
+  :END:
 ```
 
 
@@ -902,6 +921,7 @@ C-'`. To save the contents and return to the Org document, save the file or use
 ```emacs-lisp
 (define-key org-src-mode-map (kbd "C-s") #'org-edit-src-exit)
 (define-key org-src-mode-map (kbd "C-c C-'") #'org-edit-src-exit)
+(add-hook 'org-src-mode-hook #'evil-insert-state)
 ```
 
 
@@ -922,8 +942,8 @@ code in the source file is surrounded by valid Org links.
 (require 'ob-tangle)
 (defun org-babel-detangle-keep-window ()
   "Detangles the current source file while staying on the current window. This
-  is as opposed to the default behavior of detangling and opening the tangled
-  file."
+    is as opposed to the default behavior of detangling and opening the tangled
+    file."
   (interactive)
   (let* ((keep-window (selected-window))
          (keep-buffer (window-buffer keep-window))
@@ -985,11 +1005,18 @@ Graphviz is not fully supported yet. The desired behavior is to be able to
 export graphs by adding `dot` source blocks within Org files.
 
 ```emacs-lisp
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)
-   (dot . t)))
+(defun set-up-org-babel ()
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '(
+                                 (chatgpt-shell . t)
+                                 (dall-e-shell . t)
+                                 (dot . t)
+                                 (emacs-lisp . t)
+                                 (python . t)
+                                 (shell . t)
+                                 )))
+(with-eval-after-load 'org #'set-up-org-babel)
+(set-up-org-babel)
 ```
 
 
@@ -1036,10 +1063,10 @@ npm install -g yaml-language-server --prefix ~/.local/npm
 (require 'yaml-mode)
 (defun wm-setup-yaml-mode ()
   "Sets up the YAML major mode."
-  ;; LSP Mode is commented out until the YAML language server is proven to
+  ;; Eglot is commented out until the YAML language server is proven to
   ;; successfuly run.
-  ;; (lsp-mode t)
-  ;; (add-hook 'before-save-hook #'lsp-format-buffer 0 t)
+  ;; (eglot-ensure)
+  ;; (add-hook 'before-save-hook #'eglot-format-buffer 0 t)
   )
 (add-hook 'yaml-mode-hook #'wm-setup-yaml-mode)
 ```
@@ -1056,6 +1083,30 @@ the box but needs some tweaks for a better experience with Evil.
 ```emacs-lisp
 (add-to-list 'evil-motion-state-modes 'dired-mode)
 (evil-define-key 'motion dired-mode-map (kbd "RET") #'dired-find-file)
+```
+
+
+### OpenAI Integration {#OtherModesOpenAIIntegration-aq14ija0duj0}
+
+OpenAI integration requires an API key. The key can be set up with Gnome keyring
+or within emacs by running: `(secrets-create-item "Login" "emacs-openai-api-key"
+<api key>)` which can be run with `M-x eval-expression`.
+
+OpenAI integration is handled through several packages from [chatgpt-shell](https://github.com/xenodium/chatgpt-shell). The
+repo includes support for:
+
+-   ChatGPT through various `chatgpt-shell-.*` functions.
+-   DALL-E through various `dall-e-shell-.*` functions.
+-   Org mode integration.
+
+<!--listend-->
+
+```emacs-lisp
+(defun set-up-openai ()
+  (setq-default
+   chatgpt-shell-openai-key (secrets-get-secret "Login" "emacs-openai-api-key")
+   dall-e-shell-openai-key  (secrets-get-secret "Login" "emacs-openai-api-key")))
+(set-up-openai)
 ```
 
 
