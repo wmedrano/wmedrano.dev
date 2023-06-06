@@ -1,9 +1,9 @@
-#+title: Talks
+#+title: Tech Talks List
 #+author: Will Medrano
 #+HUGO_BASE_DIR: ./..
 #+DATE: 2023-06-05
-#+EXPORT_TITLE: Talks
-#+EXPORT_FILE_NAME: talks
+#+EXPORT_TITLE: Tech Talks List
+#+EXPORT_FILE_NAME: tech-talks-list
 #+FILETAGS: cheat-sheet
 
 * Introduction
@@ -13,4 +13,3 @@ Here are some talks that I found worth typing down.
 * LISP
 
 - [[https://www.youtube.com/watch?v=hGY3uBHVVr4][Lets LISP like it's 1959]] - A history of early LISP.
-

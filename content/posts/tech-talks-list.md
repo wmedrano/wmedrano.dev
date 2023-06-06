@@ -1,5 +1,5 @@
 +++
-title = "Talks"
+title = "Tech Talks List"
 author = ["Will Medrano"]
 date = 2023-06-05
 tags = ["cheat-sheet"]
