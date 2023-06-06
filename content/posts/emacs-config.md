@@ -2,7 +2,7 @@
 title = "Emacs Configuration"
 author = ["Will S. Medrano"]
 date = 2023-04-18
-lastmod = 2023-05-29T17:19:29-07:00
+lastmod = 2023-05-31T21:09:31-07:00
 tags = ["emacs", "literate-programming", "config"]
 draft = false
 +++
@@ -81,6 +81,7 @@ package updates or
                                   catppuccin-theme
                                   chat-gptshell
                                   company
+                                  company-org-block
                                   company-quickhelp
                                   counsel
                                   counsel-projectile
@@ -120,6 +121,7 @@ package updates or
                                   org-unique-id
                                   ox-gfm
                                   ox-hugo
+                                  persp-mode
                                   projectile
                                   python-mode
                                   pyvenv-auto
@@ -139,9 +141,10 @@ are no longer needed.
 
 ```emacs-lisp
 (defun wm-install-dependencies ()
-  "Install all dependencies and remove any unused dependencies. If you wish to
-    only install new dependencies and not refresh the index and clean up old
-    dependencies, use (package-install-selected-packages) instead."
+  "Install all dependencies and remove any unused dependencies.
+
+If you wish to only install new dependencies and not refresh the index and clean
+up old dependencies, use (package-install-selected-packages) instead."
   (interactive)
   (package-initialize)
   (package-refresh-contents)
@@ -159,8 +162,17 @@ are no longer needed.
 (require 'catppuccin-theme)
 (setq-default catppuccin-flavor 'frappe)
 (load-theme 'catppuccin t)
-(set-frame-font "JetBrainsMono Nerd Font 12")
-(set-frame-parameter (selected-frame) 'alpha '(98 . 98))
+(defun set-up-frame (&optional frame)
+  "Set up FRAME or use (selected-frame) if FRAME is nil."
+  (let ((target-frame (or frame (selected-frame))))
+    (set-frame-font "JetBrainsMono Nerd Font 12"
+                    nil (list target-frame))
+    (set-frame-parameter target-frame
+                         'alpha
+                         '(99 . 99))))
+(set-up-frame)
+;; Below applies when using emacsclient.
+(add-hook 'after-make-frame-functions #'set-up-frame)
 ```
 
 
@@ -176,6 +188,7 @@ which conflicts with eldoc. Using a posframe resolves the contention.
               flycheck-posframe-border-width 2
               flycheck-posframe-position 'frame-bottom-right-corner)
 (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
+(add-hook 'flycheck-posframe-mode-hook #'flycheck-posframe-configure-pretty-defaults)
 (global-flycheck-eglot-mode t)
 ```
 
@@ -207,7 +220,7 @@ which conflicts with eldoc. Using a posframe resolves the contention.
 ```emacs-lisp
 ;; Show the line number on the left of the editor with a minimum of 3
 ;; characters. The default minimum is too low
-(setq display-line-numbers-grow-only t)
+(setq-default display-line-numbers-grow-only t)
 (global-display-line-numbers-mode t)
 (global-hl-line-mode t)
 ;; Display the column number in the modeline. Admittedly, the number appears all
@@ -227,7 +240,6 @@ more options.](https://github.com/seagle0128/doom-modeline#customize)
 
 ```emacs-lisp
 (require 'doom-modeline)
-(doom-modeline-mode t)
 (setq
  ;; Make the modeline as small as possible. This usually shrinks it down to be
  ;; slightly larger than the font size.
@@ -239,6 +251,17 @@ more options.](https://github.com/seagle0128/doom-modeline#customize)
  ;; requires entering display-battery-mode.
  doom-modeline-battery t
  doom-modeline-unicode-fallback t)
+(defun set-up-frame-for-modeline (&optional frame)
+  "Use The HUD to display the position in FRAME when using the GUI mode.
+
+The hud is a small bar all the way at the left of the modeline.
+It is smaller than displaying the percent"
+  (when (display-graphic-p)
+    (setq-default doom-modeline-percent-position ""
+                  doom-modeline-hud t)))
+(add-hook 'after-make-frame-functions #'set-up-frame-for-modeline)
+(set-up-frame-for-modeline)
+(doom-modeline-mode t)
 ```
 
 
@@ -282,7 +305,9 @@ This section contains configuration that removes noisy elements from the UI.
 
 ```emacs-lisp
 (defun wm-command-error-fn (data context caller)
-  "Ignore several (noisy) signals and pass the rest to the default handler."
+  "An error function that takes DATA, CONTEXT, and CALLER.
+
+Ignores several (noisy) signals and pass the rest of to the default handler."
   (when (not (memq (car data) '(buffer-read-only
                                 beginning-of-buffer
                                 end-of-buffer
@@ -303,7 +328,8 @@ document.
 
 ```emacs-lisp
 (defun wm-define-motion-key (keys fn)
-  "Define a new motion key binding on KEYS that runs function FN."
+  "Define a new motion key binding on KEYS to run FN."
+  (require 'evil)
   (define-key evil-normal-state-map keys nil)
   (define-key evil-motion-state-map keys fn))
 ```
@@ -325,6 +351,7 @@ Enable Evil mode globally to use VIM like modal editing.
 ;; the paste command in terminal and GUI modes. Most terminal emulators paste
 ;; the current clipboard text on C-S-v.
 (define-key evil-insert-state-map (kbd "C-S-v") #'evil-paste-after)
+(add-to-list 'evil-motion-state-modes 'profiler-report-mode)
 ```
 
 Use "J" and "K" to scroll up and down the buffer as opposed to the standard
@@ -340,7 +367,7 @@ To jump around quicker to something on the screen though, `evil-avy` can be
 used. The workflow for this is to
 
 -   Find the spot on the screen to jump to.
--   Press `gw`.
+-   Press `gW`.
 -   Avy will no tag all word sequences with a chord.
 -   Enter the 2-4 letter chord.
 
@@ -349,7 +376,7 @@ used. The workflow for this is to
 ```emacs-lisp
 (require 'avy)
 (require 'evil-avy)
-(wm-define-motion-key (kbd "gw") #'evil-avy-goto-word-0)
+(wm-define-motion-key (kbd "gW") #'evil-avy-goto-word-0)
 ```
 
 Disable the VIM TAB key. This allows TAB to pass through to the underlying
@@ -359,6 +386,7 @@ headings and programming languages use TAB to automatically fix the indentation.
 
 ```emacs-lisp
 (define-key evil-motion-state-map (kbd "TAB") nil)
+(define-key evil-motion-state-map (kbd "RET") nil)
 ```
 
 I prefer to use some more standard key bindings. For example, Emacs uses `C-x
@@ -430,7 +458,8 @@ methods to use Ivy minibuffer completion. See <https://github.com/abo-abo/swiper
 (ivy-mode t)
 (counsel-mode t)
 (define-key counsel-mode-map (kbd "C-x b") #'counsel-switch-buffer)
-(define-key ivy-minibuffer-map (kbd "C-v") #'yank)
+(define-key ivy-minibuffer-map    (kbd "C-v") #'yank)
+(define-key evil-insert-state-map (kbd "C-v") #'yank)
 ```
 
 Nerd icons integration can also be used to add pretty icons to the completions
@@ -440,8 +469,21 @@ values instead, run `M-x nerd-icons-install-fonts`.
 ```emacs-lisp
 (require 'ivy-rich)
 (require 'nerd-icons-ivy-rich)
-(ivy-rich-mode t)
-(nerd-icons-ivy-rich-mode t)
+(defun wm-clone-ivy-display-transformers (src dst)
+  "Applies ivy completion styling from function SRC to function DST.
+
+Note: This must be run before the rich modes are enabled."
+  (setq ivy-rich-display-transformers-list
+        (plist-put
+         ivy-rich-display-transformers-list dst
+         (plist-get ivy-rich-display-transformers-list src)))
+  (setq nerd-icons-ivy-rich-display-transformers-list
+        (plist-put
+         nerd-icons-ivy-rich-display-transformers-list dst
+         (plist-get nerd-icons-ivy-rich-display-transformers-list src))))
+(wm-clone-ivy-display-transformers 'counsel-find-file 'delete-file)
+(add-hook 'after-init-hook #'ivy-rich-mode)
+(add-hook 'after-init-hook #'nerd-icons-ivy-rich-mode)
 ```
 
 
@@ -844,8 +886,12 @@ programming.
 
 ```emacs-lisp
 (defun wm-setup-org-mode ()
+  (require 'ob-async)
   (require 'org-unique-id)
-  (add-hook 'before-save-hook #'org-unique-id 0 t))
+  (require 'company-org-block)
+  (add-hook 'before-save-hook #'org-unique-id 0 t)
+  (add-to-list (make-local-variable 'company-backends)
+               'company-org-block))
 (add-hook 'org-mode-hook #'wm-setup-org-mode)
 ```
 
@@ -901,14 +947,34 @@ first line in the file. Example:
 ```
 
 
-#### Executing {#OrgModeCodeBlocksExecutingCodeBlocks-7vvf5e314tj0}
+#### Executing With Org Babel {#OrgModeCodeBlocksExecutingCodeBlocks-7vvf5e314tj0}
 
 Code blocks can be executed by selecting them with the cursor and running `C-c
 C-c`.
 
+<a id="code-snippet--org-babel-load-languages"></a>
 ```emacs-lisp
 ;; Disable confirmation prompt for evaluating code.
 (setq-default org-confirm-babel-evaluate nil)
+(defun set-up-org-babel ()
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '(
+                                 (chatgpt-shell . t)
+                                 (dall-e-shell . t)
+                                 (dot . t)
+                                 (emacs-lisp . t)
+                                 (python . t)
+                                 (shell . t)
+                                 ))
+  (require 'ob-async)
+  (require 'ob-chatgpt-shell)
+  (require 'ob-dall-e-shell)
+  (ob-chatgpt-shell-setup)
+  (ob-dall-e-shell-setup)
+  (add-to-list 'org-src-lang-modes '("chatgpt-shell" . markdown))
+  (add-to-list 'org-src-lang-modes '("dall-e-shell" . markdown))
+  )
+(add-hook 'org-mode-hook #'set-up-org-babel)
 ```
 
 
@@ -1004,21 +1070,6 @@ Markdown.
 Graphviz is not fully supported yet. The desired behavior is to be able to
 export graphs by adding `dot` source blocks within Org files.
 
-```emacs-lisp
-(defun set-up-org-babel ()
-  (org-babel-do-load-languages 'org-babel-load-languages
-                               '(
-                                 (chatgpt-shell . t)
-                                 (dall-e-shell . t)
-                                 (dot . t)
-                                 (emacs-lisp . t)
-                                 (python . t)
-                                 (shell . t)
-                                 )))
-(with-eval-after-load 'org #'set-up-org-babel)
-(set-up-org-babel)
-```
-
 
 ## Text Specific Configurations {#TextSpecificConfigurations-qr482r913tj0}
 
@@ -1086,7 +1137,10 @@ the box but needs some tweaks for a better experience with Evil.
 ```
 
 
-### OpenAI Integration {#OtherModesOpenAIIntegration-aq14ija0duj0}
+### <span class="org-todo todo TODO">TODO</span> OpenAI Integration {#OtherModesOpenAIIntegration-aq14ija0duj0}
+
+**Note:** Open AI Integration has not been thoroughly tested yet. I'm probably
+doing some stuff wrong in the setup.
 
 OpenAI integration requires an API key. The key can be set up with Gnome keyring
 or within emacs by running: `(secrets-create-item "Login" "emacs-openai-api-key"
@@ -1097,7 +1151,7 @@ repo includes support for:
 
 -   ChatGPT through various `chatgpt-shell-.*` functions.
 -   DALL-E through various `dall-e-shell-.*` functions.
--   Org mode integration.
+-   Org mode integration. Org mode also requires loading the language with babel.
 
 <!--listend-->
 
@@ -1108,6 +1162,8 @@ repo includes support for:
    dall-e-shell-openai-key  (secrets-get-secret "Login" "emacs-openai-api-key")))
 (set-up-openai)
 ```
+
+To set up Org Mode integration, see [Org Babel Execution](#OrgModeCodeBlocksExecutingCodeBlocks-7vvf5e314tj0) section.
 
 
 ## Source Code {#SourceCode-1wc82r913tj0}

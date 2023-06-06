@@ -12,6 +12,9 @@
 A reference of useful Org Mode (with a focus on literate programming)
 functionality.
 
+For a more official reference on Org Babel for literate programming, see
+[[https://orgmode.org/worg/org-contrib/babel/intro.html][Introducing Babel]].
+
 ** General Default Key Bindings
 :PROPERTIES:
 :CUSTOM_ID: KeyBindingsGeneralDefaults-atgfelb01uj0
@@ -33,13 +36,32 @@ The following keybindings are set up by default.
 | C-c C-' | ~org-edit-special~  | Does several things depending on what's at the point. Calls ~org-edit-src-code~ when over a source code block. This opens a new buffer to edit the source code. |
 | C-c C-c | ~org-ctrl-c-ctrl-c~ | Does several things depending on what's at the piont. Calls ~org-confirm-babel-evaluate~ when over a source code block. This runs the code at the block.        |
 
+** Programming
+:PROPERTIES:
+:CUSTOM_ID: TLDRProgramming-4rdc14n0duj0
+:END:
 
-** Python
+*** Async Evaluation
+:PROPERTIES:
+:CUSTOM_ID: TLDRProgrammingAsyncEvaluation-p1fc14n0duj0
+:END:
+
+Asynchronous evaluation is provided by the ~ob-async~ package. It must be loaded
+with ~(require 'ob-async)~. After loading, a block may be executed
+asynchronously with the following header:
+
+#+begin_src org
+,#+begin_src python :async
+return 2 + 2
+,#+end_src
+#+end_src
+
+*** Python
 :PROPERTIES:
 :CUSTOM_ID: TLDRPiChart-cdb7van01uj0
 :END:
 
-*** Charts with Matplotlib
+**** Charts with Matplotlib
 :PROPERTIES:
 :CUSTOM_ID: TLDRPythonChartswithMatplotlib-te5f4vn01uj0
 :END:
