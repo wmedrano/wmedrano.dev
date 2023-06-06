@@ -13,4 +13,4 @@ Here are some talks that I found worth typing down.
 
 ## LISP {#lisp}
 
--   [Lets LISP like it's 1959](https://www.youtube.com/watch?v=hGY3uBHVVr4&t=2160s) - A history of early LISP.
+-   [Lets LISP like it's 1959](https://www.youtube.com/watch?v=hGY3uBHVVr4) - A history of early LISP.
