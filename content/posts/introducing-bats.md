@@ -6,10 +6,10 @@ tags = ["rust", "music", "bats"]
 draft = false
 +++
 
-## Bats {#bats}
+## Bats {#Bats-tf26ad70i1k0}
 
 
-### Introduction {#introduction}
+### Introduction {#BatsIntroduction-pa56ad70i1k0}
 
 Bats is a BEATS AND TRACKS SEQUENCER similar to Maschine and the Teenage Engineering OP-1. Tentatively, the MVP should eventually have the following features:
 
@@ -24,7 +24,7 @@ The main motivation is to create a small groovebox that meets my sampling needs 
 The BATS source code can be found on [[GitHub]​](https://github.com/wmedrano/bats).
 
 
-### Inspiration {#inspiration}
+### Inspiration {#BatsInspiration-i086ad70i1k0}
 
 Every once in a while I take up making a "DAW". Like most other personal projects, I've dropped the project each time due to lack of motivation, progress, time, and stress. So I am once again embarking on this quest. The most recent points of inspiration are:
 
@@ -32,7 +32,7 @@ Every once in a while I take up making a "DAW". Like most other personal project
 -   The controversial statement "open Source Software doesn't do anything creative".
 
 
-#### Teenage Engineering OP-1 {#teenage-engineering-op-1}
+#### Teenage Engineering OP-1 {#BatsInspirationTeenageEngineeringOP1-uja6ad70i1k0}
 
 {{< figure src="/ox-hugo/wmedrano-dev/op-1.jpg" >}}
 
@@ -41,7 +41,7 @@ I recently purchased an OP-1. My main motivation for this impulse buy: avoiding 
 The OP-1 is a great piece of gear for sure, but I found it lacking in the sampling department. Its a lot of work to get samples into the machine and is still plenty of work to chop them up properly. If the sampling workflow were better, then the OP-1 would be the perfect device for me.
 
 
-#### Don't Be Original {#don-t-be-original}
+#### Don't Be Original {#BatsInspirationDontBeOriginal-4fd6ad70i1k0}
 
 There was a rant that I heard that open source software isn't original. The claim isn't worth humoring too much, but it did get me thinking about how this appies to the music space. Specifically:
 
@@ -50,7 +50,7 @@ There was a rant that I heard that open source software isn't original. The clai
 3.  I DON'T need to be original. I know what I like about OP-1/Maschine/Ableton/MPC/Digitakt, theres no shame in borrowing the great ideas. Executing is the most important part after all.
 
 
-### Expected Challenges {#expected-challenges}
+### Expected Challenges {#BatsExpectedChallenges-r4g6ad70i1k0}
 
 I'm off to the races now to build myself a groovebox. The limited feature set should help me keep focus but the following may still be challenging:
 
@@ -61,7 +61,7 @@ I'm off to the races now to build myself a groovebox. The limited feature set sh
 These are the 3 items I expect to be the most challenging to execute. The risk of other things such as performance, plugin selection, and gui are a much lower risk.
 
 
-## Current Progress {#current-progress}
+## Current Progress {#CurrentProgress-rmi6ad70i1k0}
 
 After a month of working on this in my spare time, I have made:
 
@@ -69,6 +69,6 @@ After a month of working on this in my spare time, I have made:
 -   Midi input and audio output on Linux.
 -   A simple terminal UI navigated with arrow keys, enter, and escape.
 -   Support for 8 tracks.
--   The "toof" plugin. A Sawtooth wave with a Moog Filter. Can produce already decent basslines!
+-   The "toof" plugin. A Sawtooth wave with a Moog Filter. Can produce decent basslines!
 
 {{< figure src="/ox-hugo/wmedrano-dev/introducing-bats-1.jpg" >}}

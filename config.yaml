@@ -9,7 +9,6 @@ ignoreErrors:
   - error-remote-getjson
 params:
   DateFormat: January 01 2006
-  author: Will Medrano
   description: >-
     I'm a software engineer.
   header: "wmedrano dot dev"
