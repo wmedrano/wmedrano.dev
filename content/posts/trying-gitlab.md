@@ -13,7 +13,7 @@ I switched the Bats project over from GitHub onto Gitlab. There was no real reas
 
 ### UX {#GitLabUX-tp6irt60i1k0}
 
-GitHub is more responsive. GitLab seems a bit sluggish to me. I searched to see if anyone else noticed, but it seems like I'm the only one that notices or cares.
+GitHub is more responsive while GitLab seems a bit sluggish to me. I searched to see if anyone else noticed, but it seems like I'm the only one that notices or cares.
 
 As far as the UI goes, I do slightly prefer GitLab. Although both UIs get the job done, I like GitLab's side bar for the repo once I get used to it. It does take a while to get used to though as there are many options, although I only use a few tabs. The code review seems very similar with GitLab having a few more integrations.
 
@@ -50,4 +50,4 @@ With this focus on enterprise, are their features that GitLab is missing for sol
 
 ### Conclusion {#GitLabConclusion-jmq50880i1k0}
 
-Overall my GitLab experience has been good. I learned a few things and implemented some fancy integrations. Due to GitHub's seemingly larger open source community I will likely try to at least mirror projects onto GitHub and use GitHub for anything where I expect more contributors in addition to myself.
+Overall my GitLab experience has been good. I learned a few things and implemented some fancy integrations. Due to GitHub's seemingly larger open source community, I will likely try to at least mirror projects onto GitHub. GitHub is especially usefur for projects where I expect more contributors in addition to myself.
