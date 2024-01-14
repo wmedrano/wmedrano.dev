@@ -46,19 +46,46 @@ notes at once) sawtooth wave synthesizer with a tweakable Moog style
 low pass to give the sound some smoothness. In the latest update, Toof
 was made monophonic. It can only play one note at a time therefore it
 can no longer play chords. However, with the simpifications, I was
-able to add a envelope to the filter. An envelope allows automating
-the tweaking of a parameter through time. In the filter case, you can
-think of it as someone automatically moving the filter frequency knob
-as each note is played. This allows giving more character to the sound.
-
-<bats-devlog2-filterenvelope.ogg>
-
-<bats-devlog2-nofilterenvelope.ogg>
+able to add a envelope to the filter.
 
 At some point, I may re-introduce polyphony, but its not a
 priority. The filter envelope can add a lot of character to bass
 sounds while the next plugin will likely be a polyphonic FM
 synthesizer to meet my chord needs.
+
+<!--list-separator-->
+
+-  Filter Envelope Modulation
+
+    The filter envelope changes the filter frequency automatically with
+    time. This is essentially the same as someone moving the filter
+    frequency knob as you are playing, but automated. In the example
+    below, the "Constant Filter" synths have a similar texture
+    throughout. In the "Envelope Modulated Filter", the filter frequency
+    increases a bit with time, and then settles back down.
+
+    <table>
+      <tr>
+        <th>Constant Filter</th>
+        <th>Envelope Modulated Filter</th>
+      </tr>
+      <tr>
+        <td>
+          <audio controls src="https://github.com/wmedrano/wmedrano.dev/raw/main/src/bats-devlog2-nofilterenvelope.ogg"></audio>
+        </td>
+        <td>
+          <audio controls src="https://github.com/wmedrano/wmedrano.dev/raw/main/src/bats-devlog2-filterenvelope.ogg"></audio>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <audio controls src="https://github.com/wmedrano/wmedrano.dev/raw/main/src/bats-devlog2-nofilterenvelope2.ogg"></audio>
+        </td>
+        <td>
+          <audio controls src="https://github.com/wmedrano/wmedrano.dev/raw/main/src/bats-devlog2-filterenvelope2.ogg"></audio>
+        </td>
+      </tr>
+    </table>
 
 
 #### Square and Triangle Waves {#BatsDevlog2UpdatesSquareandTriangleWaves-z8q2fgk0r2k0}
