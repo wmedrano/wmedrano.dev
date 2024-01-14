@@ -8,7 +8,7 @@ pygmentscodefencesguesssyntax: true
 ignoreErrors:
   - error-remote-getjson
 params:
-  DateFormat: January 01 2006
+  DateFormat: January 02 2006
   description: >-
     I'm a software engineer.
   header: "wmedrano dot dev"
