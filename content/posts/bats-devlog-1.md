@@ -10,6 +10,8 @@ draft = false
 
 Previous: [Devlog 0](https://www.wmedrano.dev/posts/introducing-bats/)
 
+Repo: <https://gitlab.com/wmedrano/bats>
+
 
 ### Introduction {#BatsDevlog1Introduction-z5n65g00i1k0}
 

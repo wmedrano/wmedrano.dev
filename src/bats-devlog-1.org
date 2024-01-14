@@ -13,6 +13,8 @@
 
 Previous: [[https://www.wmedrano.dev/posts/introducing-bats/][Devlog 0]]
 
+Repo: https://gitlab.com/wmedrano/bats
+
 ** Introduction
 :PROPERTIES:
 :CUSTOM_ID: BatsDevlog1Introduction-z5n65g00i1k0

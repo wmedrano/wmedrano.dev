@@ -13,6 +13,8 @@
 
 Previous: [[https://www.wmedrano.dev/posts/bats-devlog-1][Devlog 1]]
 
+Repo: https://gitlab.com/wmedrano/bats
+
 ** Introduction
 :PROPERTIES:
 :CUSTOM_ID: BatsDevlog2Introduction-sqq3j0i0r2k0
@@ -144,15 +146,11 @@ an obvious abstraction to build on, but IMO its easy to get wrong and
 pin yourself into a corner so I avoided it for a bit. This is
 especially not critical yet as I only have 1 plugin!
 
-**** Before
-:PROPERTIES:
-:CUSTOM_ID: BatsDevlog2UpdatesPluginTraitImprovementsBefore-czckjam0r2k0
-:END:
-
 The main change is that ~Params~ became more typed. Before, the Plugin
 had to keep track if IDs manually.
 
 #+BEGIN_SRC rust
+  /// Before
   impl Plugin for MyPlugin {
       const Params: Param = &[
           Param{name: "...", id: 1, min_value: ... other_stuff }
@@ -165,17 +163,8 @@ had to keep track if IDs manually.
   }
 #+END_SRC
 
-**** After
-:PROPERTIES:
-:CUSTOM_ID: BatsDevlog2UpdatesPluginTraitImprovementsAfter-bsndrdm0r2k0
-:END:
-
-After the refactor, plugin's are allowed to specify a type for their
-parameter. The main advantage is that the ~set_param~ and ~param~
-functions can use ~match~. ~match~ is very useful here as the compiler
-will ensure that all the cases are handled.
-
 #+BEGIN_SRC rust
+  /// After
   pub enum MyParam {
       FilterCutoff,
       OtherParam,
@@ -208,6 +197,11 @@ will ensure that all the cases are handled.
       }
   }
 #+END_SRC
+
+After the refactor, plugin's are allowed to specify a type for their
+parameter. The main advantage is that the ~set_param~ and ~param~
+functions can use ~match~. ~match~ is very useful here as the compiler
+will ensure that all the cases are handled.
 
 Although it seems like a strictly superior choice, it does add some
 complexity. The code on top of the plugin can't really know about the

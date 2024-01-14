@@ -10,6 +10,8 @@ draft = false
 
 Previous: [Devlog 1](https://www.wmedrano.dev/posts/bats-devlog-1)
 
+Repo: <https://gitlab.com/wmedrano/bats>
+
 
 ### Introduction {#BatsDevlog2Introduction-sqq3j0i0r2k0}
 
@@ -123,89 +125,83 @@ an obvious abstraction to build on, but IMO its easy to get wrong and
 pin yourself into a corner so I avoided it for a bit. This is
 especially not critical yet as I only have 1 plugin!
 
-<!--list-separator-->
+The main change is that `Params` became more typed. Before, the Plugin
+had to keep track if IDs manually.
 
--  Before
-
-    The main change is that `Params` became more typed. Before, the Plugin
-    had to keep track if IDs manually.
-
-    ```rust
-    impl Plugin for MyPlugin {
-        const Params: Param = &[
-            Param{name: "...", id: 1, min_value: ... other_stuff }
-            Param{name: "...", id: 2, min_value: ... other_stuff }
-            ...
-        ];
-
-        fn set_param(id: usize, value: f32) { ... }
-        fn param(id: usize) -> f32 { ... }
-    }
-    ```
-
-<!--list-separator-->
-
--  After
-
-    After the refactor, plugin's are allowed to specify a type for their
-    parameter. The main advantage is that the `set_param` and `param`
-    functions can use `match`. `match` is very useful here as the compiler
-    will ensure that all the cases are handled.
-
-    ```rust
-    pub enum MyParam {
-        FilterCutoff,
-        OtherParam,
+```rust
+/// Before
+impl Plugin for MyPlugin {
+    const Params: Param = &[
+        Param{name: "...", id: 1, min_value: ... other_stuff }
+        Param{name: "...", id: 2, min_value: ... other_stuff }
         ...
-    }
+    ];
 
-    impl Param for MyParam {
-        fn iter_all() -> impl Iterator<Self> { ... }
-        fn name(&self) -> &'static str { ... }
-        fn id(&self) -> usize { ... }
-        fn min_value(&self) -> f32 { ... }
-        ...
-    }
+    fn set_param(id: usize, value: f32) { ... }
+    fn param(id: usize) -> f32 { ... }
+}
+```
 
-    impl Plugin for MyPlugin {
-        type Param = MyParam;
+```rust
+/// After
+pub enum MyParam {
+    FilterCutoff,
+    OtherParam,
+    ...
+}
 
-        fn set_param(p: MyParam, value: f32) {
-            match p {
-                MyParam::FilterCutoff => ...
-                ... => ...
-            }
-        }
+impl Param for MyParam {
+    fn iter_all() -> impl Iterator<Self> { ... }
+    fn name(&self) -> &'static str { ... }
+    fn id(&self) -> usize { ... }
+    fn min_value(&self) -> f32 { ... }
+    ...
+}
 
-        fn param(p: MyParam) -> f32 {
-            match p {
-                MyParam::FilterCutoff => ...
-                ... => ...
-            }
+impl Plugin for MyPlugin {
+    type Param = MyParam;
+
+    fn set_param(p: MyParam, value: f32) {
+        match p {
+            MyParam::FilterCutoff => ...
+            ... => ...
         }
     }
-    ```
 
-    Although it seems like a strictly superior choice, it does add some
-    complexity. The code on top of the plugin can't really know about the
-    specifics of the plugin's `Param`. Ultimately, the wrapper code still
-    deals with IDs through a helper function that is automatically
-    implemented by the plugin.
-
-    ```rust
-    /// Set a parameter given its id.
-    fn set_param_by_id(&mut self, id: u32, value: f32) -> anyhow::Result<()> {
-        let param = match Self::Param::from_id(id) {
-            Some(p) => p,
-            None => bail!(
-                "could not convert param id {id} to param for plugin {plugin_name}",
-                plugin_name = Self::NAME
-            ),
-        };
-        self.set_param(param, value);
-        Ok(())
+    fn param(p: MyParam) -> f32 {
+        match p {
+            MyParam::FilterCutoff => ...
+            ... => ...
+        }
     }
-    ```
+}
+```
+
+After the refactor, plugin's are allowed to specify a type for their
+parameter. The main advantage is that the `set_param` and `param`
+functions can use `match`. `match` is very useful here as the compiler
+will ensure that all the cases are handled.
+
+Although it seems like a strictly superior choice, it does add some
+complexity. The code on top of the plugin can't really know about the
+specifics of the plugin's `Param`. Ultimately, the wrapper code still
+deals with IDs through a helper function that is automatically
+implemented by the plugin.
+
+```rust
+/// Set a parameter given its id.
+fn set_param_by_id(&mut self, id: u32, value: f32) -> anyhow::Result<()> {
+    let param = match Self::Param::from_id(id) {
+        Some(p) => p,
+        None => bail!(
+            "could not convert param id {id} to param for plugin {plugin_name}",
+            plugin_name = Self::NAME
+        ),
+    };
+    self.set_param(param, value);
+    Ok(())
+}
+```
 
 
 #### More Unit Tests and Cleanups {#BatsDevlog2UpdatesMoreUnitTestsandCleanups-rp4b4ym0r2k0}
