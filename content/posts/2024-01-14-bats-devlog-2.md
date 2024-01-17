@@ -73,18 +73,18 @@ synthesizer to meet my chord needs.
       </tr>
       <tr>
         <td>
-          <audio controls src="https://github.com/wmedrano/wmedrano.dev/raw/main/src/bats-devlog2-nofilterenvelope.ogg"></audio>
+          <audio controls src="/2024-01-14-bats-devlog-2-assets/nofilterenvelope.ogg"></audio>
         </td>
         <td>
-          <audio controls src="https://github.com/wmedrano/wmedrano.dev/raw/main/src/bats-devlog2-filterenvelope.ogg"></audio>
+          <audio controls src="/2024-01-14-bats-devlog-2-assets/filterenvelope.ogg"></audio>
         </td>
       </tr>
       <tr>
         <td>
-          <audio controls src="https://github.com/wmedrano/wmedrano.dev/raw/main/src/bats-devlog2-nofilterenvelope2.ogg"></audio>
+          <audio controls src="/2024-01-14-bats-devlog-2-assets/nofilterenvelope2.ogg"></audio>
         </td>
         <td>
-          <audio controls src="https://github.com/wmedrano/wmedrano.dev/raw/main/src/bats-devlog2-filterenvelope2.ogg"></audio>
+          <audio controls src="/2024-01-14-bats-devlog-2-assets/filterenvelope2.ogg"></audio>
         </td>
       </tr>
     </table>
