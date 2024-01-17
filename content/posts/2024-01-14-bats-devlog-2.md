@@ -61,10 +61,10 @@ synthesizer to meet my chord needs.
 
     The filter envelope changes the filter frequency automatically with
     time. This is essentially the same as someone moving the filter
-    frequency knob as you are playing, but automated. In the example
+    frequency knob as you are playing, but automated. In the examples
     below, the "Constant Filter" synths have a similar texture
-    throughout. In the "Envelope Modulated Filter", the filter frequency
-    increases a bit with time, and then settles back down.
+    throughout. In the "Envelope Modulated Filter", the filter
+    frequency increases a bit with time, and then settles back down.
 
     <table>
       <tr>
@@ -88,6 +88,13 @@ synthesizer to meet my chord needs.
         </td>
       </tr>
     </table>
+
+As you can hear, in the first example the modulation starts out at a
+lower frequency, builds up, and then back down. This creates a
+"brassy" sound. In the second example, higher frequencies are present
+at the start, and then die down, leaving just bass. This gives a
+punchier sound at the start and leaves a thick low end for the
+sustain.
 
 
 #### Square and Triangle Waves {#BatsDevlog2UpdatesSquareandTriangleWaves-z8q2fgk0r2k0}
