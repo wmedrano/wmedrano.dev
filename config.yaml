@@ -1,5 +1,5 @@
 baseURL: 'https://wmedrano.dev'
-theme: salinger
+theme: paper-mod
 title: wmedrano dot dev
 copyright: will.s.medrano@gmail.com
 pygmentsstyle: github
@@ -44,3 +44,5 @@ markup:
   goldmark:
     renderer:
       unsafe: true
+  highlight:
+    style: 'nord'
