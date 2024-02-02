@@ -2,7 +2,7 @@
 title = "Introducing Bats: Beat And Tracks Sequencer"
 author = ["Will Medrano"]
 date = 2023-11-08
-tags = ["rust", "music", "bats"]
+tags = ["rust", "music", "bats", "devlog"]
 draft = false
 +++
 

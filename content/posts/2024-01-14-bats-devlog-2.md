@@ -2,7 +2,7 @@
 title = "Bats Devlog 2"
 author = ["Will Medrano"]
 date = 2024-01-14
-tags = ["rust", "music", "bats"]
+tags = ["rust", "music", "bats", "devlog"]
 draft = false
 +++
 
