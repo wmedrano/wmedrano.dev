@@ -1,6 +1,7 @@
 #+TITLE: wmedrano dot dev
 #+AUTHOR: Will Medrano
+#+DATE: [2024-05-12 Sun]
 
+[[file:posts/index.org][Posts]]
 
-- [[file:posts/index.org][Posts]]
-- [[file:about.org][About Me]]
+[[file:about.org][About Me]]

@@ -1,5 +1,6 @@
 #+TITLE: About Me
 #+AUTHOR: Will Medrano
+#+DATE: [2024-05-12 Sun]
 
 * About Me
 :PROPERTIES:

@@ -4,37 +4,36 @@
 ;;; Code:
 (require 'ox-publish)
 
-(setq org-publish-project-alist
-      '(
-        ("wmedrano-home"
-         :base-directory "./src"
-         :publishing-function org-html-publish-to-html
-         :publishing-directory "./site"
-         :recursive nil
-         :auto-sitemap nil
-         :exclude ".*"
-         :include ("index.org" "about.org")
-         :with-toc nil
-         :section-numbers nil
-         :html-link-home "./"
-         :html-link-up "./"
-         :html-head "<style>body { padding: 1rem }</style>")
-        ("wmedrano-posts"
-         :base-directory "./src/posts"
-         :publishing-function org-html-publish-to-html
-         :publishing-directory "./site/posts"
-         :recursive t
-         :auto-sitemap t
-         :sitemap-title "Posts"
-         :sitemap-filename "index.org"
-         :html-link-home "/.."
-         :html-link-up "./index.html"
-         :html-head "<style>body { padding: 1rem }</style>")
-        ("wmedrano-site" :components ("wmedrano-home" "wmedrano-posts"))
-        ))
+(defun build-wmedrano-dev-site ()
+  (let ((org-publish-project-alist
+         '(("wmedrano-site" :components ("wmedrano-home" "wmedrano-posts"))
+           ("wmedrano-home"
+            :base-directory "./src"
+            :publishing-function org-html-publish-to-html
+            :publishing-directory "./site"
+            :recursive nil
+            :exclude ".*"
+            :include ("index.org" "about.org")
+            :with-toc nil
+            :section-numbers nil
+            :html-link-home "./"
+            :html-link-up "./")
+           ("wmedrano-posts"
+            :base-directory "./src/posts"
+            :publishing-function org-html-publish-to-html
+            :publishing-directory "./site/posts"
+            :recursive t
+            :auto-sitemap t
+            :sitemap-title "Posts"
+            :sitemap-filename "index.org"
+            :html-link-home "/.."
+            :html-link-up "./index.html")))
+        (org-html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\"/>")
+        (org-html-validation-link nil))
+    (org-publish-project "wmedrano-site" nil)
+    (copy-file "src/style.css" "site/style.css" t)))
 
-(delete-directory "./site" t t)
-(org-publish-project "wmedrano-site" t)
+(build-wmedrano-dev-site)
 
 (provide 'build)
 ;;; build.el ends here
