@@ -1,0 +1,6 @@
+#+TITLE: wmedrano dot dev
+#+AUTHOR: Will Medrano
+
+
+- [[file:posts/index.org][Posts]]
+- [[file:about.org][About Me]]

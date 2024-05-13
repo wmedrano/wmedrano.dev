@@ -1,0 +1,48 @@
+#+TITLE: About Me
+#+AUTHOR: Will Medrano
+
+* About Me
+:PROPERTIES:
+:CUSTOM_ID: AboutMe-o46g18m057k0
+:END:
+
+I'm Will and I work as a Software Engineer at Google. I deal with very big data during my day job. In my spare time I tinker with a variety of things like:
+
+- The Rust programming language.
+- Audio for music creation purposes.
+- Ergonomic keyboards.
+
+** Notable Open Source Work
+:PROPERTIES:
+:CUSTOM_ID: AboutMeNotableOpenSourceWork-mpn568q057k0
+:END:
+
+*** Rust JACK
+:PROPERTIES:
+:CUSTOM_ID: AboutMeNotableOpenSourceWorkRustJACK-mqp568q057k0
+:END:
+
+https://github.com/rustaudio/rust-jack is a Rust wrapper over JACK. JACK is the recommended Realtime audio API for Linux.
+
+*** wmidi
+:PROPERTIES:
+:CUSTOM_ID: AboutMeNotableOpenSourceWorkwmidi-hsr568q057k0
+:END:
+
+https://github.com/rustaudio/wmidi is a midi encoding and decoding library. Midi is a widely used digital interface to communcate musical data such as note keypresses and parameter changes.
+
+*** livi-rs
+:PROPERTIES:
+:CUSTOM_ID: AboutMeNotableOpenSourceWorklivirs-ott568q057k0
+:END:
+
+https://github.com/wmedrano/livi-rs is a Rust library for hosting LV2 plugins.
+
+** Links
+:PROPERTIES:
+:CUSTOM_ID: wmedranodotdevLinks-t35ajge047k0
+:END:
+
+- [[https://github.com/wmedrano][GitHub profile]]
+- [[https://github.com/wmedrano/wmedrano.dev][Source Code]]
+- [[https://ko-fi.com/wmedrano][Donate on Ko-Fi]]
