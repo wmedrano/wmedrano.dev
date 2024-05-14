@@ -1,16 +1,16 @@
-#+TITLE: GitLab for Hobby Projects
+#+TITLE: GitHub or GitLab for Hobby Projects
 #+AUTHOR: Will Medrano
 #+DATE: [2024-05-13 Mon]
 
 * Introduction
 :PROPERTIES:
-:CUSTOM_ID: GitLab-8nt9l58067k0
+:CUSTOM_ID: Introduction-2kba2r3087k0
 :END:
 
 GitHub and GitLab are code hosting platforms. After using both, I
 prefer to keep my solo development needs on GitHub. It's not that
 GitHub is significantly better than GitLab, but its slightly better
-and lets be get back to focusing on my dev work.
+and lets me get back to focusing on my dev work.
 
 * Basics
 :PROPERTIES:
@@ -35,21 +35,21 @@ For my hobbyist needs, they both:
 :CUSTOM_ID: Considerations-gackdb9067k0
 :END:
 
-** Speed
+** Latency
 :PROPERTIES:
 :CUSTOM_ID: CategoriesSpeed-d8ci1d9067k0
 :END:
 
 GitHub just feels snappier. I can't help but get annoyed at how
-sluggish page loads are in GitLab. Doing a quick comparison, I found
-that loading the "Changes" tab for a Merge Request takes about ~2.5s~
-before any reviewable code appears on the screen. Similarly, GitHub
-takes about ~1.0s~ to display code.
+sluggish page loads are in GitLab. Doing a quick comparison of the
+code review page, I found that GitLab takes about 2.5s while GitHub
+only takes around 1.0s before displaying any code.
 
 Really, this is the make or break feature for most of my usage. The
 sluggishness of GitLab gives my mind enough time to wander and get
 bored. This is especially bothersome for the moments where I'm locked
-in and highly productive.
+in and highly productive. Most people may not mind, but I'm pretty
+sensitive to latency.
 
 
 ** Community
@@ -57,11 +57,13 @@ in and highly productive.
 :CUSTOM_ID: CategoriesCommunity-3eei1d9067k0
 :END:
 
-Community is pretty important for the small libraries I
-develop. Although I have no expectation that anyone will use my niche
-library, it does happen from time to time. Its always a good feeling
-when someone contributes back a great feature to even a niche library
-like [[https://github.com/wmedrano/livi-rs][livi-rs]].
+Surprisingly, some of the small libraries I use have had a small
+amount of success in the open source community. Although I had no
+expectation that anyone would find, or even use my libraries, it's
+satisfying when someone finds my library and finds it useful. It's
+even more satisfying when someone contributes back a good feature to
+even a small library like
+[[https://github.com/wmedrano/livi-rs][livi-rs]].
 
 GitHub's community eclipses GitLab. Anecdotally, I've noticed most
 projects I use or have had any contribution to tend to be on
@@ -74,12 +76,14 @@ appreciate contributors.
 :CUSTOM_ID: CategoriesCommunityLibraryEngagementCaveats-1nxih7a067k0
 :END:
 
-All of my libraries are on GitHub while I only have binaries on
-GitLab. Libraries tend to attract at least a few users so it may be
-worth it to experiment with the amount of engagement the equivalent
-GitLab package would have. Unfortunately, Open Source development is
-only a side project as my main job eats most of my development time
-and energy.
+All of my libraries are on GitHub while I only have few prototype
+binaries on GitLab. Libraries tend to attract at least a few users so
+it may be worth it to experiment with the amount of engagement the
+equivalent GitLab package would have. Unfortunately, Open Source
+development is only a side project as my main job eats most of my
+development time and energy. Despite this, it does feel like the
+libraries on find on GitHub tend to have more contributor than the
+ones on GitLab.
 
 
 ** CI
@@ -88,8 +92,7 @@ and energy.
 :END:
 
 The CI between GitHub and GitLab is pretty comparable. Both allow
-running builds, lints, tests, and other checks before comitting
-code.
+running builds, lints, tests, and other checks before committing code.
 
 
 GitHub's implementation (GitHub Actions) involves writing YAML
@@ -98,12 +101,12 @@ actions. I've imported other actions to checkout repos, set up caching
 for Rust, uploading coverage results to another provider, and probably
 a few other cases.
 
-GitLab's ecosystem is a bit more barebones. You write YAML that also
+GitLab's ecosystem is a bit more bare bones. You write YAML that also
 executes commands, but there is no ecosystem of actions/commands like
-GitHub. Unpopular opinion, but I prefer not having to import magical
-actions to accomplish tasks. GitLab also had the extra benefit that
-you can provide specific artifacts/files/directories and export
-them. I used this to surface code coverage and test
+GitHub. Unpopular opinion, but I prefer not using magical actions
+(specific to GitHub) to accomplish tasks. GitLab also had the extra
+benefit that you can provide specific artifacts/files/directories and
+export them. I used this to surface code coverage and test
 results. Additionally, I ran benchmarks in the CI which exported
 HTML. The frontend was then able to provide a link to the HTML.
 
@@ -121,9 +124,9 @@ request.
 
 I'm not an expert in security or reliability. I also don't use GitHub
 or GitLab at my professional work. However, I see more headlines about
-GitLab going down. Some famous incidents include GitLab calling
-deleting its database [[https://news.ycombinator.com/item?id=13537052][[hackernews post]​]] or tthe password reset exploit
-[[https://thehackernews.com/2024/05/cisa-warns-of-active-exploitation-of.htm][[hackernews post]​]].
+GitLab going down. Some infamous incidents include GitLab deleting its
+own database [[https://news.ycombinator.com/item?id=13537052][(hackernews post)]] or the password reset exploit
+[[https://news.ycombinator.com/item?id=39159002][(hackernews post)]].
 
 
 ** Features & UX
@@ -147,9 +150,9 @@ really holds the experience back for me.
 :END:
 
 While both GitHub and GitLab offer similar experiences for code
-hosting, I have a slight preferance for GitHub. I can't speak to how
-everyone else perceives GitLab, but the unresponsiveness of the
-website is a slight annoyance. Additionally, GitHub has the larger
-developer community which helps bolster the open source
-community. As the underdog, I hope GitLab can make strides to improve
-GitLab for solo and small open source development.
+hosting, I prefer for GitHub. I can't speak to how everyone else
+perceives GitLab, but the unresponsiveness of the website is a slight
+annoyance. Additionally, GitHub has the larger developer community
+which helps bring in open source contributors. As the underdog, I hope
+GitLab can make strides to improve GitLab for solo and small open
+source development.

@@ -8,8 +8,15 @@
   "Build wmedrano.dev website.
 
 The static site is output into the site directory."
-  (let ((org-publish-project-alist
-         '(("wmedrano-site" :components ("wmedrano-home" "wmedrano-posts"))
+  (let ((org-html-home/up-format "
+<div id=\"org-div-home-and-up\">
+ <!--%s-->
+ <a href=\"%s\">HOME</a> | <a href=\"/posts\">POSTS</a> | <a href=\"/about.html\">ABOUT</a>
+</div>
+")
+        (org-html-link-up "../") ;; Unused. Required for home/up to render.
+        (org-publish-project-alist
+         `(("wmedrano-site" :components ("wmedrano-home" "wmedrano-posts"))
            ("wmedrano-home"
             :base-directory "./src"
             :publishing-function org-html-publish-to-html
@@ -20,20 +27,21 @@ The static site is output into the site directory."
             :with-toc nil
             :section-numbers nil
             :html-link-home "./"
-            :html-link-up "./")
+            )
            ("wmedrano-posts"
             :base-directory "./src/posts"
             :publishing-function org-html-publish-to-html
             :publishing-directory "./site/posts"
             :recursive t
             :auto-sitemap t
+            :section-numbers nil
             :sitemap-title "Posts"
             :sitemap-filename "index.org"
-            :html-link-home "/.."
-            :html-link-up "./index.html")))
-        (org-html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\"/>")
+            :html-link-home "../"
+            )))
+        (org-html-head "<link rel=\"stylesheet\" type=\"text/css\" href=\"/style.css\"/>")
         (org-html-validation-link nil))
-    (org-publish-project "wmedrano-site" nil)
+    (org-publish-project "wmedrano-site" t)
     (copy-file "src/style.css" "site/style.css" t)))
 
 (build-wmedrano-dev-site)

@@ -1,3 +1,6 @@
-.content {
-    padding: 1rem
+body {
+    margin: auto;
+    max-width: 50rem;
+    padding: 1rem;
+    font-family: verdana, sans;
 }

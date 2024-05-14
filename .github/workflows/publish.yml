@@ -33,7 +33,7 @@ jobs:
       - name: Install Deps
         run: |
           sudo apt-get update
-          sudo apt-get -y install emacs
+          sudo apt-get -y install emacs-nox
       - name: Checkout
         uses: actions/checkout@v3
         with:
