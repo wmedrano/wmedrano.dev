@@ -5,6 +5,9 @@
 (require 'ox-publish)
 
 (defun build-wmedrano-dev-site ()
+  "Build wmedrano.dev website.
+
+The static site is output into the site directory."
   (let ((org-publish-project-alist
          '(("wmedrano-site" :components ("wmedrano-home" "wmedrano-posts"))
            ("wmedrano-home"
