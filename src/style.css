@@ -4,3 +4,6 @@ body {
     padding: 1rem;
     font-family: verdana, sans;
 }
+a {
+    text-decoration: none;
+}
