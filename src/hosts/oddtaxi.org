@@ -12,20 +12,26 @@
 - Serve a static file.
 - Reroute request to another job.
 
+** Data Flow
+   :PROPERTIES:
+   :CUSTOM_ID: OverviewDataFlow-8074oxm0y7k0
+   :END:
+
 #+BEGIN_SRC dot :file oddtaxi.png
-  digraph oddtaxi {
+digraph oddtaxi {
   node[shape=record];
+  subgraph cluster_1 {
+    prometheus[label="prometheus\n(metric collector)"];
+    grafana[label="grafana\n(prometheus frontend)"];
+    caddy[label="caddy\n(web server)"];
+    blog[label="blog\n(static files)"];
+  }
   blog -> caddy -> public_internet;
   prometheus -> grafana -> caddy;
-  blog -> prometheus[style=dashed];
   grafana -> prometheus[style=dashed];
   prometheus -> prometheus[style=dashed];
-
-  blog[label="blog\n(static files)"];
-  prometheus[label="prometheus\n(metric collector)"];
-  grafana[label="grafana\n(prometheus frontend)"];
-  caddy[label="caddy\n(web server)"];
-  }
+  caddy -> prometheus[style=dashed];
+}
 #+END_SRC
 
 #+RESULTS:
