@@ -158,7 +158,8 @@ file:server-setup/grafana.png
 :END:
 
 Grafana is a UI for Prometheus. Since there is no system package
-available, we use Docker to run a prepackaged image.
+available, we use Docker to run a prepackaged image. Grafana is served
+at ~http://localhost:21895~.
 
 #+BEGIN_SRC sh
 sudo docker run -d \
