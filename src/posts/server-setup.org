@@ -1,6 +1,7 @@
 #+TITLE: Server Setup for wmedrano.dev
 #+AUTHOR: Will S. Medrano
 #+DATE: [2024-06-04 Tue]
+#+DESCRIPTION: Discover the efficient server setup for wmedrano.dev. Learn how the 'oddtaxi' Raspberry Pi 4 machine, Caddy, Prometheus, and Grafana work together to serve static files, collect metrics, and provide a seamless user experience. Explore the detailed configurations and monitoring setup for optimal website performance.
 
 * Overview
 :PROPERTIES:
@@ -98,7 +99,7 @@ automatically installed with ~Prometheus~.
 
 Caddy is install through ~sudo apt install caddy~. After installation,
 Caddy should automatically be started as a daemon that reads the
-config from /etc/caddy/Caddyfile. The logs and status of the daemon
+config from ~/etc/caddy/Caddyfile~. The logs and status of the daemon
 can be inspected with ~systemctl status caddy~.
 
 ** Static Files

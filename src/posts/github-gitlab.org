@@ -1,6 +1,8 @@
 #+TITLE: GitHub or GitLab for Hobby Projects
 #+AUTHOR: Will Medrano
 #+DATE: [2024-05-13 Mon]
+#+DESCRIPTION: Compare GitHub and GitLab for hobby or personal projects. Compares speed, community engagement, CI capabilities, security, features, and user experience.
+
 
 * Introduction
 :PROPERTIES:

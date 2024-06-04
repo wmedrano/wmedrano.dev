@@ -4,6 +4,20 @@
 ;;;   ~emacs -Q --script build.el~
 ;;; Code:
 (require 'ox-publish)
+(require 'cl-lib)
+
+(defun add-tangled-name (backend)
+  (let ((src-blocks (org-element-map (org-element-parse-buffer) 'src-block #'identity)))
+(setq src-blocks (nreverse src-blocks))
+    (cl-loop for src in src-blocks
+      do
+      (goto-char (org-element-property :begin src))
+      (let* ((properties (nth 2 (org-babel-get-src-block-info)))
+             (tangle     (alist-get :tangle properties))
+             (file       (alist-get :file properties)))
+        (when (string= tangle "yes")
+          (insert (format "File ~%s~:\n" file)))
+        ))))
 
 (defun build-wmedrano-dev-site ()
   "Build wmedrano.dev website.
@@ -16,6 +30,7 @@ The static site is output into the site directory."
 </div>
 ")
         (org-html-link-up "../") ;; Unused. Required for home/up to render.
+        (org-export-before-processing-functions '(add-tangled-name))
         (org-publish-project-alist
          `(("wmedrano-site" :components ("wmedrano-home" "wmedrano-posts"))
            ("wmedrano-home"
