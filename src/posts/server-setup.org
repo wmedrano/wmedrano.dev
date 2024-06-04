@@ -160,8 +160,12 @@ file:server-setup/grafana.png
 Grafana is a UI for Prometheus. Since there is no system package
 available, we use Docker to run a prepackaged image.
 
-#+BEGIN_SRC
-sudo docker run -d -p 21895:3000 --name=grafana --restart unless-stopped grafana/grafana-enterprise
+#+BEGIN_SRC sh
+sudo docker run -d \
+  --name=grafana \
+  -p 21895:3000 \
+  --restart unless-stopped \
+  grafana/grafana-enterprise
 #+END_SRC
 
 ** Caddy
@@ -192,20 +196,4 @@ Prometheus.
     - job_name: grafana
       static_configs:
         - targets: ['localhost:21895']
-#+END_SRC
-
-** Grafana
-:PROPERTIES:
-:CUSTOM_ID: ConfigsGrafana-fwaaqbk0y7k0
-:END:
-
-Grafana is a GUI for Prometheus. It allows building dashboards based
-on metrics collected from Prometheus.
-
-#+BEGIN_SRC sh
-sudo docker run -d \
-  --name=grafana \
-  -p 21895:3000 \
-  --restart unless-stopped \
-  grafana/grafana-enterprise
 #+END_SRC
