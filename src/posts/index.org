@@ -1,3 +1,0 @@
-#+TITLE: Posts
-
-- [[file:github-gitlab.org][GitHub or GitLab for Hobby Projects]]

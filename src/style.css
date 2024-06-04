@@ -2,8 +2,12 @@ body {
     margin: auto;
     max-width: 50rem;
     padding: 1rem;
-    font-family: verdana, sans;
+    font-family: sans;
 }
+img {
+    max-width: 50rem;
+}
+
 a {
     text-decoration: none;
 }

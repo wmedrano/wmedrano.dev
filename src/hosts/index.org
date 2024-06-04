@@ -1,3 +1,0 @@
-#+TITLE: Hosts
-
-- [[file:oddtaxi.org][Odd Taxi]]
