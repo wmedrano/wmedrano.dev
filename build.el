@@ -30,7 +30,7 @@ The static site is output into the site directory."
 </div>
 ")
         (org-html-link-up "../") ;; Unused. Required for home/up to render.
-        (org-export-before-processing-functions '(add-tangled-name))
+        (org-export-before-processing-hook '(add-tangled-name))
         (org-publish-project-alist
          `(("wmedrano-site" :components ("wmedrano-home" "wmedrano-posts"))
            ("wmedrano-home"
