@@ -7,6 +7,7 @@
 (require 'cl-lib)
 
 (defun add-tangled-name (backend)
+  "Adds the name of the file for tangled src blocks."
   (let ((src-blocks (org-element-map (org-element-parse-buffer) 'src-block #'identity)))
 (setq src-blocks (nreverse src-blocks))
     (cl-loop for src in src-blocks
@@ -30,7 +31,11 @@ The static site is output into the site directory."
 </div>
 ")
         (org-html-link-up "../") ;; Unused. Required for home/up to render.
-        (org-export-before-processing-hook '(add-tangled-name))
+        (org-export-before-processing-functions '(add-tangled-name))
+        ;; org-export-before-processing-hook has been deprecated by
+        ;; org-export-before-processing-functions but is not available
+        ;; on all my systems yet.
+        (org-export-before-processing-hook      '(add-tangled-name))
         (org-publish-project-alist
          `(("wmedrano-site" :components ("wmedrano-home" "wmedrano-posts"))
            ("wmedrano-home"
