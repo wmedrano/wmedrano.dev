@@ -1,10 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand');
 
 body {
     margin: auto;
     max-width: 50rem;
     padding: 1rem;
-    font-family: 'Montserrat', sans;
+    font-family: 'Quicksand', sans;
+    font-size: 1.1rem;
 }
 
 a {
