@@ -1,9 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat');
+
 body {
     margin: auto;
     max-width: 50rem;
     padding: 1rem;
-    font-family: sans;
+    font-family: 'Montserrat', sans;
 }
+
+a {
+    text-decoration: none;
+}
+
 img {
     max-width: 50rem;
 }
@@ -11,7 +18,4 @@ img {
     img {
         max-width: 100%;
     }
-}
-a {
-    text-decoration: none;
 }

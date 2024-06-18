@@ -7,7 +7,7 @@
 (require 'cl-lib)
 
 (defun add-tangled-name (backend)
-  "Adds the name of the file for tangled src blocks."
+  "Add the name of the file for tangled src blocks for any BACKEND."
   (let ((src-blocks (org-element-map (org-element-parse-buffer) 'src-block #'identity)))
 (setq src-blocks (nreverse src-blocks))
     (cl-loop for src in src-blocks
