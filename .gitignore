@@ -1,2 +1,5 @@
-*html
-src/posts/*png
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+vendor
