@@ -33,8 +33,8 @@ and effects.
 
 ## Links
 
-[@wmedrano on GitHub](https://github.com/wmedrano)
-[Blog Source](https://github.com/wmedrano/wmedrano.dev)
-[Sponsor on GitHub](https://github.com/sponsors/wmedrano)
-[Email](mailto:will.s.medrano@gmail.com)
+- [@wmedrano on GitHub](https://github.com/wmedrano)
+- [Blog Source](https://github.com/wmedrano/wmedrano.dev)
+- [Sponsor on GitHub](https://github.com/sponsors/wmedrano)
+- [Email](mailto:will.s.medrano@gmail.com)
 
