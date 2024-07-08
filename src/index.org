@@ -1,8 +1,0 @@
-#+TITLE: wmedrano dot dev
-#+AUTHOR: Will Medrano
-#+DATE: [2024-05-12 Sun]
-
-- [[file:index.org][Posts]]
-  - [[file:posts/github-gitlab.org][GitHub or GitLab for Hobby Projects]]
-  - [[file:posts/server-setup.org][Server Setup for wmedrano.dev]]
-- [[file:about.org][About Me]]

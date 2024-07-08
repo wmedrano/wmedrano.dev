@@ -1,0 +1,121 @@
+---
+layout: post
+title:  "GitHub or GitLab for Hobby Projects"
+date:   2024-05-13 16:34:11 -0700
+categories: post
+---
+
+# Introduction
+
+GitHub and GitLab are code hosting platforms. After using both, I prefer to keep
+my solo development needs on GitHub due to GitHub's larger community and faster
+page loads.
+
+# Basics
+
+Although GitLab also sells itself as a DevOps platform, both GitLab and GitHub
+essentially have the same functionality. This is especially true for a
+non-enterprise user like myself. My basic needs are:
+
+- Host code using Git. I'd prefer Mercurial, but I'll take what I can get.
+  - Allow browsing code. They both do the job here but pale in comparison to
+    something like SourceGraph.
+- Automate workflows on Pull/Merge request for things such as building, running
+  tests, and deploying.
+- Facilitate feedback and contributions from others within the community.
+
+# Categories
+
+## Latency
+
+GitHub just feels snappier. I can't help but get annoyed at how sluggish GitLab
+presents its content. Doing a quick comparison of the code review page, I found
+that GitLab takes `2.5s` to display code, while GitHub does so in `1.0s`.
+
+Really, speed is the make or break feature for my usage. The latency GitLab
+introduces is enough time for my mind to wander. This is especially bothersome
+for the moments where I'm locked in and highly productive. I'm very sensitive to
+latency, though many may not mind.
+
+## Community
+
+Surprisingly, some of the small libraries I use have had a small amount of
+success in the open source community. Although I had no expectation that anyone
+would find, let alone use my libraries, it's satisfying when it does
+happen. It's even better when someone contributes back a feature or two.
+
+GitHub's community eclipses GitLab. Anecdotally, I've noticed most projects I
+use tend to be on GitHub. In terms of contributions, GitHub projects seem to be
+more lively as well.
+
+### Library Engagement Caveats
+
+All of my libraries are on GitHub while I only have a few prototype binaries on
+GitLab. Libraries tend to attract at least a few users so it may be worth it for
+me to experiment by developing some libraries on GitLab to get a better sense of
+engagement. Unfortunately, my main job eats a lot of my time and energy leaving
+very little for my side projects. Despite this, it does fell like the libraries
+I find on GitHub tend to have more contributors than the ones on GitLab.
+
+### CI
+
+The CI between GitHub and GitLab is comparable. Both allow running builds,
+lints, tests, and other checks before committing code.
+
+GitHub's implementation (GitHub Actions) involves writing YAML that can execute
+commands and import other commands. These other commands have their own open
+source ecosystem. The actions I've used do things like checkout repos, set up
+Rust caching, upload code coverage results, and probably a few other actions.
+
+GitLab's ecosystem is more bare bones. You write YAML that executes commands,
+similarly to GitHub, but unlike GitHub, there is no ecosystem of
+actions/commands to import. Unpopular opinion, but I prefer not using magical
+actions that are specific to GitHub's platform to accomplish tasks. Despite the
+lack of reusable actions, GitLab does have better artifacts support. Artifacts
+are files that are produced by the CI. These can include anything like the
+binary build, intermediate data, or, very nicely formatted HTML reports. In
+GitLab, I enjoyed setting up several reports. My CI would build and test and
+produce several neat artifacts like
+
+- Code coverage report highlighting all lines that executed during the tests,
+  bringing attention to those that had no coverage.
+- Benchmark report, filled with insightful distribution plots.
+- Test suite report itemizing all unit tests with their result and
+  runtime.
+  
+The CI would generate the reports and link to each report in the code review
+UI. GitHub can similarly produce artifacts, but the artifacts are hard to
+access. While GitLab HTML artifacts can be viewed directly in the browser,
+GitHub requires downloading the artifacts as a zip file, after which the files
+can be opened on the browser. GitHub has an [open
+issue](https://github.com/actions/upload-artifact/issues/14) for this, maybe
+they'll get to it one day.
+
+## Security & Reliability
+
+I'm no expert in security or reliability. I don't use GitHub or GitLab in my
+professional work. But as an outsider, I can't help but to watch some of
+GitLab's wrecks from the sidelines. Some infamous incidents include GitLab
+deleting its own database ([hackernews post
+2017](https://news.ycombinator.com/item?id=13537052)) or the password exploit
+that allow you to reset anyone's password ([hackernews post
+2024](https://news.ycombinator.com/item?id=39159002)).
+
+## Features & UX
+
+Overall, features & UX for GitHub and GitLab are equivalent. There's basically
+no point to this section. I have a slight preference for GitLab in many ways,
+but not enough to overcome any other deficiencies. Here's a list of some of my
+favorite features:
+
+- Easily browsing HTML artifacts. (OK, this one is actually a big deal IMO)
+- The GitLab sidebar looks nice. Maybe slightly clunky, but I prefer it over
+  GitHub.
+- Terminology. MergeRequest resonates with me more than PullRequest.
+
+# Conclusion
+
+Both GitHub and GitLab offer similar experiences for code and CI hosting. I
+prefer GitHub due to its larger community and more responsive page loads. As the
+underdog, I hope that GitLab, or any other great hosting platform, can make
+strides to improve for solo and small open source development.
