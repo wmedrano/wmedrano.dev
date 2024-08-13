@@ -82,7 +82,7 @@ produce several neat artifacts like
 - Benchmark report, filled with insightful distribution plots.
 - Test suite report itemizing all unit tests with their result and
   runtime.
-  
+
 The CI would generate the reports and link to each report in the code review
 UI. GitHub can similarly produce artifacts, but the artifacts are hard to
 access. While GitLab HTML artifacts can be viewed directly in the browser,
@@ -119,3 +119,19 @@ Both GitHub and GitLab offer similar experiences for code and CI hosting. I
 prefer GitHub due to its larger community and more responsive page loads. As the
 underdog, I hope that GitLab, or any other great hosting platform, can make
 strides to improve for solo and small open source development.
+
+<script src="https://giscus.app/client.js"
+        data-repo="wmedrano/wmedrano.dev"
+        data-repo-id="R_kgDOHEvXbw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOHEvXb84Cc8xb"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>

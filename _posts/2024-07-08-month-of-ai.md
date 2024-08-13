@@ -97,3 +97,19 @@ stemming. A more insightful discussion on vector embeddings for Search can be
 found in Lex Fridman's
 [interview](https://youtu.be/e-gwvmhyU7A?si=znZM8TD-9O28t0v2) with Perplexity's
 CEO.
+
+<script src="https://giscus.app/client.js"
+        data-repo="wmedrano/wmedrano.dev"
+        data-repo-id="R_kgDOHEvXbw"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOHEvXb84Cc8xb"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        crossorigin="anonymous"
+        async>
+</script>

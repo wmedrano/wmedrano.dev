@@ -5,8 +5,6 @@ description: >-
 baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://wmedrano.dev" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  wmedrano
-
-# Build settings
 theme: minima
 plugins:
   - jekyll-feed
