@@ -4,12 +4,28 @@ title: About
 permalink: /about/
 ---
 
-I work as a Software Engineer at Google. I deal with very big data during my day job and tinker with stuff in my freetime. This includes:
+I work as a Software Engineer at Google. I deal with very big data during my day
+job and tinker with stuff in my freetime.
 
-- Developing in Rust.
-- Audio programming for music.
-- Ergonomic keyboards.
-- Tweaking Emacs.
+Keywords:
+- Rust & Zig
+- Audio programming
+- Ergonomic keyboards
+- Tweaking Emacs
+- Open source scenester
+
+# Ideapad
+
+A list of things I could write a post about. In relative order of when I will
+publish them.
+
+- How I fell into becoming an open source maintainer. for rust-jack.
+- Optimizing programs with profile tools.
+- Initial dissapointment when joining Google out of University in 2016.
+  - ...maybe to shy to put this one out there
+- My favorite things about my Emacs setup.
+- Ranking features of my weird Colemak, thumb cluster, split keyboard setup.
+- Idiot's guide to a mark-and-sweep garbage collector.
 
 # Notable Open Source Work
 
@@ -37,4 +53,3 @@ and effects.
 - [Blog Source](https://github.com/wmedrano/wmedrano.dev)
 - [Sponsor on GitHub](https://github.com/sponsors/wmedrano)
 - [Email](mailto:will.s.medrano@gmail.com)
-
