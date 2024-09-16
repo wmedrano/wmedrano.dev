@@ -14,19 +14,6 @@ Keywords:
 - Tweaking Emacs
 - Open source scenester
 
-# Ideapad
-
-A list of things I could write a post about. In relative order of when I will
-publish them.
-
-- How I fell into becoming an open source maintainer. for rust-jack.
-- Optimizing programs with profile tools.
-- Initial dissapointment when joining Google out of University in 2016.
-  - ...maybe to shy to put this one out there
-- My favorite things about my Emacs setup.
-- Ranking features of my weird Colemak, thumb cluster, split keyboard setup.
-- Idiot's guide to a mark-and-sweep garbage collector.
-
 # Notable Open Source Work
 
 ## Rust JACK
@@ -52,4 +39,4 @@ and effects.
 - [@wmedrano on GitHub](https://github.com/wmedrano)
 - [Blog Source](https://github.com/wmedrano/wmedrano.dev)
 - [Sponsor on GitHub](https://github.com/sponsors/wmedrano)
-- [Email](mailto:will.s.medrano@gmail.com)
+- [Email](mailto:will@wmedrano.dev)
