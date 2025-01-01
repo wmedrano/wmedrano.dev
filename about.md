@@ -5,14 +5,9 @@ permalink: /about/
 ---
 
 I work as a Software Engineer at Google. I deal with very big data during my day
-job and tinker with stuff in my freetime.
+job and tinker with stuff in my freetime. Open source scenester and tinkerer.
 
-Keywords:
-- Rust & Zig
-- Audio programming
-- Ergonomic keyboards
-- Tweaking Emacs
-- Open source scenester
+- [Sponsor on GitHub](https://github.com/sponsors/wmedrano)
 
 # Notable Open Source Work
 
