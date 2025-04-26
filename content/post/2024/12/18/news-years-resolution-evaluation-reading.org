@@ -1,11 +1,8 @@
----
-layout: post
-title:  "New Years Resolution Evaluation - Reading"
-date:   2024-12-18 08:39:00 -0700
-categories: post
----
+#+title: New Years Resolution Evaluation - Reading
+#+author: Will Medrano
+#+date: 2024-12-18
 
-# Goal
+* Goal
 
 My goal this year was to read more books. One a month. To be honest, the
 planning was very fuzzy so I can hardly remember what I set out to do. The
@@ -13,7 +10,7 @@ brainstorming featured piano, personal projects, drawing, and reading. By the
 time I remembered in November, the most reasonable seemed to be reading a book a
 month, making me 10 books behind.
 
-# Reasoning
+* Reasoning
 
 So why reading? My past goals have been related to improvement, usually with
 some aspect of work. I've obtained a consistent exercise routine, optimized my
@@ -21,9 +18,9 @@ productivity, improved my planning & design skills, and documentation. At this
 point, I feel like I produce pretty good artifacts but I have the one shame, I
 don't read good.
 
-There is some documentation that I read religiously [^1], but for the most part, I
-hack and slash to get what I want. This is my primary approach. I don't have any
-plans to change it, but I think there's headroom to improve what I take away
+There is some documentation that I read religiously [^1], but for the most part,
+I hack and slash to get what I want. This is my primary approach. I don't have
+any plans to change it, but I think there's headroom to improve what I take away
 from technical documentation.
 
 So, why not set a goal on reading documentation and technical material? For one,
@@ -33,22 +30,22 @@ can't I read a goddamn book! I can scroll through heaps of Hacker News, YouTube,
 Reddit, audiobooks but only manage to read about one or two non fiction books
 per year.
 
-# Progress
+* Progress
 
 By the time I remembered my reading goal in November, I had read 0.1 books. It
 is now mid December and I have finished 5 books. This puts me at a 41% with a
 trajectory of finishing at 50% with a moderate possibility of 100% depending on
 how I spend my weekend.
 
-![Books read](/assets/2024-12-18-new-years-resolution-evaluation-reading/books.png)
+file:books.png
 
 So, based on the numbers, I did not do well this year. On the other hand, I did
 also read some papers sometime in the middle of the year and the reading of
 fiction has improved my ability to focus.
 
-# Findings
+* Findings
 
-## Reading Speed
+** Reading Speed
 
 I can now read pretty fast *sometimes*.
 
@@ -68,7 +65,7 @@ focus and was able to read longer without needing a break. Will this translate
 to work-related readings? Probably, I think, I'll see once I get back from my
 short vacation.
 
-## School and Time Sucked the Fun out of Fiction
+** School and Time Sucked the Fun out of Fiction
 
 This is perhaps the first time I have voluntarily completed a fiction novel
 since middle school. The first novel I read was "Tuck Everlasting" in 4th
@@ -92,9 +89,10 @@ for its own sake".
 
 It's much more fun when there's no pressure of an upcoming test or
 assignment. Without the weight, I feel like I'm diving just as deep, possibly
-deeper, than I used to. I managed to have fun reading all the books on my list [^3].
+deeper, than I used to. I managed to have fun reading all the books on my list
+[^3].
 
-## El Enemigo Returns
+** El Enemigo Returns
 
 This wasn't really a learning. I've known this for a while. As I'm trying to
 read and need a break, the first thing that I reach for is... my phone. More
@@ -103,14 +101,14 @@ on YouTube?! When YCombinator expound the beauty of startups providing huge
 value and name the iPhone, I can't help but to throw up. The dopamine device has
 stolen way too much attention.
 
-# Conclusion
+* Conclusion
 
 So how did I do? I did pretty well in the past 2 months. Although I should've
 put more effort at the start of the year, I did read a lot and it was
 enjoyable. Next year I will focus on my Piano skills, but will probably continue
 to read[^4] and combat the urge to burn time on form content.
 
-# Footnotes
+* Footnotes
 
 [^1]: Some of my favorite documentation includes
     [The Guile Reference Manual](https://www.gnu.org/software/guile/manual/html_node/)
@@ -125,19 +123,3 @@ to read[^4] and combat the urge to burn time on form content.
 
 [^4]: I read "The Trial" by Franz Kafka before the end of the year which
     technically puts me at 6 out of 12 for the year.
-
-<script src="https://giscus.app/client.js"
-        data-repo="wmedrano/wmedrano.dev"
-        data-repo-id="R_kgDOHEvXbw"
-        data-category="Announcements"
-        data-category-id="DIC_kwDOHEvXb84Cc8xb"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        crossorigin="anonymous"
-        async>
-</script>
