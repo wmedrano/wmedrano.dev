@@ -92,7 +92,7 @@ text-generation, but my wishlist for a card:
 - Demo
 - Brief description
 - Caveats
-- Special tokens (like FIM_PREFIX)
+- Special tokens (like ~FIM_PREFIX~)
 
 *** Text Vectorization Alone is Crap
 

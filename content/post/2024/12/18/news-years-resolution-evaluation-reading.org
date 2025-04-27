@@ -18,10 +18,10 @@ productivity, improved my planning & design skills, and documentation. At this
 point, I feel like I produce pretty good artifacts but I have the one shame, I
 don't read good.
 
-There is some documentation that I read religiously [^1], but for the most part,
-I hack and slash to get what I want. This is my primary approach. I don't have
-any plans to change it, but I think there's headroom to improve what I take away
-from technical documentation.
+There is some documentation that I read religiously [fn:favorite-documentation],
+but for the most part, I hack and slash to get what I want. This is my primary
+approach. I don't have any plans to change it, but I think there's headroom to
+improve what I take away from technical documentation.
 
 So, why not set a goal on reading documentation and technical material? For one,
 I've liked the idea of adding some fiction reading to my routine. I haven't
@@ -74,7 +74,7 @@ experience. Over the years, I would get assigned books and even read more
 related books. However, sometime in high school, I dropped reading for fun due
 to time constraints and the focus of reading books. Books were read to hunt for
 themes and symbols in order to churn out generic essays highlighting the correct
-answer [^2].
+answer [fn:school-reading-requirements].
 
 With the latest readings, I didn't need to be on the lookout for the right
 answers to an upcoming test. In 1984, I didn't have to care at all about what
@@ -89,8 +89,8 @@ for its own sake".
 
 It's much more fun when there's no pressure of an upcoming test or
 assignment. Without the weight, I feel like I'm diving just as deep, possibly
-deeper, than I used to. I managed to have fun reading all the books on my list
-[^3].
+deeper, than I used to. I managed to have fun reading all the books on my
+list[fn:poe].
 
 ** El Enemigo Returns
 
@@ -106,20 +106,17 @@ stolen way too much attention.
 So how did I do? I did pretty well in the past 2 months. Although I should've
 put more effort at the start of the year, I did read a lot and it was
 enjoyable. Next year I will focus on my Piano skills, but will probably continue
-to read[^4] and combat the urge to burn time on form content.
+to read[fn:post-blog-readings] and combat the urge to burn time on form content.
 
-* Footnotes
+[fn:favorite-documentation] Some of my favorite documentation includes [[https://www.gnu.org/software/guile/manual/html_node/][The Guile Reference
+Manual]] and [[https://wiki.libsdl.org/SDL3/FrontPage][SDL Wiki]].
 
-[^1]: Some of my favorite documentation includes
-    [The Guile Reference Manual](https://www.gnu.org/software/guile/manual/html_node/)
-    and [SDL Wiki](https://wiki.libsdl.org/SDL3/FrontPage).
+[fn:school-reading-requirements] Although this may sound like a harsh critique, I'm glad that
+school forced me to read. Praying that I would read for fun would not
+have improved my literacy.
 
-[^2]: Although this may sound like a harsh critique, I'm glad that school forced
-    me to read. Praying that I would read for fun would not have improved my
-    literacy.
+[fn:poe] After reading the first short story, I didn't want to spend
+any more time translating Poe's overindulgent language.
 
-[^3]: After reading the first short story, I didn't want to spend any more time
-    translating Poe's overindulgent language.
-
-[^4]: I read "The Trial" by Franz Kafka before the end of the year which
-    technically puts me at 6 out of 12 for the year.
+[fn:post-blog-readings] I read "The Trial" by Franz Kafka before the end of the
+year which technically puts me at 6 out of 12 for the year.

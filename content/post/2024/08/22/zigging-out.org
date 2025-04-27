@@ -163,7 +163,7 @@ pub const Ir = union(enum) {
 };
 
 test "nested badly formed lambda produces error" {
-	// This unit test helped me clean up the partially formed `*Ir` objects.
+    // This unit test helped me clean up the partially formed `*Ir` objects.
     try std.testing.expectError(
         Ir.Error.SyntaxError,
         Ir.initStrExpr(std.testing.allocator, "(define foo (lambda () (lambda ())))"),
@@ -254,16 +254,16 @@ implemented like so:
 
 #+BEGIN_SRC rust
 pub trait Animal {
-	fn speak(&self);
+    fn speak(&self);
 }
 
 impl Animal for Duck {
-	fn speak(&self) { println!("quack!") }
+    fn speak(&self) { println!("quack!") }
 }
 
 fn double_speak(a: &impl Animal) {
-	a.speak();
-	a.speak();
+    a.speak();
+    a.speak();
 }
 #+END_SRC
 
@@ -277,14 +277,14 @@ implementation of the above would be:
 
 #+BEGIN_SRC zig
 const Duck = struct{
-	pub fn speak(_: *const Duck) void {
-		std.debug.print("quack!", .{});
-	}
+    pub fn speak(_: *const Duck) void {
+        std.debug.print("quack!", .{});
+    }
 };
 
 fn doubleSpeak(animal: anytype) void {
-	animal.speak();
-	animal.speak();
+    animal.speak();
+    animal.speak();
 }
 #+END_SRC
 
@@ -360,14 +360,14 @@ C++ version of the API may involve writing the following boilerplate:
 class ThingWrapper {
   public:
     ThingWrapper() {
-		m_thing = newThing();
-		if (!m_thing) throw std::runtime_error("Failed to create thing");
-	}
+        m_thing = newThing();
+        if (!m_thing) throw std::runtime_error("Failed to create thing");
+    }
 
-	~ThingWrapper() {
-	  if (m_thing) deleteThing(m_thing);
-	  m_thing = nullptr;
-	}
+    ~ThingWrapper() {
+      if (m_thing) deleteThing(m_thing);
+      m_thing = nullptr;
+    }
 
   private:
     void* m_thing;

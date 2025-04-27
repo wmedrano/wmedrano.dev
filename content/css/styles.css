@@ -35,6 +35,12 @@ img {
     font-size: small;
     line-height: 0.5;
 }
+.org-src-container {
+    border-block: solid;
+    border-style: solid;
+    border-width: thin;
+    padding: 8px;
+}
 
 /*Generated from M-x org-htm-htmlize-generate-css for codeblocks*/
 .org-abbrev-table-name {
