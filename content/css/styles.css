@@ -40,6 +40,7 @@ img {
     border-style: solid;
     border-width: thin;
     padding: 8px;
+    overflow: scroll;
 }
 
 /*Generated from M-x org-htm-htmlize-generate-css for codeblocks*/
