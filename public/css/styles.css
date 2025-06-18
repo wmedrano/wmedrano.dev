@@ -1,0 +1,43 @@
+body {
+    font-family: 'Quicksand', sans-serif;
+    line-height: 1.25;
+    margin: 8px;
+}
+a {
+    text-decoration: inherit;
+    color: #51afef;
+}
+a:hover {
+    text-decoration: underline;
+}
+code {
+    color: #bbc2cf;
+    background-color: #21242b;
+}
+img {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+}
+.content {
+    max-width: 60em;
+    margin: auto;
+}
+.navbar {
+    display: block;
+    font-size: larger;
+    font-weight: bold;
+    margin: auto;
+    max-width: 60em;
+}
+.status {
+    font-size: small;
+    line-height: 0.5;
+}
+.org-src-container {
+    border-block: solid;
+    border-style: solid;
+    border-width: thin;
+    padding: 8px;
+    overflow: scroll;
+}
