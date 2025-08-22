@@ -227,7 +227,8 @@ allocator was trivial. Instead of passing the ~self.allocator()~
 object that was in scope, I wrapped things in an arena:
 
 #+BEGIN_SRC zig
-...
+fn arenaExample() {
+// ...
 // Create an arena that will be freed upon exiting the function.
 var arena = std.heap.ArenaAllocator.init(self.allocator());
 defer arena.deinit();
@@ -241,9 +242,10 @@ errdefer if (!module_ok) self.deleteModule(new_module) catch {};
 const ir = Ir.init(arena.allocator(), ast.asts) catch return Error.RuntimeError;
 var compiler = try Compiler.initModule(arena.allocator(), self, new_module);
 const module_bytecode = compiler.compile(ir) catch Error.RuntimeError;
-_ = try self.evalNoReset(try module_bytecode, &.{});
+try self.evalNoReset(try module_bytecode, &.{});
 module_ok = true;
 try module.setModuleAlias(self.allocator(), module_alias, new_module);
+}
 #+END_SRC
 
 *** No Interfaces, we have ducktyping at home

@@ -21,8 +21,6 @@
  ;; Do not use the built-in org mode html styling. Instead, import the custom
  ;; stylesheet defined at ./content/css/styles.css.
  org-html-style-default "
- <link rel=\"stylesheet\"
-          href=\"https://fonts.googleapis.com/css?family=Quicksand\">
 <link rel=\"stylesheet\" href=\"/css/htmlize-styles.css\">
 <link rel=\"stylesheet\" href=\"/css/styles.css\">
 "
@@ -50,27 +48,22 @@
 <p class=\"date\">Date: %d</p>
 ")))
 
-;; Define recipe for exporting Org to HTML.
-(setq website
-      (list "wmedrano dot dev"
-            :recursive t
-            :base-directory "./content"
-            :publishing-directory "./public"
-            :publishing-function 'org-html-publish-to-html))
 
-;; Define recipe for exporting static assets.
-(setq images
-      (list "wmedrano dot dev images"
-            :recursive t
-            :base-directory "./content"
-            :base-extension "png\\|svg\\|css"
-            :publishing-directory "./public"
-            :publishing-function 'org-publish-attachment))
-
-;; Publish all recipes.
-(setq-local org-publish-project-alist
-      (list website images))
-(org-publish-all t)
+(let ((website (list "wmedrano dot dev"
+                     :recursive t
+                     :base-directory "./content"
+                     :publishing-directory "./public"
+                     :publishing-function 'org-html-publish-to-html))
+      ;; Define recipe for exporting static assets.
+      (images (list "wmedrano dot dev images"
+                    :recursive t
+                    :base-directory "./content"
+                    :base-extension "png\\|svg\\|css"
+                    :publishing-directory "./public"
+                    :publishing-function 'org-publish-attachment)))
+  (setq-local org-publish-project-alist
+              (list website images))
+  (org-publish-all t))
 
 (provide 'build)
 ;;; build.el ends here
