@@ -34,6 +34,7 @@
 <div class=\"navbar\" id=\"org-div-home-and-up\">
  <!--Ignore %s-->
  <a accesskey=\"H\" href=\"%s\">wmedrano dot dev</a>
+ <a href=\"/about.html\">About</a>
 </div>"
  ;; Set the home link to the homepage.
  org-html-link-home "/"

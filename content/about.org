@@ -1,0 +1,51 @@
+#+TITLE: About Me
+#+AUTHOR: William Medrano
+#+OPTIONS: toc:nil num:nil html-postamble:nil
+
+I'm me.
+
+** Professional Work
+
+*** Fonts @ Google
+
+November 2025 - Present
+
+I'll be working on fonts. I'm a fonts guy now.
+
+*** Gigantic Data, Huge @ Google
+
+June 2016 - October 2025
+
+I've worked on gigangic data within Google on the Seach Analytics team. It was
+fun times as I evolved from a junior engineer to an effective senior tech
+lead. In my role I:
+
+- Stared at flamegraphs and dashboards with proficiency.
+- Re-architected dataflows for efficiency and simplicity.
+- Maintained great docs to facilitate onboarding and design discussions.
+- Lead teams to deliver over-complicated software.
+
+** Hobby Work
+
+*** Audio
+
+I'm a small time maintainer of a few Rust crates. They could use more care, but
+they work well enough.
+
+- [[https://github.com/wmedrano/livi-rs][Livi]] - A library for running [[https://lv2plug.in/][LV2]] audio plugins.
+- [[https://github.com/RustAudio/rust-jack][rust-jack]] - Rust bindings for the JACK audio API. Basically the go-to
+  real-time audio/midi IO library.
+- [[https://github.com/rustaudio/wmidi][wmidi]] - MIDI encoding and decoding library for Rust.
+
+*** Programming Languages
+
+I am working on [[https://github.com/wmedrano/szl][Sizzle]], a Scheme interpreter written in Zig. It is currently
+/usable/ and well on its way to [[https://r7rs.org/][R7RS]] small compliance. At some point, I'll
+probably tear it down and recreate it with a [[https://cranelift.dev/][cranelift]] backend for better
+performance.
+
+* Contact
+
+You can find me on:
+- GitHub: [[https://github.com/wmedrano][wmedrano]]
+- Email: will@wmedrano.dev
