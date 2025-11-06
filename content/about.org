@@ -46,6 +46,7 @@ performance.
 
 * Contact
 
-You can find me on:
-- GitHub: [[https://github.com/wmedrano][wmedrano]]
-- Email: will@wmedrano.dev
+#+ATTR_HTML: :style width:auto;
+| @@html:<img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" width="18px" style="vertical-align: middle; margin-right: 5px;">@@ [[https://github.com/wmedrano][wmedrano]] |
+| @@html:<img src="https://joinmastodon.org/logos/logo-purple.svg" width="18px" style="vertical-align: middle; margin-right: 5px;">@@ [[https://fosstodon.org/@wmedrano][@wmedrano]] |
+| 📧 will@wmedrano.dev |
