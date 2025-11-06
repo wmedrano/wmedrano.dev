@@ -20,10 +20,11 @@ I've worked on gigangic data within Google on the Seach Analytics team. It was
 fun times as I evolved from a junior engineer to an effective senior tech
 lead. In my role I:
 
-- Stared at flamegraphs and dashboards with proficiency.
+- Stared at flamegraphs and dashboards to optimize and find headroom.
 - Re-architected dataflows for efficiency and simplicity.
 - Maintained great docs to facilitate onboarding and design discussions.
 - Lead teams to deliver over-complicated software.
+- Try to understand the real problems we are trying to solve.
 
 ** Hobby Work
 
