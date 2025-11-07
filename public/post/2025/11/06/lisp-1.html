@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-11-06 Thu 23:12 -->
+<!-- 2025-11-08 Sat 11:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Building a Lisp Interpreter (in Rust) - Part 1</title>
@@ -25,25 +25,25 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org756082d">1. Why Lisp</a></li>
-<li><a href="#orgd8feba8">2. Goal</a></li>
-<li><a href="#orgd1053b0">3. Representing Lisp Data</a>
+<li><a href="#orge0992f2">1. Why Lisp</a></li>
+<li><a href="#org4e1dbc4">2. Goal</a></li>
+<li><a href="#org2197ae5">3. Representing Lisp Data</a>
 <ul>
-<li><a href="#org3f3fc48">3.1. Lists</a></li>
-<li><a href="#org5eb39ff">3.2. Final Design</a></li>
+<li><a href="#orgba4e002">3.1. Lists</a></li>
+<li><a href="#org27cb5b6">3.2. Final Design</a></li>
 </ul>
 </li>
-<li><a href="#orga55a6b6">4. Parsing</a>
+<li><a href="#org8db6d44">4. Parsing</a>
 <ul>
-<li><a href="#org9f57c90">4.1. Tokenization</a></li>
-<li><a href="#org6d4e501">4.2. Reading</a></li>
+<li><a href="#orgebbd2d5">4.1. Tokenization</a></li>
+<li><a href="#orgf6b41c4">4.2. Reading</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org756082d" class="outline-2">
-<h2 id="org756082d"><span class="section-number-2">1.</span> Why Lisp</h2>
+<div id="outline-container-orge0992f2" class="outline-2">
+<h2 id="orge0992f2"><span class="section-number-2">1.</span> Why Lisp</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Implementing a compiler or interpreter is fun but intimidating to start
@@ -74,8 +74,8 @@ Lisp program involves two steps:
 </div>
 </div>
 </div>
-<div id="outline-container-orgd8feba8" class="outline-2">
-<h2 id="orgd8feba8"><span class="section-number-2">2.</span> Goal</h2>
+<div id="outline-container-org4e1dbc4" class="outline-2">
+<h2 id="org4e1dbc4"><span class="section-number-2">2.</span> Goal</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 In this post, we will use Rust to <b>implement only the <code>read</code> step</b>. We’ll
@@ -90,8 +90,8 @@ implementation, check out the <a href="https://r7rs.org/">Scheme R7RS specificat
 </p>
 </div>
 </div>
-<div id="outline-container-orgd1053b0" class="outline-2">
-<h2 id="orgd1053b0"><span class="section-number-2">3.</span> Representing Lisp Data</h2>
+<div id="outline-container-org2197ae5" class="outline-2">
+<h2 id="org2197ae5"><span class="section-number-2">3.</span> Representing Lisp Data</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Lisp is dynamically typed, like JavaScript or Python. Dynamic typing means that
@@ -116,8 +116,8 @@ possible Lisp values. Integers and booleans can be represented as <code>i64</cod
 <code>bool</code>, respectively. Symbols (identifiers) will be stored as <code>String</code>.
 </p>
 </div>
-<div id="outline-container-org3f3fc48" class="outline-3">
-<h3 id="org3f3fc48"><span class="section-number-3">3.1.</span> Lists</h3>
+<div id="outline-container-orgba4e002" class="outline-3">
+<h3 id="orgba4e002"><span class="section-number-3">3.1.</span> Lists</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Lists in Lisp are typically <b>linked lists</b>. A linked list is a node containing
@@ -135,8 +135,8 @@ might look like:
 
 <p>
 However, in the spirit of Lisp’s dynamic typing, lists are often represented as
-*pairs*—where the first item points to the head element (<code>car</code>), and the second
-points to the rest (<code>cdr</code>), which is either another pair or <code>null</code>.
+pairs. The first item of the pair points to the head element (<code>car</code>), and the
+second points to the rest (<code>cdr</code>), which is either another pair or <code>null</code>.
 </p>
 
 <div class="org-src-container">
@@ -158,8 +158,8 @@ slices.
 </p>
 </div>
 </div>
-<div id="outline-container-org5eb39ff" class="outline-3">
-<h3 id="org5eb39ff"><span class="section-number-3">3.2.</span> Final Design</h3>
+<div id="outline-container-org27cb5b6" class="outline-3">
+<h3 id="org27cb5b6"><span class="section-number-3">3.2.</span> Final Design</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Our final data structure will have four variants. It’s easy to add new datatypes
@@ -167,7 +167,8 @@ later; just add another enum variant!
 </p>
 
 <div class="org-src-container">
-<pre class="src src-rust"><span class="org-keyword">pub</span> <span class="org-keyword">enum</span> <span class="org-type">Val</span> {
+<pre class="src src-rust"><span class="org-preprocessor">#[derive(Clone, Debug, PartialEq)]</span>
+<span class="org-keyword">pub</span> <span class="org-keyword">enum</span> <span class="org-type">Val</span> {
     <span class="org-type">Int</span>(<span class="org-type">i64</span>),
     <span class="org-type">Bool</span>(<span class="org-type">bool</span>),
     <span class="org-type">Symbol</span>(<span class="org-type">String</span>),
@@ -178,8 +179,8 @@ later; just add another enum variant!
 </div>
 </div>
 </div>
-<div id="outline-container-orga55a6b6" class="outline-2">
-<h2 id="orga55a6b6"><span class="section-number-2">4.</span> Parsing</h2>
+<div id="outline-container-org8db6d44" class="outline-2">
+<h2 id="org8db6d44"><span class="section-number-2">4.</span> Parsing</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Parsing text into a <code>Val</code> involves two steps:
@@ -190,8 +191,8 @@ Parsing text into a <code>Val</code> involves two steps:
 <li>Reading - Convert the sequence of tokens into Lisp values.</li>
 </ol>
 </div>
-<div id="outline-container-org9f57c90" class="outline-3">
-<h3 id="org9f57c90"><span class="section-number-3">4.1.</span> Tokenization</h3>
+<div id="outline-container-orgebbd2d5" class="outline-3">
+<h3 id="orgebbd2d5"><span class="section-number-3">4.1.</span> Tokenization</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 The tokenizer splits the text into identifiers and symbols. We’ll split by whitespace, treating <code>(</code> and <code>)</code> as separate tokens.
@@ -202,7 +203,7 @@ The tokenizer splits the text into identifiers and symbols. We’ll split by whi
 <span class="org-keyword">fn</span> <span class="org-function-name">test_tokenizer</span>() {
     <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">tokenizer</span> = <span class="org-type">Tokenizer</span>::new(<span class="org-string">"12 #true (+ 1 2)"</span>);
     <span class="org-preprocessor">assert_eq!</span>(
-        tokenizer.try_collect::&lt;<span class="org-type">Vec</span>&lt;<span class="org-rust-ampersand">&amp;</span><span class="org-type">str</span>&gt;&gt;().unwrap(),
+        tokenizer.collect::&lt;<span class="org-type">Vec</span>&lt;_&gt;&gt;(),
         <span class="org-rust-ampersand">&amp;</span>[<span class="org-string">"12"</span>, <span class="org-string">"#true"</span>, <span class="org-string">"("</span>, <span class="org-string">"+"</span>, <span class="org-string">"1"</span>, <span class="org-string">"2"</span>, <span class="org-string">")"</span>]
     );
 }
@@ -210,13 +211,8 @@ The tokenizer splits the text into identifiers and symbols. We’ll split by whi
 </div>
 
 <p>
-This part isn’t too exciting, so here’s a code dump. Our tokenizer is simple, but could be extended later to handle:
+The tokenizer is pretty boring, so here’s a code dump.
 </p>
-
-<ul class="org-ul">
-<li>String literals: for example, `"also (include this) in string"` should remain one token.</li>
-<li>Source positions: for debugging or error reporting, you might want tokens to include <code>start</code> and <code>end</code> positions instead of just the text slice.</li>
-</ul>
 
 <div class="org-src-container">
 <pre class="src src-rust"><span class="org-preprocessor">#[derive(Debug, Clone)]</span>
@@ -230,7 +226,10 @@ This part isn’t too exciting, so here’s a code dump. Our tokenizer is simple
 
     <span class="org-keyword">fn</span> <span class="org-function-name">next</span>(<span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-keyword">self</span>) -&gt; <span class="org-type">Option</span>&lt;<span class="org-type">Self</span>::<span class="org-type">Item</span>&gt; {
         <span class="org-comment-delimiter">// </span><span class="org-comment">Skip whitespace.
-</span>        <span class="org-keyword">if</span> <span class="org-keyword">let</span> <span class="org-type">Some</span>(offset) = <span class="org-keyword">self</span>.input.chars().position(|c| !c.is_whitespace()) {
+</span>        <span class="org-keyword">if</span> <span class="org-keyword">let</span> <span class="org-type">Some</span>(offset) = <span class="org-keyword">self</span>.input[<span class="org-keyword">self</span>.position..]
+            .chars()
+            .position(|c| !c.is_whitespace())
+        {
             <span class="org-keyword">self</span>.position += offset
         }
         <span class="org-keyword">if</span> <span class="org-keyword">self</span>.position &gt;= <span class="org-keyword">self</span>.input.len() {
@@ -245,8 +244,10 @@ This part isn’t too exciting, so here’s a code dump. Our tokenizer is simple
             <span class="org-keyword">return</span> <span class="org-type">Some</span>(ch);
         }
         <span class="org-comment-delimiter">// </span><span class="org-comment">Handle identifiers
-</span>        <span class="org-keyword">let</span> <span class="org-variable-name">token</span> = <span class="org-keyword">self</span>.input.get(start..)<span class="org-rust-question-mark">?</span>
-            .split(|c| c.is_whitespace() || c == <span class="org-string">'('</span> || c == <span class="org-string">')'</span>)
+</span>        <span class="org-keyword">let</span> <span class="org-variable-name">token</span> = <span class="org-keyword">self</span>
+            .input
+            .get(start..)<span class="org-rust-question-mark">?</span>
+            .split(|<span class="org-variable-name">c</span>: <span class="org-type">char</span>| c.is_whitespace() || c == <span class="org-string">'('</span> || c == <span class="org-string">')'</span>)
             .next()<span class="org-rust-question-mark">?</span>;
         <span class="org-keyword">self</span>.position += token.len();
         <span class="org-type">Some</span>(token)
@@ -260,10 +261,19 @@ This part isn’t too exciting, so here’s a code dump. Our tokenizer is simple
 }
 </pre>
 </div>
+
+<p>
+The tokenizer is simple, but could be extended later to handle:
+</p>
+
+<ul class="org-ul">
+<li>String literals: for example, `"also (include this) in string"` should remain one token.</li>
+<li>Source positions: for debugging or error reporting, you might want tokens to include <code>start</code> and <code>end</code> positions instead of just the text slice.</li>
+</ul>
 </div>
 </div>
-<div id="outline-container-org6d4e501" class="outline-3">
-<h3 id="org6d4e501"><span class="section-number-3">4.2.</span> Reading</h3>
+<div id="outline-container-orgf6b41c4" class="outline-3">
+<h3 id="orgf6b41c4"><span class="section-number-3">4.2.</span> Reading</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 The reader converts the token stream into Lisp values:
@@ -345,7 +355,7 @@ The reader converts the token stream into Lisp values:
         <span class="org-type">Some</span>(<span class="org-string">"("</span>) =&gt; {
             <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">res</span> = <span class="org-type">Vec</span>::new();
             <span class="org-keyword">loop</span> {
-                <span class="org-keyword">match</span> read_next_impl(tokenizer, source)<span class="org-rust-question-mark">?</span> {
+                <span class="org-keyword">match</span> read_next_impl(tokenizer)<span class="org-rust-question-mark">?</span> {
                     <span class="org-type">ReadItem</span>::<span class="org-type">EndExpr</span> =&gt; <span class="org-keyword">return</span> <span class="org-type">Ok</span>(<span class="org-type">ReadItem</span>::<span class="org-type">Atom</span>(<span class="org-type">Val</span>::<span class="org-type">List</span>(res))),
                     <span class="org-type">ReadItem</span>::<span class="org-type">Atom</span>(v) =&gt; res.push(v),
                     <span class="org-type">ReadItem</span>::<span class="org-type">None</span> =&gt; <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">TokenizerError</span>::<span class="org-type">UnexpectedEndOfInput</span>),

@@ -72,8 +72,8 @@ pub struct LinkedListNode<T> {
 #+END_SRC
 
 However, in the spirit of Lisp’s dynamic typing, lists are often represented as
-*pairs*—where the first item points to the head element (~car~), and the second
-points to the rest (~cdr~), which is either another pair or ~null~.
+pairs. The first item of the pair points to the head element (~car~), and the
+second points to the rest (~cdr~), which is either another pair or ~null~.
 
 #+BEGIN_SRC rust
 pub struct Pair {
@@ -97,6 +97,7 @@ Our final data structure will have four variants. It’s easy to add new datatyp
 later; just add another enum variant!
 
 #+BEGIN_SRC rust
+#[derive(Clone, Debug, PartialEq)]
 pub enum Val {
     Int(i64),
     Bool(bool),
@@ -123,16 +124,13 @@ The tokenizer splits the text into identifiers and symbols. We’ll split by whi
 fn test_tokenizer() {
     let mut tokenizer = Tokenizer::new("12 #true (+ 1 2)");
     assert_eq!(
-        tokenizer.try_collect::<Vec<&str>>().unwrap(),
+        tokenizer.collect::<Vec<_>>(),
         &["12", "#true", "(", "+", "1", "2", ")"]
     );
 }
 #+END_SRC
 
-This part isn’t too exciting, so here’s a code dump. Our tokenizer is simple, but could be extended later to handle:
-
-- String literals: for example, `"also (include this) in string"` should remain one token.
-- Source positions: for debugging or error reporting, you might want tokens to include ~start~ and ~end~ positions instead of just the text slice.
+The tokenizer is pretty boring, so here’s a code dump.
 
 #+BEGIN_SRC rust
 #[derive(Debug, Clone)]
@@ -146,7 +144,10 @@ impl<'a> Iterator for Tokenizer<'a> {
 
     fn next(&mut self) -> Option<Self::Item> {
         // Skip whitespace.
-        if let Some(offset) = self.input.chars().position(|c| !c.is_whitespace()) {
+        if let Some(offset) = self.input[self.position..]
+            .chars()
+            .position(|c| !c.is_whitespace())
+        {
             self.position += offset
         }
         if self.position >= self.input.len() {
@@ -161,8 +162,10 @@ impl<'a> Iterator for Tokenizer<'a> {
             return Some(ch);
         }
         // Handle identifiers
-        let token = self.input.get(start..)?
-            .split(|c| c.is_whitespace() || c == '(' || c == ')')
+        let token = self
+            .input
+            .get(start..)?
+            .split(|c: char| c.is_whitespace() || c == '(' || c == ')')
             .next()?;
         self.position += token.len();
         Some(token)
@@ -176,6 +179,10 @@ impl<'a> Tokenizer<'a> {
 }
 #+END_SRC
 
+The tokenizer is simple, but could be extended later to handle:
+
+- String literals: for example, `"also (include this) in string"` should remain one token.
+- Source positions: for debugging or error reporting, you might want tokens to include ~start~ and ~end~ positions instead of just the text slice.
 
 ** Reading
 
@@ -254,7 +261,7 @@ fn read_next_impl(tokenizer: &mut Tokenizer) -> Result<ReadItem, TokenizerError>
         Some("(") => {
             let mut res = Vec::new();
             loop {
-                match read_next_impl(tokenizer, source)? {
+                match read_next_impl(tokenizer)? {
                     ReadItem::EndExpr => return Ok(ReadItem::Atom(Val::List(res))),
                     ReadItem::Atom(v) => res.push(v),
                     ReadItem::None => return Err(TokenizerError::UnexpectedEndOfInput),
