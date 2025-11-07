@@ -1,6 +1,8 @@
 #+title: wmedrano.dev
 #+options: toc:nil num:nil html-postamble:nil
 
+[[file:post/2025/11/06/lisp-1.org][Building a Lisp Interpreter (in Rust) - Part 1]]
+
 [[file:post/2024/12/18/news-years-resolution-evaluation-reading.org][New Years Resolution Evaluation - Reading]]
 
 [[file:post/2024/08/22/zigging-out.org][Zigging Out]]

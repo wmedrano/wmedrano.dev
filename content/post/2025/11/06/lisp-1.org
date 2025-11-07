@@ -1,0 +1,275 @@
+#+title: Building a Lisp Interpreter (in Rust) - Part 1
+#+date: 2025-11-06
+#+author: Will S. Medrano
+
+* Why Lisp
+
+Implementing a compiler or interpreter is fun but intimidating to start
+with. However, Lisp is a great starting point. Although it’s infamous for being
+riddled with "unreadable parentheses," the parentheses actually keep things
+simple.
+
+To write Lisp code, you write down the Lisp data structure itself. Evaluating a
+Lisp program involves two steps:
+
+1. ~read~ - Read the text into a Lisp data structure.
+2. ~eval~ - Evaluate that structure according to Lisp’s simple rules.
+
+#+BEGIN_SRC scheme
+12 ;; An integer, 12
+#true ;; A boolean
+
+;; A list containing the identifier +, and the integers 1 and 2.
+;; This expression specifically invokes the + function with arguments 1 and 2.
+;; The result of evaluating this list is 3.
+(+ 1 2)
+#+END_SRC
+
+* Goal
+
+In this post, we will use Rust to *implement only the ~read~ step*. We’ll
+evaluate expressions in Part 2 and implement custom functions in Part 3.
+
+Our implementation will favor readability over performance. In some cases (such
+as list storage design), we’ll also diverge from traditional Lisp
+implementations for clarity. If you want a well-defined reference
+implementation, check out the [[https://r7rs.org/][Scheme R7RS specification]].
+
+
+* Representing Lisp Data
+
+Lisp is dynamically typed, like JavaScript or Python. Dynamic typing means that
+the type of a variable is determined at runtime.
+
+#+BEGIN_SRC scheme
+(define x 100) ;; x is an integer
+(set! x #true) ;; now x is a boolean
+
+...
+
+;; At this point, we might be able to guess the type,
+;; but there are no guarantees about what x is.
+(+ x 100)
+#+END_SRC
+
+To implement dynamic typing, we’ll define a single enum that contains all
+possible Lisp values. Integers and booleans can be represented as ~i64~ and
+~bool~, respectively. Symbols (identifiers) will be stored as ~String~.
+
+
+
+** Lists
+
+Lists in Lisp are typically *linked lists*. A linked list is a node containing
+an element and a reference to the rest of the list. In Rust, a basic version
+might look like:
+
+#+BEGIN_SRC rust
+pub struct LinkedListNode<T> {
+    item: T,
+    rest: Option<Box<LinkedListNode<T>>>,
+}
+#+END_SRC
+
+However, in the spirit of Lisp’s dynamic typing, lists are often represented as
+*pairs*—where the first item points to the head element (~car~), and the second
+points to the rest (~cdr~), which is either another pair or ~null~.
+
+#+BEGIN_SRC rust
+pub struct Pair {
+    // To make things more proper, instead of `first` and `second`,
+    // the traditional Lisp names `car` and `cdr` are used.
+    //
+    // Nobody remembers what they originally stand for.
+    car: Val,
+    cdr: Val,
+}
+#+END_SRC
+
+That said, we’ll take a simpler approach for our interpreter and represent lists
+as ~Vec<Val>~, largely because Rust’s pattern matching works beautifully with
+slices.
+
+
+** Final Design
+
+Our final data structure will have four variants. It’s easy to add new datatypes
+later; just add another enum variant!
+
+#+BEGIN_SRC rust
+pub enum Val {
+    Int(i64),
+    Bool(bool),
+    Symbol(String),
+    List(Vec<Val>),
+}
+#+END_SRC
+
+* Parsing
+
+Parsing text into a ~Val~ involves two steps:
+
+1. Tokenization - Split the text into meaningful tokens.
+2. Reading - Convert the sequence of tokens into Lisp values.
+
+
+
+** Tokenization
+
+The tokenizer splits the text into identifiers and symbols. We’ll split by whitespace, treating ~(~ and ~)~ as separate tokens.
+
+#+BEGIN_SRC rust
+#[test]
+fn test_tokenizer() {
+    let mut tokenizer = Tokenizer::new("12 #true (+ 1 2)");
+    assert_eq!(
+        tokenizer.try_collect::<Vec<&str>>().unwrap(),
+        &["12", "#true", "(", "+", "1", "2", ")"]
+    );
+}
+#+END_SRC
+
+This part isn’t too exciting, so here’s a code dump. Our tokenizer is simple, but could be extended later to handle:
+
+- String literals: for example, `"also (include this) in string"` should remain one token.
+- Source positions: for debugging or error reporting, you might want tokens to include ~start~ and ~end~ positions instead of just the text slice.
+
+#+BEGIN_SRC rust
+#[derive(Debug, Clone)]
+pub struct Tokenizer<'a> {
+    input: &'a str,
+    position: usize,
+}
+
+impl<'a> Iterator for Tokenizer<'a> {
+    type Item = &'a str;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // Skip whitespace.
+        if let Some(offset) = self.input.chars().position(|c| !c.is_whitespace()) {
+            self.position += offset
+        }
+        if self.position >= self.input.len() {
+            return None;
+        }
+
+        // Handle parens
+        let start = self.position;
+        let ch = &self.input[start..start + 1];
+        if matches!(ch, "(" | ")") {
+            self.position += 1;
+            return Some(ch);
+        }
+        // Handle identifiers
+        let token = self.input.get(start..)?
+            .split(|c| c.is_whitespace() || c == '(' || c == ')')
+            .next()?;
+        self.position += token.len();
+        Some(token)
+    }
+}
+
+impl<'a> Tokenizer<'a> {
+    pub fn new(input: &'a str) -> Self {
+        Self { input, position: 0 }
+    }
+}
+#+END_SRC
+
+
+** Reading
+
+The reader converts the token stream into Lisp values:
+
+- Identifiers are parsed as integers, booleans, or symbols.
+- A ~(~ begins a list; elements are parsed until the matching ~)~.
+- If there’s no closing ~)~, we signal an error.
+
+#+BEGIN_SRC rust
+#[test]
+fn test_read() {
+    let mut tokenizer = Tokenizer::new("42 #true + (+ (* 2 3) 4)");
+    assert_eq!(read_next(&mut tokenizer).unwrap(), Some(Val::Int(42)));
+    assert_eq!(read_next(&mut tokenizer).unwrap(), Some(Val::Bool(true)));
+    assert_eq!(read_next(&mut tokenizer).unwrap(), Some(Val::Symbol("+".to_string())));
+    assert_eq!(
+        read_next(&mut tokenizer).unwrap(),
+        Some(Val::List(vec![
+            Val::Symbol("+".to_string()),
+            Val::List(vec![
+                Val::Symbol("*".to_string()),
+                Val::Int(2),
+                Val::Int(3)
+            ]),
+            Val::Int(4)
+        ]))
+    );
+    assert_eq!(read_next(&mut tokenizer).unwrap(), None);
+}
+
+#[test]
+fn test_read_unmatched_paren() {
+    let mut tokenizer = Tokenizer::new("(+ 1 2");
+    assert!(matches!(
+        read_next(&mut tokenizer),
+        Err(TokenizerError::UnexpectedEndOfInput)
+    ));
+}
+
+#[test]
+fn test_read_extra_closing_paren() {
+    let mut tokenizer = Tokenizer::new(")");
+    assert!(matches!(
+        read_next(&mut tokenizer),
+        Err(TokenizerError::UnexpectedEndOfInput)
+    ));
+}
+#+END_SRC
+
+#+BEGIN_SRC rust
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum TokenizerError {
+    UnexpectedEndOfInput,
+}
+
+pub fn read_next(tokenizer: &mut Tokenizer) -> Result<Option<Val>, TokenizerError> {
+    match read_next_impl(tokenizer)? {
+        ReadItem::EndExpr => Err(TokenizerError::UnexpectedEndOfInput),
+        ReadItem::Atom(val) => Ok(Some(val)),
+        ReadItem::None => Ok(None),
+    }
+}
+
+enum ReadItem {
+    EndExpr,
+    Atom(Val),
+    None,
+}
+
+fn read_next_impl(tokenizer: &mut Tokenizer) -> Result<ReadItem, TokenizerError> {
+    match tokenizer.next() {
+        None => Ok(ReadItem::None),
+        Some("#true") => Ok(ReadItem::Atom(Val::Bool(true))),
+        Some("#false") => Ok(ReadItem::Atom(Val::Bool(false))),
+        Some("(") => {
+            let mut res = Vec::new();
+            loop {
+                match read_next_impl(tokenizer, source)? {
+                    ReadItem::EndExpr => return Ok(ReadItem::Atom(Val::List(res))),
+                    ReadItem::Atom(v) => res.push(v),
+                    ReadItem::None => return Err(TokenizerError::UnexpectedEndOfInput),
+                }
+            }
+        }
+        Some(")") => Ok(ReadItem::EndExpr),
+        Some(identifier @ _) => {
+            let val = if let Ok(int_val) = identifier.parse::<i64>() {
+                Val::Int(int_val)
+            } else {
+                Val::Symbol(identifier.to_string())
+            };
+            Ok(ReadItem::Atom(val))
+        }
+    }
+}
+#+END_SRC
