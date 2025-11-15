@@ -48,7 +48,7 @@ final result of vector search was unimpressive.
 
 The next stop was running LLMs. I ~sudo pacman -S ollama~ my way into
 running the Phi-3 mini model. The model ran quickly and with a small
-memory footprint due to the Q4 quantization cramming by cramming 16
+memory footprint due to the Q4 quantization cramming 16
 bits information into just 4 bits. This breakthrough allowed me to
 even run Phi-3 mini on a Raspberry Pi 5. The next step from this, I
 ran ~sudo pacman -S ollama-rocm~ and the models ran faster on my

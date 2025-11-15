@@ -51,7 +51,7 @@ All of my libraries are on GitHub while I only have a few prototype binaries on
 GitLab. Libraries tend to attract at least a few users so it may be worth it for
 me to experiment by developing some libraries on GitLab to get a better sense of
 engagement. Unfortunately, my main job eats a lot of my time and energy leaving
-very little for my side projects. Despite this, it does fell like the libraries
+very little for my side projects. Despite this, it does feel like the libraries
 I find on GitHub tend to have more contributors than the ones on GitLab. 
 
 *** CI

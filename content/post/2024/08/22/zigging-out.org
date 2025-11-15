@@ -311,7 +311,7 @@ benefits from interfaces are:
 
 *** Metaprogramming with Comptime (largely untested)
 
-In most languages, metaprogramming feels compeletely different than
+In most languages, metaprogramming feels completely different than
 the language it is programming for. In Zig, ~comptime~ is very much
 built in Zig. You can have compile time functions that return a
 type. Implementations can check type info to produced different code
