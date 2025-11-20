@@ -1,5 +1,5 @@
 #+title: Building a Lisp Interpreter (in Rust) - Part 1
-#+date: 2025-11-06
+#+date: 2025-11-15
 #+author: Will S. Medrano
 
 * Why Lisp
