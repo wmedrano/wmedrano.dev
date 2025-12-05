@@ -12,7 +12,7 @@ div.navbar {
 div.navbar > a {
     text-decoration: inherit;
     color: #282a36;
-    font-size: 48px;
+    font-size: 32px;
     font-family: "Google Sans Flex", sans-serif;
     font-optical-sizing: auto;
     font-weight: 600;
@@ -34,20 +34,22 @@ div.content {
     max-width: 800px;
     margin: auto;
     font-family: Google Sans Flex, sans-serif;
-    font-size: 18px;
+    font-size: 16px;
     color: #282A36;
 }
-h1 {font-size: 48px;}
-h2 {font-size: 32px;}
-h3 {font-size: 24px;}
+h1 {font-size: 32px;}
+h2 {font-size: 24px;}
+h3 {font-size: 20px;}
+h4 {font-size: 18px;}
+h5 {font-size: 16px;}
 img { max-width: 100%; }
 pre.src {
     font-family: Inconsolata, monospace;
     font-weight: 500;
     background-color: #f8f8f8;
     border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 16px;
+    border-radius: 6px;
+    padding: 8px;
     overflow-x: auto;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }

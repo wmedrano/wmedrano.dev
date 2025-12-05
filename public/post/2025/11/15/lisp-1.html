@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-12-04 Thu 20:37 -->
+<!-- 2025-12-05 Fri 08:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Building a Lisp Interpreter (in Rust) - Part 1</title>
@@ -25,25 +25,25 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orga757c6c">1. Why Lisp</a></li>
-<li><a href="#orgf3c82e7">2. Goal</a></li>
-<li><a href="#org0d9e762">3. Representing Lisp Data</a>
+<li><a href="#orgfa2207e">1. Why Lisp</a></li>
+<li><a href="#org75a15a5">2. Goal</a></li>
+<li><a href="#org60b3cec">3. Representing Lisp Data</a>
 <ul>
-<li><a href="#org8020c21">3.1. Lists</a></li>
-<li><a href="#org8222d85">3.2. Final Design</a></li>
+<li><a href="#orga11c8f1">3.1. Lists</a></li>
+<li><a href="#org68d42c4">3.2. Final Design</a></li>
 </ul>
 </li>
-<li><a href="#orgc62d095">4. Parsing</a>
+<li><a href="#org9af3af6">4. Parsing</a>
 <ul>
-<li><a href="#org0638d88">4.1. Tokenization</a></li>
-<li><a href="#org08adbcc">4.2. Reading</a></li>
+<li><a href="#orgc408611">4.1. Tokenization</a></li>
+<li><a href="#org41b44bd">4.2. Reading</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orga757c6c" class="outline-2">
-<h2 id="orga757c6c"><span class="section-number-2">1.</span> Why Lisp</h2>
+<div id="outline-container-orgfa2207e" class="outline-2">
+<h2 id="orgfa2207e"><span class="section-number-2">1.</span> Why Lisp</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Implementing a compiler or interpreter may seem like a daunting task, but a Lisp
@@ -72,8 +72,8 @@ Lisp program involves two steps:
 </div>
 </div>
 </div>
-<div id="outline-container-orgf3c82e7" class="outline-2">
-<h2 id="orgf3c82e7"><span class="section-number-2">2.</span> Goal</h2>
+<div id="outline-container-org75a15a5" class="outline-2">
+<h2 id="org75a15a5"><span class="section-number-2">2.</span> Goal</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 In this post, we will use Rust to <b>implement only the <code>read</code> step</b>. We’ll
@@ -88,8 +88,8 @@ implementation, check out the <a href="https://r7rs.org/">Scheme R7RS specificat
 </p>
 </div>
 </div>
-<div id="outline-container-org0d9e762" class="outline-2">
-<h2 id="org0d9e762"><span class="section-number-2">3.</span> Representing Lisp Data</h2>
+<div id="outline-container-org60b3cec" class="outline-2">
+<h2 id="org60b3cec"><span class="section-number-2">3.</span> Representing Lisp Data</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Lisp is dynamically typed, like JavaScript or Python. Dynamic typing means that
@@ -125,8 +125,8 @@ types. We will support integers, booleans, and symbols/identifiers.
 </pre>
 </div>
 </div>
-<div id="outline-container-org8020c21" class="outline-3">
-<h3 id="org8020c21"><span class="section-number-3">3.1.</span> Lists</h3>
+<div id="outline-container-orga11c8f1" class="outline-3">
+<h3 id="orga11c8f1"><span class="section-number-3">3.1.</span> Lists</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Lists in Lisp are typically <b>linked lists</b>. A linked list is a node containing
@@ -168,8 +168,8 @@ slices.
 </p>
 </div>
 </div>
-<div id="outline-container-org8222d85" class="outline-3">
-<h3 id="org8222d85"><span class="section-number-3">3.2.</span> Final Design</h3>
+<div id="outline-container-org68d42c4" class="outline-3">
+<h3 id="org68d42c4"><span class="section-number-3">3.2.</span> Final Design</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Our final data structure will have four variants. It’s easy to add new datatypes
@@ -189,8 +189,8 @@ later; just add another enum variant!
 </div>
 </div>
 </div>
-<div id="outline-container-orgc62d095" class="outline-2">
-<h2 id="orgc62d095"><span class="section-number-2">4.</span> Parsing</h2>
+<div id="outline-container-org9af3af6" class="outline-2">
+<h2 id="org9af3af6"><span class="section-number-2">4.</span> Parsing</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Parsing text into a <code>Val</code> involves two steps:
@@ -201,8 +201,8 @@ Parsing text into a <code>Val</code> involves two steps:
 <li>Reading - Convert the sequence of tokens into Lisp values.</li>
 </ol>
 </div>
-<div id="outline-container-org0638d88" class="outline-3">
-<h3 id="org0638d88"><span class="section-number-3">4.1.</span> Tokenization</h3>
+<div id="outline-container-orgc408611" class="outline-3">
+<h3 id="orgc408611"><span class="section-number-3">4.1.</span> Tokenization</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 The tokenizer splits the text into identifiers and symbols. We’ll split by whitespace, treating <code>(</code> and <code>)</code> as separate tokens.
@@ -303,8 +303,8 @@ information to the downstream processing.
 </p>
 </div>
 </div>
-<div id="outline-container-org08adbcc" class="outline-3">
-<h3 id="org08adbcc"><span class="section-number-3">4.2.</span> Reading</h3>
+<div id="outline-container-org41b44bd" class="outline-3">
+<h3 id="org41b44bd"><span class="section-number-3">4.2.</span> Reading</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 The reader converts the token stream into Lisp values:
