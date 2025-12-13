@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2025-12-05 Fri 08:50 -->
+<!-- 2025-12-12 Fri 17:01 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Building a Lisp Interpreter (in Rust) - Part 1</title>
@@ -25,25 +25,25 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgfa2207e">1. Why Lisp</a></li>
-<li><a href="#org75a15a5">2. Goal</a></li>
-<li><a href="#org60b3cec">3. Representing Lisp Data</a>
+<li><a href="#org1cc1e91">1. Why Lisp</a></li>
+<li><a href="#org9107945">2. Goal</a></li>
+<li><a href="#org73b5278">3. Representing Lisp Data</a>
 <ul>
-<li><a href="#orga11c8f1">3.1. Lists</a></li>
-<li><a href="#org68d42c4">3.2. Final Design</a></li>
+<li><a href="#org02a7b4e">3.1. Lists</a></li>
+<li><a href="#orgec29c21">3.2. Final Design</a></li>
 </ul>
 </li>
-<li><a href="#org9af3af6">4. Parsing</a>
+<li><a href="#org6dddd9e">4. Parsing</a>
 <ul>
-<li><a href="#orgc408611">4.1. Tokenization</a></li>
-<li><a href="#org41b44bd">4.2. Reading</a></li>
+<li><a href="#orgcdc19b1">4.1. Tokenization</a></li>
+<li><a href="#orgce53183">4.2. Reading</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgfa2207e" class="outline-2">
-<h2 id="orgfa2207e"><span class="section-number-2">1.</span> Why Lisp</h2>
+<div id="outline-container-org1cc1e91" class="outline-2">
+<h2 id="org1cc1e91"><span class="section-number-2">1.</span> Why Lisp</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Implementing a compiler or interpreter may seem like a daunting task, but a Lisp
@@ -64,16 +64,18 @@ Lisp program involves two steps:
 <pre class="src src-scheme">12 <span class="org-comment-delimiter">;; </span><span class="org-comment">An integer, 12
 </span>#true <span class="org-comment-delimiter">;; </span><span class="org-comment">A boolean
 </span>
-<span class="org-comment-delimiter">;; </span><span class="org-comment">A list containing the identifier +, and the integers 1 and 2.
-</span><span class="org-comment-delimiter">;; </span><span class="org-comment">This expression specifically invokes the + function with arguments 1 and 2.
-</span><span class="org-comment-delimiter">;; </span><span class="org-comment">The result of evaluating this list is 3.
+<span class="org-comment-delimiter">;; </span><span class="org-comment">A list containing the identifier +,
+</span><span class="org-comment-delimiter">;; </span><span class="org-comment">and the integers 1 and 2.  This
+</span><span class="org-comment-delimiter">;; </span><span class="org-comment">expression specifically invokes the +
+</span><span class="org-comment-delimiter">;; </span><span class="org-comment">function with arguments 1 and 2.  The
+</span><span class="org-comment-delimiter">;; </span><span class="org-comment">result of evaluating this list is 3.
 </span>(+ 1 2)
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org75a15a5" class="outline-2">
-<h2 id="org75a15a5"><span class="section-number-2">2.</span> Goal</h2>
+<div id="outline-container-org9107945" class="outline-2">
+<h2 id="org9107945"><span class="section-number-2">2.</span> Goal</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 In this post, we will use Rust to <b>implement only the <code>read</code> step</b>. We’ll
@@ -88,8 +90,8 @@ implementation, check out the <a href="https://r7rs.org/">Scheme R7RS specificat
 </p>
 </div>
 </div>
-<div id="outline-container-org60b3cec" class="outline-2">
-<h2 id="org60b3cec"><span class="section-number-2">3.</span> Representing Lisp Data</h2>
+<div id="outline-container-org73b5278" class="outline-2">
+<h2 id="org73b5278"><span class="section-number-2">3.</span> Representing Lisp Data</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Lisp is dynamically typed, like JavaScript or Python. Dynamic typing means that
@@ -103,7 +105,9 @@ the type of a variable is determined at runtime. The type may also change.
 <span class="org-comment-delimiter">;; </span><span class="org-comment">More code
 </span>...
 
-<span class="org-comment-delimiter">;; </span><span class="org-comment">At this point, x is probably a boolean, unless it was changed in "More code".
+<span class="org-comment-delimiter">;; </span><span class="org-comment">At this point, x is probably a
+</span><span class="org-comment-delimiter">;; </span><span class="org-comment">boolean, unless it was changed in
+</span><span class="org-comment-delimiter">;; </span><span class="org-comment">"More code".
 </span>(+ x 100)
 </pre>
 </div>
@@ -125,8 +129,8 @@ types. We will support integers, booleans, and symbols/identifiers.
 </pre>
 </div>
 </div>
-<div id="outline-container-orga11c8f1" class="outline-3">
-<h3 id="orga11c8f1"><span class="section-number-3">3.1.</span> Lists</h3>
+<div id="outline-container-org02a7b4e" class="outline-3">
+<h3 id="org02a7b4e"><span class="section-number-3">3.1.</span> Lists</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Lists in Lisp are typically <b>linked lists</b>. A linked list is a node containing
@@ -151,10 +155,12 @@ and the second points to the rest (<code>cdr</code>), which is either another pa
 
 <div class="org-src-container">
 <pre class="src src-rust"><span class="org-keyword">pub</span> <span class="org-keyword">struct</span> <span class="org-type">Pair</span> {
-    <span class="org-comment-delimiter">// </span><span class="org-comment">To make things more proper, instead of `first` and `second`,
-</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">the traditional Lisp names `car` and `cdr` are used.
+    <span class="org-comment-delimiter">// </span><span class="org-comment">To make things more proper, instead of
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">`first` and `second`,the traditional
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">Lisp names `car` and `cdr` are used.
 </span>    <span class="org-comment-delimiter">//</span><span class="org-comment">
-</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">Nobody remembers what they originally stand for.
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">Nobody remembers what they originally
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">stand for.
 </span>    <span class="org-variable-name">car</span>: <span class="org-type">Val</span>,
     <span class="org-variable-name">cdr</span>: <span class="org-type">Val</span>,
 }
@@ -168,8 +174,8 @@ slices.
 </p>
 </div>
 </div>
-<div id="outline-container-org68d42c4" class="outline-3">
-<h3 id="org68d42c4"><span class="section-number-3">3.2.</span> Final Design</h3>
+<div id="outline-container-orgec29c21" class="outline-3">
+<h3 id="orgec29c21"><span class="section-number-3">3.2.</span> Final Design</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Our final data structure will have four variants. It’s easy to add new datatypes
@@ -189,8 +195,8 @@ later; just add another enum variant!
 </div>
 </div>
 </div>
-<div id="outline-container-org9af3af6" class="outline-2">
-<h2 id="org9af3af6"><span class="section-number-2">4.</span> Parsing</h2>
+<div id="outline-container-org6dddd9e" class="outline-2">
+<h2 id="org6dddd9e"><span class="section-number-2">4.</span> Parsing</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Parsing text into a <code>Val</code> involves two steps:
@@ -201,8 +207,8 @@ Parsing text into a <code>Val</code> involves two steps:
 <li>Reading - Convert the sequence of tokens into Lisp values.</li>
 </ol>
 </div>
-<div id="outline-container-orgc408611" class="outline-3">
-<h3 id="orgc408611"><span class="section-number-3">4.1.</span> Tokenization</h3>
+<div id="outline-container-orgcdc19b1" class="outline-3">
+<h3 id="orgcdc19b1"><span class="section-number-3">4.1.</span> Tokenization</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 The tokenizer splits the text into identifiers and symbols. We’ll split by whitespace, treating <code>(</code> and <code>)</code> as separate tokens.
@@ -303,8 +309,8 @@ information to the downstream processing.
 </p>
 </div>
 </div>
-<div id="outline-container-org41b44bd" class="outline-3">
-<h3 id="org41b44bd"><span class="section-number-3">4.2.</span> Reading</h3>
+<div id="outline-container-orgce53183" class="outline-3">
+<h3 id="orgce53183"><span class="section-number-3">4.2.</span> Reading</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 The reader converts the token stream into Lisp values:
@@ -365,8 +371,9 @@ results can be:
 
 <div class="org-src-container">
 <pre class="src src-rust"><span class="org-keyword">enum</span> <span class="org-type">ReadItem</span> {
-    <span class="org-comment-delimiter">// </span><span class="org-comment">The end of an expression was reached. The end is signaled with a closing
-</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">parenthesis.
+    <span class="org-comment-delimiter">// </span><span class="org-comment">The end of an expression was
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">reached. The end is signaled with a
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">closing parenthesis.
 </span>    <span class="org-type">EndExpr</span>,
     <span class="org-comment-delimiter">// </span><span class="org-comment">A value was parsed.
 </span>    <span class="org-type">Val</span>(<span class="org-type">Val</span>),

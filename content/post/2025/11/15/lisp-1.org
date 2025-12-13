@@ -17,9 +17,11 @@ Lisp program involves two steps:
 12 ;; An integer, 12
 #true ;; A boolean
 
-;; A list containing the identifier +, and the integers 1 and 2.
-;; This expression specifically invokes the + function with arguments 1 and 2.
-;; The result of evaluating this list is 3.
+;; A list containing the identifier +,
+;; and the integers 1 and 2.  This
+;; expression specifically invokes the +
+;; function with arguments 1 and 2.  The
+;; result of evaluating this list is 3.
 (+ 1 2)
 #+END_SRC
 
@@ -46,7 +48,9 @@ the type of a variable is determined at runtime. The type may also change.
 ;; More code
 ...
 
-;; At this point, x is probably a boolean, unless it was changed in "More code".
+;; At this point, x is probably a
+;; boolean, unless it was changed in
+;; "More code".
 (+ x 100)
 #+END_SRC
 
@@ -84,14 +88,16 @@ and the second points to the rest (~cdr~), which is either another pair or
 ~null~.
 
 #+BEGIN_SRC rust
-pub struct Pair {
-    // To make things more proper, instead of `first` and `second`,
-    // the traditional Lisp names `car` and `cdr` are used.
-    //
-    // Nobody remembers what they originally stand for.
-    car: Val,
-    cdr: Val,
-}
+  pub struct Pair {
+      // To make things more proper, instead of
+      // `first` and `second`,the traditional
+      // Lisp names `car` and `cdr` are used.
+      //
+      // Nobody remembers what they originally
+      // stand for.
+      car: Val,
+      cdr: Val,
+  }
 #+END_SRC
 
 That said, we’ll take a simpler approach for our interpreter and represent lists
@@ -261,15 +267,16 @@ To accomplish this, we'll create a helper that can parse the next thing. The
 results can be:
 
 #+BEGIN_SRC rust
-enum ReadItem {
-    // The end of an expression was reached. The end is signaled with a closing
-    // parenthesis.
-    EndExpr,
-    // A value was parsed.
-    Val(Val),
-    // There were no more values.
-    None,
-}
+  enum ReadItem {
+      // The end of an expression was
+      // reached. The end is signaled with a
+      // closing parenthesis.
+      EndExpr,
+      // A value was parsed.
+      Val(Val),
+      // There were no more values.
+      None,
+  }
 #+END_SRC
 
 When parsing the next token, the options are:
