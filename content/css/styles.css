@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wdth,wght@6..144,105,1..1000&family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght,ROND@6..144,1..1000,50&family=Sixtyfour:SCAN@-25&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
 div.navbar {
     display: flex;
     margin: auto;
@@ -11,17 +11,15 @@ div.navbar {
 }
 div.navbar > a {
     text-decoration: inherit;
+    font-size: 30px;
+    font-family: "Sixtyfour", sans-serif;
     color: #282a36;
     font-size: 32px;
-    font-family: "Google Sans Flex", sans-serif;
     font-optical-sizing: auto;
-    font-weight: 600;
+    font-weight: 400;
     font-style: normal;
-    font-variation-settings:
-        "slnt" 10,
-        "wdth" 100,
-        "GRAD" 100,
-        "ROND" 100;
+    font-variation-settings: "SCAN" -25;
+
 }
 a {
     color: #0000ff;
@@ -34,17 +32,17 @@ div.content {
     max-width: 800px;
     margin: auto;
     font-family: Google Sans Flex, sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     color: #282A36;
 }
-h1 {font-size: 32px;}
-h2 {font-size: 24px;}
-h3 {font-size: 20px;}
-h4 {font-size: 18px;}
-h5 {font-size: 16px;}
+h1 {font-size: 30px; font-family: "serif"; }
+h2 {font-size: 22px; font-family: "serif"; }
+h3 {font-size: 18px; font-family: "serif"; }
+h4 {font-size: 16px; font-family: "serif"; }
+h5 {font-size: 14px; font-family: "serif"; }
 img { max-width: 100%; }
 pre.src {
-    font-family: "Google Sans Code", monospace;
+    font-family: "Source Code Pro", monospace;
     background-color: #f8f8f8;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -53,7 +51,7 @@ pre.src {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 code {
-    font-family: "Google Sans Code", monospace;
+    font-family: "Source Code Pro", monospace;
     background-color: #f8f8f8;
     border: 1px solid #ddd;
     border-radius: 1px;
@@ -62,7 +60,7 @@ code {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 div.status {
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1px;
     color: #4d4d4d;
 }
@@ -71,4 +69,13 @@ div.status {
 }
 div.footdef {
     padding-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+    div.navbar > a {
+        font-size: 20px;
+    }
+    div.navbar {
+        padding: 12px;
+    }
 }

@@ -226,6 +226,7 @@ time allocations and many small allocations. Slapping on an arena
 allocator was trivial. Instead of passing the ~self.allocator()~
 object that was in scope, I wrapped things in an arena:
 
+
 #+BEGIN_SRC zig
 fn arenaExample() {
 // ...
