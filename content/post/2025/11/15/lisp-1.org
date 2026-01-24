@@ -101,8 +101,8 @@ and the second points to the rest (~cdr~), which is either another pair or
 #+END_SRC
 
 That said, we’ll take a simpler approach for our interpreter and represent lists
-as ~Vec<Val>~, largely because Rust’s pattern matching works beautifully with
-slices.
+as ~Vec<Val>~. Rust is much better at dealing with slices than (infamously)
+linked lists.
 
 
 ** Final Design
@@ -136,7 +136,7 @@ The tokenizer splits the text into identifiers and symbols. We’ll split by whi
 #+BEGIN_SRC rust
 #[test]
 fn test_tokenizer() {
-    let mut tokenizer = Tokenizer::new("12 #true (+ 1 2)");
+    let tokenizer = Tokenizer::new("12 #true (+ 1 2)");
     assert_eq!(
         tokenizer.collect::<Vec<_>>(),
         &["12", "#true", "(", "+", "1", "2", ")"]

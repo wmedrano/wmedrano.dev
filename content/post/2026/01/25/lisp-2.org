@@ -1,0 +1,610 @@
+#+title: Building a Lisp Interpreter (in Rust) - Part 2
+#+date: 2026-01-25
+#+author: Will S. Medrano
+
+* Introduction
+
+This is part 2 of 3 of the ~Building a Lisp Interpreter (in Rust)~ series. In
+[[file:../../../2025/11/15/lisp-1.org][Part 1]], we created the Lisp value and a tokenizer/parser. In this part, we will
+evaluate expressions.
+
+To recap, a Lisp interpreter has 2 main components.
+
+1. ~read~ - Read the text into a Lisp data structure. (In Part 1)
+2. ~eval~ - Evaluate that structure according to Lisp’s simple rules. (This part)
+
+Our main goal will be to implement:
+
+#+BEGIN_SRC rust
+fn eval(expr: &Val, env: &mut Environment) -> Result<Val, Error> { .. }
+#+END_SRC
+
+Where ~expr~ is a Lisp data structure that holds the code we will evaluate and
+~env~ contains the variables and functions that are available for use.
+
+** ~eval~ Rules
+
+Simple data (atoms) return just themselves.
+
+#+BEGIN_SRC scheme
+12 ;; => 12
+#true ;; => #true
+#+END_SRC
+
+A naked symbol returns the variable it references.
+
+#+BEGIN_SRC scheme
+pi ;; => 3.1415... ?
+does-not-exist ;; => error
+#+END_SRC
+
+Lists are function calls. The first element is the function and the rest are the
+arguments.
+
+#+BEGIN_SRC scheme
+(+ 1 2) ;; => 3
+(+ 1 2 (* 3 4)) ;; => (+ 1 2 12) => 15
+#+END_SRC
+
+Because we aren't guaranteed to have a function at the first position, sometimes
+it may be an error to evaluate a list.
+
+#+BEGIN_SRC scheme
+(1 2 3) ;; Error, 1 is not a function
+#+END_SRC
+
+Also, the function itself may be misused leading to an error.
+
+#+BEGIN_SRC scheme
+(/) ;; Error, / requires at least 1 argument.
+(+ #true #false) ;; Error, + only accepts numbers.
+#+END_SRC
+
+A list can also have special behavior based on the first element. For example,
+an if statement.
+
+#+BEGIN_SRC scheme
+(if #true (run-this-code) (never-run-this-code))
+#+END_SRC
+
+Or ~define~ can be used to set a variable.
+
+#+BEGIN_SRC scheme
+(define x 12)
+x ;; 12
+#+END_SRC
+
+* Data structures
+
+We defined a basic datastructure in [[file:../../../2025/11/15/lisp-1.org][Lisp 1]]. Before continuing, they need a
+little more refinement. We want to support:
+
+1. Functions - To be defined in native Rust at the moment.
+2. Environment - A place where we can store and retrieve variables.
+3. Errors - Your standard Rust ~enum~ based error.
+
+** Function Type in Value
+
+In our language, we have the concept of a function. For example, in ~(+ 1 2 3)~,
+~+~ is a function that adds all its arguments. We will keep a function simple. A
+function takes in any number of arguments and can return either the resulting
+value or an error.
+
+#+BEGIN_SRC rust
+type Function = fn(&[Val]) -> Result<Val, Error>;
+#+END_SRC
+
+Which makes our ~Val~:
+
+#+BEGIN_SRC rust
+#[derive(Clone, Debug, PartialEq)]
+pub enum Val {
+    Int(i64),
+    Bool(bool),
+    Symbol(String),
+    List(Vec<Val>),
+    Function(Function), // Support for functions!
+}
+#+END_SRC
+
+** Environment/Variables
+
+In the ~symbol~ example, we referenced a variable.
+
+#+BEGIN_SRC scheme
+pi ;; => 3.14
+#+END_SRC
+
+Even in ~(+ 1 2 3)~, we also reference a variable. ~+~ is bound to a
+function.
+
+To handle this, we will create an ~Environment~. Values can be stored and
+retrieved from the environment, similar to a hashmap. In fact, we'll back it
+with a ~HashMap~.
+
+#+BEGIN_SRC rust
+use std::collections::HashMap;
+
+#[derive(Debug, Default)]
+pub struct Environment {
+    values: HashMap<String, Val>,
+}
+
+impl Environment {
+    pub fn with_value(mut self, name: impl Into<String>, val: Val) -> Environment {
+        self.set(name.into(), val);
+        self
+    }
+
+    pub fn set(&mut self, name: impl Into<String>, val: Val) {
+        self.values.insert(name.into(), val);
+    }
+
+    pub fn get(&self, name: &str) -> Option<&Val> {
+        self.values.get(name)
+    }
+}
+#+END_SRC
+
+** Errors
+
+We've been alluding to errors happening. Here are the final set of errors we use
+in this post.
+
+#+BEGIN_SRC rust
+#[derive(Debug, Clone, PartialEq)]
+pub enum Error {
+    TokenizerError(TokenizerError),
+    ValueNotFound(String),
+    ValueNotCallable(Val),
+    WrongType { expected: &'static str, got: Val },
+    WrongArity { expected: usize, got: usize },
+    Other(&'static str),
+}
+
+impl From<TokenizerError> for Error {
+    fn from(e: TokenizerError) -> Error {
+        Error::TokenizerError(e)
+    }
+}
+#+END_SRC
+
+* Eval
+
+** API
+
+The eval function will take in an expression and an environment where it can
+store and retrieve values from. The behavior is based on the value.
+
+#+BEGIN_SRC rust
+pub fn eval(expr: &Val, env: &mut Environment) -> Result<Val, Error> {
+    match expr {
+        Val::Int(x) => todo!(),
+        Val::Bool(x) => todo!(),
+        Val::Symbol(x) => todo!(),
+        Val::List(x) => todo!(),
+        Val::Function(x) => todo!(),
+    }
+}
+#+END_SRC
+
+For convenience purposes, we will also create ~eval_str~ which automatically
+converts a string into a ~Val~ expression for us.
+
+In case there are multiple expressions, we will return the final result. There
+are some other reasonable alternatives like returning a vector of all the values
+or maybe even returning an error if there is more than one expression.
+
+#+BEGIN_SRC rust
+pub fn eval_str(s: &str, env: &mut Environment) -> Result<Val, Error> {
+    let mut res_val: Option<Val> = None;
+
+    let mut tokenizer = Tokenizer::new(s);
+    while let Some(expr) = read_next(&mut tokenizer)? {
+        res_val = Some(eval(&expr, env)?);
+    }
+
+    res_val
+        .ok_or(Error::TokenizerError(TokenizerError::UnexpectedEndOfInput))
+}
+#+END_SRC
+
+Now all we have to do is implement the eval function.
+
+** Simple Case: Atoms/Constants
+
+The case for integers and booleans is easy. They just evaluate to
+themselves. Another one that may not seem obvious is a function. When we
+encounter a function (that is not the first element of a list), we should just
+return that function as a value.
+
+#+BEGIN_SRC scheme
+12 ;; => 12
+#true ;; => #true
+#false ;; => #false
++ ;; => <function>
+#+END_SRC
+
+#+BEGIN_SRC rust
+#[test]
+fn test_eval_int() {
+    assert_eq!(
+        eval_str("12", &mut Environment::default()).unwrap(),
+        Val::Int(12)
+    );
+}
+
+#[test]
+fn test_eval_bool() {
+    assert_eq!(
+        eval_str("#true", &mut Environment::default()).unwrap(),
+        Val::Bool(true)
+    );
+    assert_eq!(
+        eval_str("#false", &mut Environment::default()).unwrap(),
+        Val::Bool(false)
+    );
+}
+
+#[test]
+fn test_eval_function() {
+    fn no_op(_: &[Val]) -> Result<Val, Error> {
+        Ok(Val::Int(0))
+    }
+    assert_eq!(
+        eval(&Val::Function(no_op), &mut Environment::default()).unwrap(),
+        Val::Function(no_op)
+    );
+}
+#+END_SRC
+
+To implement this, we will simply return a copy of our input:
+
+#+BEGIN_SRC rust
+pub fn eval(expr: &Val, env: &mut Environment) -> Result<Val, Error> {
+    match expr {
+        Val::Int(_) | Val::Bool(_) | Val::Function(_) => Ok(expr.clone()),
+        Val::Symbol(x) => todo!(),
+        Val::List(x) => todo!(),
+    }
+}
+#+END_SRC
+
+** Symbol Case: Variables
+
+A variable can be referenced by using a raw symbol. Let's say we manually define
+~x~ as 10 in our environment, then:
+
+#+BEGIN_SRC scheme
+x ;; 10
+#+END_SRC
+
+#+BEGIN_SRC rust
+#[test]
+fn test_variable() {
+    assert_eq!(
+        eval_str("x", &mut Environment::default().with_value("x", Val::Int(10))).unwrap(),
+        Val::Int(10)
+    );
+}
+#+END_SRC
+
+To implement this, we will simply query the ~Environment~.
+
+#+BEGIN_SRC rust
+pub fn eval(expr: &Val, env: &mut Environment) -> Result<Val, Error> {
+    match expr {
+        Val::Int(_) | Val::Bool(_) | Val::Function(_) => Ok(expr.clone()),
+        Val::Symbol(x) => env
+            .get(x.as_str())
+            .cloned()
+            .ok_or_else(|| Error::ValueNotFound(x.clone())),
+        Val::List(x) => todo!(),
+    }
+}
+#+END_SRC
+
+** Function Call Case: List Evaluation
+
+List evaluation is more complex. Let's fork this off into a function.
+
+#+BEGIN_SRC rust
+pub fn eval(expr: &Val, env: &mut Environment) -> Result<Val, Error> {
+    match expr {
+        Val::Int(_) | Val::Bool(_) | Val::Function(_) => Ok(expr.clone()),
+        Val::Symbol(x) => env
+            .get(x.as_str())
+            .cloned()
+            .ok_or_else(|| Error::ValueNotFound(x.clone())),
+        Val::List(x) => eval_list(x.as_slice(), env),
+    }
+}
+
+fn eval_list(expr: &[Val], env: &mut Environment) -> Result<Val, Error> {
+    todo!()
+}
+#+END_SRC
+
+For our test, let's use the simple ~(+ 1 2 3)~ and only handle integers.
+
+#+BEGIN_SRC scheme
+(+ 1 2 3) ;; 6
+#+END_SRC
+
+#+BEGIN_SRC rust
+fn add(args: &[Val]) -> Result<Val, Error> {
+    let mut sum: i64 = 0;
+    for arg in args {
+        let Val::Int(x) = arg else {
+            return Err(Error::WrongType {
+                expected: "Int",
+                got: arg.clone(),
+            });
+        };
+        sum += x;
+    }
+    Ok(Val::Int(sum))
+}
+
+#[test]
+fn test_add() {
+    let mut env = Environment::default().with_value("+", Val::Function(add));
+    assert_eq!(eval_str("(+ 1 2 3)", &mut env).unwrap(), Val::Int(6));
+}
+#+END_SRC
+
+Let's see what it takes to evaluate a list. In ~(func a b c)~, what do we need
+to do? We need to get the arguments, and pass them to ~func~. So there are
+roughly 3 steps:
+
+1. Evaluate the first argument. If it does not resolve to a function, then it is
+   an error.
+2. Evaluate the arguments and collect them.
+3. Call the function with the given arguments.
+
+#+BEGIN_SRC rust
+fn eval_list(expr: &[Val], env: &mut Environment) -> Result<Val, Error> {
+    // 1. Evaluate the first argument.
+    let (func_expr, arg_vals) = match expr {
+        [] => return Err(Error::Other("empty function call")),
+        [first, rest @ ..] => (first, rest),
+    };
+    let func_val = eval(func_expr, env)?;
+    // 1a. If it does not resolve to a function, then return an error.
+    let Val::Function(f) = func_val else {
+        return Err(Error::ValueNotCallable(func_val));
+    };
+
+    // 2. Evaluate the arguments and collect them.
+    let args: Vec<Val> = arg_vals
+        .iter()
+        .map(|x| eval(x, env))
+        .collect::<Result<_, _>>()?;
+
+    // 3. Call the function with the given arguments.
+    f(&args)
+}
+#+END_SRC
+
+#+BEGIN_QUOTE
+Any sufficiently complicated [program] contains an ad-hoc, informally-specified,
+bug-ridden, slow implementation of half of [Lisp].
+
+--- Greenspun's Tenth Rule
+#+END_QUOTE
+
+Tada 🥳! We have a basic interpreter that is relatively powerful despite the
+simple implementation.
+
+* Special Forms
+
+Not all expressions follow the standard evaluation rules. These are called
+special forms. In a normal function call like ~(+ 1 2)~, all arguments are
+evaluated before being passed to the function. Special forms have their own
+evaluation rules. We will introduce the special forms ~if~ and ~define~.
+
+** If
+
+The ~if~ special form takes 3 arguments: a condition, a "true" branch, and a
+"false" branch. Only one branch should be evaluated based on the condition.
+
+#+BEGIN_SRC scheme
+(if #true 1 2) ;; => 1
+(if #false 1 2) ;; => 2
+#+END_SRC
+
+If ~if~ were a normal function, both branches would be evaluated. This would be
+problematic for side effects. For example, this program would be broken if ~if~
+were a function call!
+
+#+BEGIN_SRC scheme
+(if #false (crash-my-program!) 42)
+#+END_SRC
+
+#+BEGIN_SRC rust
+#[test]
+fn test_if_lazy_evaluation() {
+    fn crash(_: &[Val]) -> Result<Val, Error> {
+        panic!("This should never be called!");
+    }
+
+    let mut env = Environment::default()
+        .with_value("crash-my-program!", Val::Function(crash));
+
+    // The true branch (call crash-my-program!) should not be evaluated on
+    // #false.
+    assert_eq!(
+        eval_str("(if #false (crash-my-program!) 42)", &mut env).unwrap(),
+        Val::Int(42)
+    );
+}
+#+END_SRC
+
+*** Implementation
+
+
+We need to handle ~if~ before attempting to call it as a function. Let's add an
+escape hatch for our special forms in ~eval_list~:
+
+#+BEGIN_SRC rust
+fn eval_list(expr: &[Val], env: &mut Environment) -> Result<Val, Error> {
+    let (func_expr, arg_vals) = match expr {
+        [] => return Err(Error::Other("empty function call")),
+        [first, rest @ ..] => (first, rest),
+    };
+
+    // Handle special forms
+    if let Val::Symbol(s) = func_expr {
+        match s.as_str() {
+            "if" => return eval_if(arg_vals, env),
+            _ => {}
+        }
+    }
+    // Normal function call
+    let func_val = eval(func_expr, env)?;
+    // ... rest of function unchanged
+}
+#+END_SRC
+
+Now, it is easy to evaluate our if expression.
+
+1. First we need to deconstruct our arguments into the ~condition~, the ~true
+   branch~ and the ~false branch~.
+2. Then we evaluate our ~condition~. How do we evaluate our condition? Well,
+   ~eval~ can evaluate an expression given an environment. We can call that.
+3. Based on the result, we can then choose to evaluate the ~true branch~ or
+   ~false branch~.
+
+
+#+BEGIN_SRC rust
+fn eval_if(args: &[Val], env: &mut Environment) -> Result<Val, Error> {
+    // 1. Deconstruct our arguments.
+    let [cond, true_branch, false_branch] = args else {
+        return Err(Error::WrongArity {
+            expected: 3,
+            got: args.len(),
+        });
+    };
+
+    // 2. Evaluate our condition.
+    let cond_val = eval(cond, env)?;
+    let Val::Bool(b) = cond_val else {
+        return Err(Error::WrongType {
+            expected: "Bool",
+            got: cond_val,
+        });
+    };
+
+    // 3. Evaluate the chosen branch.
+    if b {
+        eval(true_branch, env)
+    } else {
+        eval(false_branch, env)
+    }
+}
+#+END_SRC
+
+** Define
+
+The ~define~ special form binds a value to a name in the environment. The first
+argument is the symbol (not evaluated), and the second is the value (evaluated).
+
+Here is a simple definition and variable reference:
+
+#+BEGIN_SRC scheme
+(define x 10)
+x ;; => 10
+#+END_SRC
+
+#+BEGIN_SRC rust
+#[test]
+fn test_define() {
+    let mut env = Environment::default().with_value("+", Val::Function(add));
+    eval_str("(define x 10)", &mut env).unwrap();
+    assert_eq!(eval_str("x", &mut env).unwrap(), Val::Int(10));
+}
+#+END_SRC
+
+Now here is an expression assigned to a variable:
+
+#+BEGIN_SRC scheme
+(define y (+ 1 2 3))
+y ;; => 6
+#+END_SRC
+
+#+BEGIN_SRC rust
+#[test]
+fn test_define_with_expression() {
+    let mut env = Environment::default().with_value("+", Val::Function(add));
+    eval_str("(define y (+ 1 2 3))", &mut env).unwrap();
+    assert_eq!(eval_str("y", &mut env).unwrap(), Val::Int(6));
+}
+#+END_SRC
+
+To implement this, we can add another escape hatch in ~eval_list~ for
+~define~. Then we implement define.
+
+#+BEGIN_SRC rust
+fn eval_list(expr: &[Val], env: &mut Environment) -> Result<Val, Error> {
+    // ... destructure expr into func_expr and arg_vals ...
+
+    // Handle special forms
+    if let Val::Symbol(s) = func_expr {
+        match s.as_str() {
+            "if" => return eval_if(arg_vals, env),
+            "define" => return eval_define(arg_vals, env),
+            _ => {}
+        }
+    }
+    // ... rest of function unchanged
+}
+#+END_SRC
+
+Define can be implemented with a similar philosophy to function evaluation and
+if.
+
+1. Deconstruct the args into the ~name~ of the variable and the ~expression~.
+2. Evaluate the ~expression~.
+3. Assign its result to ~name~.
+
+#+BEGIN_SRC rust
+fn eval_define(args: &[Val], env: &mut Environment) -> Result<Val, Error> {
+    // 1. Deconstruct the name and expression.
+    let [name, expr] = args else {
+        return Err(Error::WrongArity {
+            expected: 2,
+            got: args.len(),
+        });
+    };
+    // 1a. Name must be a symbol.
+    let Val::Symbol(name) = name else {
+        return Err(Error::WrongType {
+            expected: "Symbol",
+            got: name.clone(),
+        });
+    };
+
+    // 2. Evaluate the expression.
+    let val = eval(expr, env)?;
+
+    // 3. Assign the result to name.
+    env.set(name.clone(), val.clone());
+
+    // We must return a value, so here you go. Some Lisps choose to return an
+    // "undefined" value.
+    Ok(val)
+}
+#+END_SRC
+
+* Conclusion
+
+With function evaluation, ~if~ and ~define~, we can now write some non-trivial
+programs. In the next part, we'll add user-defined functions with ~lambda~.
+
+Preview:
+
+#+BEGIN_SRC scheme
+(define foo (lambda (a b c) (+ a b c)))
+
+(foo 10 20 30) ;; 60
+#+END_SRC
