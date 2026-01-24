@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght,ROND@6..144,1..1000,50&family=Sixtyfour:SCAN@-25&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cantarell:ital,wght@0,400;0,700;1,400;1,700&family=Reddit+Mono:wght@200..900&family=Sixtyfour:SCAN@-25&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
 div.navbar {
     display: flex;
     margin: auto;
@@ -13,13 +13,16 @@ div.navbar > a {
     text-decoration: inherit;
     font-size: 30px;
     font-family: "Sixtyfour", sans-serif;
-    color: #282a36;
     font-size: 32px;
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
-    font-variation-settings: "SCAN" -25;
-
+    font-variation-settings: "SCAN" -15;
+    background: linear-gradient(90deg, #9b59b6, #3498db, #3498db);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.3));
 }
 a {
     color: #0000ff;
@@ -31,18 +34,18 @@ a:hover {
 div.content {
     max-width: 800px;
     margin: auto;
-    font-family: Google Sans Flex, sans-serif;
+    font-family: "Cantarell", sans-serif;
     font-size: 14px;
     color: #282A36;
 }
-h1 {font-size: 30px; font-family: "serif"; }
-h2 {font-size: 22px; font-family: "serif"; }
-h3 {font-size: 18px; font-family: "serif"; }
-h4 {font-size: 16px; font-family: "serif"; }
-h5 {font-size: 14px; font-family: "serif"; }
+h1 {font-size: 30px; font-family: "Source Serif 4", serif; }
+h2 {font-size: 22px; font-family: "Source Serif 4", serif; }
+h3 {font-size: 18px; font-family: "Source Serif 4", serif; }
+h4 {font-size: 16px; font-family: "Source Serif 4", serif; }
+h5 {font-size: 14px; font-family: "Source Serif 4", serif; }
 img { max-width: 100%; }
 pre.src {
-    font-family: "Source Code Pro", monospace;
+    font-family: "Reddit Mono", monospace;
     background-color: #f8f8f8;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -51,7 +54,7 @@ pre.src {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 code {
-    font-family: "Source Code Pro", monospace;
+    font-family: "Reddit Mono", monospace;
     background-color: #f8f8f8;
     border: 1px solid #ddd;
     border-radius: 1px;
