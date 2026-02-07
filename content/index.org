@@ -3,30 +3,30 @@
 
 * Recent
 
-[[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (with Rust) Part 2]] 󠀠_{    2026-01-25}
+[[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (with Rust) Part 2]] @@html:<span class="post-date">2026-01-25</span>@@
 
-[[file:post/2026/01/14/2025-recap.org][2025 Recap]] 󠀠_{    2026-01-14}
+[[file:post/2026/01/14/2025-recap.org][2025 Recap]] @@html:<span class="post-date">2026-01-14</span>@@
 
-[[file:post/2025/11/15/lisp-1.org][Building a Lisp Interpreter (with Rust) Part 1]] 󠀠_{    2025-11-15}
+[[file:post/2025/11/15/lisp-1.org][Building a Lisp Interpreter (with Rust) Part 1]] @@html:<span class="post-date">2025-11-15</span>@@
 
 
 * Archive
 
 ** General
 
-[[file:post/2026/01/14/2025-recap.org][2025 Recap]] 󠀠_{    2026-01-14}
+[[file:post/2026/01/14/2025-recap.org][2025 Recap]] @@html:<span class="post-date">2026-01-14</span>@@
 
-[[file:post/2024/12/18/news-years-resolution-evaluation-reading.org][New Years Resolution Evaluation - Reading]] 󠀠_{    2024-12-08}
+[[file:post/2024/12/18/news-years-resolution-evaluation-reading.org][New Years Resolution Evaluation - Reading]] @@html:<span class="post-date">2024-12-18</span>@@
 
-[[file:post/2024/08/22/zigging-out.org][Zigging Out]] 󠀠_{    2024-08-22}
+[[file:post/2024/08/22/zigging-out.org][Zigging Out]] @@html:<span class="post-date">2024-08-22</span>@@
 
-[[file:post/2024/07/08/month-of-ai.org][Month of AI]] 󠀠_{    2024-07-08}
+[[file:post/2024/07/08/month-of-ai.org][Month of AI]] @@html:<span class="post-date">2024-07-08</span>@@
 
-[[file:post/2024/05/13/github-gitlab.org][GitHub or GitLab for Hobby Projects]] 󠀠_{    2024-05-13}
+[[file:post/2024/05/13/github-gitlab.org][GitHub or GitLab for Hobby Projects]] @@html:<span class="post-date">2024-05-13</span>@@
 
 
 ** Tutorials
 
-[[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (with Rust) Part 2]] 󠀠_{    2026-01-25}
+[[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (with Rust) Part 2]] @@html:<span class="post-date">2026-01-25</span>@@
 
-[[file:post/2025/11/15/lisp-1.org][Building a Lisp Interpreter (with Rust) Part 1]] 󠀠_{    2025-11-15}
+[[file:post/2025/11/15/lisp-1.org][Building a Lisp Interpreter (with Rust) Part 1]] @@html:<span class="post-date">2025-11-15</span>@@

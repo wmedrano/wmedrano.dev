@@ -1,77 +1,114 @@
-@import url('https://fonts.googleapis.com/css2?family=Cantarell:ital,wght@0,400;0,700;1,400;1,700&family=Inconsolata:wght@200..900&family=Sixtyfour:SCAN@-25&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+@font-face {
+    font-family: "Inter";
+    src: url("/fonts/Inter-Regular.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Inconsolata";
+    src: url("/fonts/Inconsolata.woff2") format("woff2");
+}
+@font-face {
+    font-family: "SpaceGrotesk";
+    src: url("/fonts/SpaceGrotesk.woff2") format("woff2");
+}
+body {
+    color: #f8f8f2;
+    background-color: #282a36;
+}
 div.navbar {
     display: flex;
     margin: auto;
     justify-content: space-between;
-    max-width: 900px;
-    background-color: #f8f8f8;
+    max-width: 720px;
     border-radius: 12px;
-    padding: 16px;
+    padding-top: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
     overflow-x: auto;
 }
 div.navbar > a {
     text-decoration: inherit;
-    font-size: 30px;
-    font-family: "Sixtyfour", sans-serif;
+    font-family: "SpaceGrotesk", sans-serif;
     font-size: 32px;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    font-variation-settings: "SCAN" -15;
-    background: linear-gradient(90deg, #9b59b6, #3498db, #3498db);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.3));
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #33ff33;
+    text-shadow: 0 0 8px rgba(51, 255, 51, 0.6);
+    filter: drop-shadow(0 0 4px rgba(51, 255, 51, 0.3));
 }
 a {
-    color: #0000ff;
+    color: #5eaeff;
     text-decoration: inherit;
 }
 a:hover {
     text-decoration: underline;
 }
 div.content {
-    max-width: 800px;
+    max-width: 45em;
     margin: auto;
-    font-family: "Cantarell", sans-serif;
-    font-size: 14px;
-    color: #282A36;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    color: #e0e0e0;
+    font-feature-settings: "calt", "tnum", "zero", "cv08", "cv01", "ss07";
 }
-h1 {font-size: 30px; font-family: "Source Serif 4", serif; }
-h2 {font-size: 22px; font-family: "Source Serif 4", serif; }
-h3 {font-size: 18px; font-family: "Source Serif 4", serif; }
-h4 {font-size: 16px; font-family: "Source Serif 4", serif; }
-h5 {font-size: 14px; font-family: "Source Serif 4", serif; }
+h2 {
+    font-family: "SpaceGrotesk",sans-serif;
+    color: #f0f0f0;
+    margin-top: 1em;
+    margin-bottom: 0;
+}
+h1, h3, h4, h5 {
+    font-family: "SpaceGrotesk",sans-serif;
+    color: #f0f0f0;
+    margin-top: 1em;
+    margin-bottom: 0;
+}
+
+/* Fix table of contents */
+#text-table-of-contents {
+    margin-top: 0.5rem;
+}
+ul {
+    margin-top: 0;
+}
+
+h1 {font-size: 32px; }
+h2 {font-size: 24px; }
+h3 {font-size: 20px; }
+h4 {font-size: 18px; }
+h5 {font-size: 16px; }
 img { max-width: 100%; }
-pre.src {
+pre.src, code {
     font-family: "Inconsolata", monospace;
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
+    background-color: #1a1a2e;
+    border: 1px solid #2a2a4a;
     border-radius: 6px;
-    padding: 8px;
     overflow-x: auto;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    margin-top: 0;
+}
+pre.src {
+    padding: 8px;
 }
 code {
-    font-family: "Inconsolata", monospace;
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
-    border-radius: 1px;
     padding: 1px;
-    overflow-x: auto;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 div.status {
     font-size: 11px;
     line-height: 1px;
-    color: #4d4d4d;
+    color: #888;
 }
 .footpara {
     display: inline;
 }
 div.footdef {
     padding-bottom: 16px;
+}
+
+.post-date {
+    font-size: 14px;
+    color: #888;
+    margin-left: 8px;
 }
 
 @media (max-width: 600px) {
