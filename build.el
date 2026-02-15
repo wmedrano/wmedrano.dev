@@ -21,6 +21,9 @@
  ;; Do not use the built-in org mode html styling. Instead, import the custom
  ;; stylesheet defined at ./content/css/styles.css.
  org-html-style-default "
+<link rel=\"icon\" type=\"image/svg+xml\" href=\"/favicon.svg\">
+<link rel=\"icon\" type=\"image/png\" href=\"/favicon.png\">
+<link rel=\"icon\" href=\"/favicon.ico\" sizes=\"any\">
 <link rel=\"stylesheet\" href=\"/css/htmlize-styles.css\">
 <link rel=\"stylesheet\" href=\"/css/styles.css\">
 "
@@ -59,7 +62,7 @@
       (images (list "wmedrano dot dev images"
                     :recursive t
                     :base-directory "./content"
-                    :base-extension "png\\|jpg\\|svg\\|css\\|woff2"
+                    :base-extension "png\\|jpg\\|svg\\|ico\\|css\\|woff2"
                     :publishing-directory "./public"
                     :publishing-function 'org-publish-attachment)))
   (setq-local org-publish-project-alist
