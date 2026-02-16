@@ -1071,12 +1071,10 @@
 .org-function-call {
     /* font-lock-function-call-face */
     color: #50fa7b;
-    font-weight: bold;
 }
 .org-function-name {
     /* font-lock-function-name-face */
     color: #50fa7b;
-    font-weight: bold;
 }
 .org-glyphless-char {
     /* glyphless-char */
@@ -1387,7 +1385,6 @@
 .org-keyword {
     /* font-lock-keyword-face */
     color: #ff79c6;
-    font-weight: bold;
 }
 .org-kmacro-menu-flagged {
     /* kmacro-menu-flagged */

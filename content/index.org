@@ -3,6 +3,8 @@
 
 * Recent
 
+[[file:post/2026/02/21/lisp-3.org][Building a Lisp Interpreter (with Rust) Part 3]] @@html:<span class="post-date">2026-02-21</span>@@
+
 [[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (with Rust) Part 2]] @@html:<span class="post-date">2026-01-25</span>@@
 
 [[file:post/2026/01/14/2025-recap.org][2025 Recap]] @@html:<span class="post-date">2026-01-14</span>@@
@@ -30,3 +32,5 @@
 [[file:post/2025/11/15/lisp-1.org][Building a Lisp Interpreter (with Rust) Part 1]] @@html:<span class="post-date">2025-11-15</span>@@
 
 [[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (with Rust) Part 2]] @@html:<span class="post-date">2026-01-25</span>@@
+
+[[file:post/2026/02/21/lisp-3.org][Building a Lisp Interpreter (with Rust) Part 3]] @@html:<span class="post-date">2026-02-21</span>@@

@@ -1,8 +1,9 @@
-_site
-.sass-cache
 .jekyll-cache
 .jekyll-metadata
-vendor
+.sass-cache
 /.packages/
-target/
+_site
+deploy.sh
 public/
+target/
+vendor

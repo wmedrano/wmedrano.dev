@@ -227,7 +227,7 @@ return that function as a value.
 
 #+BEGIN_SRC rust
 #[test]
-fn test_eval_int() {
+fn eval_int_produces_int() {
     assert_eq!(
         eval_str("12", &mut Environment::default()).unwrap(),
         Val::Int(12)
@@ -235,7 +235,7 @@ fn test_eval_int() {
 }
 
 #[test]
-fn test_eval_bool() {
+fn eval_bool_produces_bool() {
     assert_eq!(
         eval_str("#true", &mut Environment::default()).unwrap(),
         Val::Bool(true)
@@ -247,7 +247,7 @@ fn test_eval_bool() {
 }
 
 #[test]
-fn test_eval_function() {
+fn eval_function_literal_returns_function() {
     fn no_op(_: &[Val]) -> Result<Val, Error> {
         Ok(Val::Int(0))
     }
@@ -281,7 +281,7 @@ x ;; 10
 
 #+BEGIN_SRC rust
 #[test]
-fn test_variable() {
+fn eval_variable_returns_value_referenced_by_variable() {
     assert_eq!(
         eval_str("x", &mut Environment::default().with_value("x", Val::Int(10))).unwrap(),
         Val::Int(10)
@@ -347,7 +347,7 @@ fn add(args: &[Val]) -> Result<Val, Error> {
 }
 
 #[test]
-fn test_add() {
+fn function_call_expression_evaluates_function() {
     let mut env = Environment::default().with_value("+", Val::Function(add));
     assert_eq!(eval_str("(+ 1 2 3)", &mut env).unwrap(), Val::Int(6));
 }
@@ -423,7 +423,7 @@ were a function call!
 
 #+BEGIN_SRC rust
 #[test]
-fn test_if_lazy_evaluation() {
+fn if_statement_only_executes_single_branch() {
     fn crash(_: &[Val]) -> Result<Val, Error> {
         panic!("This should never be called!");
     }
@@ -518,7 +518,7 @@ x ;; => 10
 
 #+BEGIN_SRC rust
 #[test]
-fn test_define() {
+fn define_sets_variable_reference() {
     let mut env = Environment::default().with_value("+", Val::Function(add));
     eval_str("(define x 10)", &mut env).unwrap();
     assert_eq!(eval_str("x", &mut env).unwrap(), Val::Int(10));
@@ -534,7 +534,7 @@ y ;; => 6
 
 #+BEGIN_SRC rust
 #[test]
-fn test_define_with_expression() {
+fn define_with_expression_assigns_result_of_expression_to_variable() {
     let mut env = Environment::default().with_value("+", Val::Function(add));
     eval_str("(define y (+ 1 2 3))", &mut env).unwrap();
     assert_eq!(eval_str("y", &mut env).unwrap(), Val::Int(6));

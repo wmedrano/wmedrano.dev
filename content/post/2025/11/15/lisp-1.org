@@ -71,6 +71,10 @@ pub enum Val {
 
 ** Lists
 
+We are going to represent lists as simple ~Vec<T>~ since Rust deals with them
+better. However, we should discuss how traditional Lisps represent their most
+important datastructure.
+
 Lists in Lisp are typically *linked lists*. A linked list is a node containing
 an element and a reference to the rest of the list. A basic version might look
 like:
@@ -135,7 +139,7 @@ The tokenizer splits the text into identifiers and symbols. We’ll split by whi
 
 #+BEGIN_SRC rust
 #[test]
-fn test_tokenizer() {
+fn tokenizer_separates_by_token() {
     let tokenizer = Tokenizer::new("12 #true (+ 1 2)");
     assert_eq!(
         tokenizer.collect::<Vec<_>>(),
@@ -224,7 +228,7 @@ The reader converts the token stream into Lisp values:
 
 #+BEGIN_SRC rust
 #[test]
-fn test_read() {
+fn read_returns_lisp_datastructure() {
     let mut tokenizer = Tokenizer::new("42 #true + (+ (* 2 3) 4)");
     assert_eq!(read_next(&mut tokenizer).unwrap(), Some(Val::Int(42)));
     assert_eq!(read_next(&mut tokenizer).unwrap(), Some(Val::Bool(true)));
@@ -245,7 +249,7 @@ fn test_read() {
 }
 
 #[test]
-fn test_read_unmatched_paren() {
+fn read_unmatched_paren_returns_error() {
     let mut tokenizer = Tokenizer::new("(+ 1 2");
     assert!(matches!(
         read_next(&mut tokenizer),
@@ -254,7 +258,7 @@ fn test_read_unmatched_paren() {
 }
 
 #[test]
-fn test_read_extra_closing_paren() {
+fn read_extra_closing_paren_returns_error() {
     let mut tokenizer = Tokenizer::new(")");
     assert!(matches!(
         read_next(&mut tokenizer),
@@ -312,7 +316,7 @@ fn read_next_impl(tokenizer: &mut Tokenizer) -> Result<ReadItem, TokenizerError>
             }
         }
         Some(")") => Ok(ReadItem::EndExpr),
-        Some(identifier @ _) => {
+        Some(identifier) => {
             let val = if let Ok(int_val) = identifier.parse::<i64>() {
                 Val::Int(int_val)
             } else {
