@@ -71,6 +71,10 @@ pub enum Val {
 
 ** Lists
 
+We are going to represent lists as simple ~Vec<T>~ since Rust deals with them
+better. However, we should discuss how traditional Lisps represent their most
+important datastructure.
+
 Lists in Lisp are typically *linked lists*. A linked list is a node containing
 an element and a reference to the rest of the list. A basic version might look
 like:
@@ -312,7 +316,7 @@ fn read_next_impl(tokenizer: &mut Tokenizer) -> Result<ReadItem, TokenizerError>
             }
         }
         Some(")") => Ok(ReadItem::EndExpr),
-        Some(identifier @ _) => {
+        Some(identifier) => {
             let val = if let Ok(int_val) = identifier.parse::<i64>() {
                 Val::Int(int_val)
             } else {
