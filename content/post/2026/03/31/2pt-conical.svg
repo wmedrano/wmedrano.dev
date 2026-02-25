@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200">
+  <defs>
+    <radialGradient id="two-point"
+      gradientUnits="userSpaceOnUse"
+      cx="228" cy="88" r="200"
+      fx="96" fy="128" fr="18">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="12%" stop-color="#4338ca"/>
+      <stop offset="24%" stop-color="#2563eb"/>
+      <stop offset="36%" stop-color="#0891b2"/>
+      <stop offset="48%" stop-color="#059669"/>
+      <stop offset="60%" stop-color="#65a30d"/>
+      <stop offset="72%" stop-color="#eab308"/>
+      <stop offset="84%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#db2777"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="320" height="200" fill="url(#two-point)"/>
+</svg>

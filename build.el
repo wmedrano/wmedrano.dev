@@ -62,7 +62,7 @@
       (images (list "wmedrano dot dev images"
                     :recursive t
                     :base-directory "./content"
-                    :base-extension "png\\|jpg\\|svg\\|ico\\|css\\|woff2"
+                    :base-extension "png\\|jpg\\|svg\\|ico\\|css\\|woff2\\|ogg"
                     :publishing-directory "./public"
                     :publishing-function 'org-publish-attachment)))
   (setq-local org-publish-project-alist

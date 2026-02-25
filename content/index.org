@@ -3,6 +3,8 @@
 
 * Recent
 
+[[file:post/2026/03/31/function-ptrs.org][Function Pointer OP Codes]] @@html:<span class="post-date">2026-03-31</span>@@
+
 [[file:post/2026/02/21/lisp-3.org][Building a Lisp Interpreter (with Rust) Part 3]] @@html:<span class="post-date">2026-02-21</span>@@
 
 [[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (with Rust) Part 2]] @@html:<span class="post-date">2026-01-25</span>@@

@@ -71,7 +71,30 @@ h2 {font-size: 24px; }
 h3 {font-size: 20px; }
 h4 {font-size: 18px; }
 h5 {font-size: 16px; }
-img { max-width: 100%; display: block; margin: 0 auto; }
+img {
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
+    border: 1px solid #44475a;
+    background-color: #1a1a2e;
+}
+table {
+    background-color: #1a1a2e;
+    border-collapse: collapse;
+    width: auto;
+    max-width: 100%;
+    margin: 0 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+th {
+    background-color: #2a2a4a;
+}
+td {
+    border: 1px solid #44475a;
+}
+th, td {
+    padding: 8px;
+}
 pre.src, code {
     font-family: "FiraCode", monospace;
     font-feature-settings: "calt", "liga", "cv02", "cv06", "ss03";
