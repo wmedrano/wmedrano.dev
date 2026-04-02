@@ -1,4 +1,4 @@
-#+title: Function Pointer OP Codes
+#+title: Functional Dispatch
 #+date: 2026-03-31
 #+author: Will S. Medrano
 
@@ -11,8 +11,8 @@ a sequence of ~function pointers~.
 
 This got me curious on why? Is it faster? More flexible?
 
-Spoiler: I don't know. For my adhoc interpreter, function pointers were a bit
-slower, but more flexible. See the [[id:89620a29-0426-4063-8f03-fa8a5c7ba15d][Results section]].
+Spoiler: For my use case and set of benchmarks, the more compact ~enum~
+implementation was generally faster. See the [[id:89620a29-0426-4063-8f03-fa8a5c7ba15d][Results section]].
 
 #+caption: A two-point radial gradient
 [[file:2pt-conical.svg]]
@@ -55,10 +55,16 @@ compact binary data (bytecode). A bytecode interpreter defines its own virtual
 instruction set and executes it in a loop. This is the approach used by
 languages like Python and Ruby.
 
-The core of most bytecode interpreters is a /dispatch loop/: fetch the next
-instruction, decode it, execute it, repeat. A simple Rust implementation uses an
-~enum~ to represent instructions and a ~match~ to dispatch them.
+The core of most bytecode interpreters is a /dispatch loop/.
 
+| Step | Instruction                |
+|------+----------------------------|
+|    1 | Fetch the next instruction |
+|    2 | Decode it                  |
+|    3 | Execute it                 |
+|    4 | Repeat.                    |
+
+#+CAPTION: A simple Rust implementation uses an ~enum~ to represent instructions and a ~match~ to dispatch them.
 #+BEGIN_SRC rust
 impl Vm {
     fn run(&mut self) -> Result<Val> {
@@ -80,12 +86,12 @@ impl Vm {
 For example, computing ~1 + 2~ compiles to three instructions. Each step either
 pushes a value onto the stack or pops values and pushes a result:
 
-| Step | Instruction    | Stack  |
-|------+----------------+--------|
-|    1 | ~LoadInt(1)~   | [1]    |
-|    2 | ~LoadInt(2)~   | [1, 2] |
-|    3 | ~Binop(Add)~   | [3]    |
-|    4 | ~Return~       | []     |
+| Step | Instruction | Stack  |
+|------+-------------+--------|
+|    1 | LoadInt(1)  | [1]    |
+|    2 | LoadInt(2)  | [1, 2] |
+|    3 | Binop(Add)  | [3]    |
+|    4 | Return      | []     |
 
 *** Performance Considerations
 
@@ -98,9 +104,9 @@ performance. Smaller datastructures are preferred as:
 
 Many virtual machines resort to storing both ~float64~ and ~pointer~ values in a
 single ~8 byte~ value through [[https://craftinginterpreters.com/optimization.html#nan-boxing][NaN Boxing]][fn:64bit]. This is impressive
-considering that both ~float64~ and ~pointers~ individually take ~8
-bytes~. OCaml's dynamic value type is stored as either a [[https://blog.janestreet.com/what-is-gained-and-lost-with-63-bit-integers/][=63bit int= or a
-pointer]].
+considering that both ~float64~ and ~pointers~ individually take ~8 bytes~, but
+we can store them in a datastructure that itself takes ~8 bytes~. Similarly,
+OCaml uses bit tagging to store either [[https://blog.janestreet.com/what-is-gained-and-lost-with-63-bit-integers/][=63bit int= or a pointer]].
 
 Instructions are another dimension that can be shrunk — which is why the
 function pointer approach is surprising: it uses a ~8 byte pointer~ instead of a
@@ -173,44 +179,44 @@ Function pointers should be slower as:
 
 - They take more bytes to represent. The ~enum~ used in this interpreter uses =2
   bytes= vs the =8 bytes= for the function pointer and =1 byte= for the data
-  byte. This 4.5x size difference means fewer instructions fit in CPU cache,
-  increasing cache pressure.
+  byte. The =4.5x= increase in size means that fewer instructions fit in CPU
+  cache, increasing cache pressure.
 - Dispatching an enum should have lower overhead than even a tail function
   call. This is the part I'm less sure about, if you have any good resources on
   this, email me at will@wmedrano.dev. In addition to being less sure about
-  this, the impact of the dispatch mechanism may change as the complexity of the
-  instructions grows.
+  this, the impact of the dispatch mechanism may change if we redesign
+  representations or add/remove code.
 
 ** Instructions
 
 The following instruction set seems powerful enough to test. Don't worry,
-despite looking small, instructions like ~Return~ and ~Eval~ are fairly complex
-and powerful.
+despite looking small, instructions like ~Return~ and ~Eval~ have a lot of
+complexity.
 
 | Instruction  | Parameter | Description                                                                                                                     |
 |--------------+-----------+---------------------------------------------------------------------------------------------------------------------------------|
-| Eval         | =i8=      | Pop a =Func= from the stack and call it with =n= arguments. If =n= is negative, it's a recursive call with =n + 128= arguments. |
+| Eval         | i8        | Pop a =Func= from the stack and call it with =n= arguments. If =n= is negative, it's a recursive call with =n + 128= arguments. |
 | Return       |           | Return from the current function.                                                                                               |
-| LoadInt      | =i8=      | Push a small integer literal onto the stack.                                                                                    |
-| LoadConst    | =u8=      | Push a constant from the function's constant table onto the stack.                                                              |
-| LoadLocal    | =u8=      | Push a local variable (by index into the current stack frame) onto the stack.                                                   |
-| SetLocal     | =u8=      | Set a local variable (by index into the current stack frame) from the top of the stack.                                         |
-| JumpIf       | =i8=      | Skip the next =n= instructions if the top of the stack is truthy.                                                               |
-| Jump         | =i8=      | Skip the next =n= instructions unconditionally.                                                                                 |
-| Binop        | =Binop=   | Apply a binary operation to the top two stack values, leaving the result.                                                       |
-| AddN         | =i8=      | Add a small integer literal to the top-of-stack integer in place.                                                               |
-| LessThan     | =i8=      | Replace the top-of-stack integer with a bool: =top < n=.                                                                        |
-| GreaterThan  | =i8=      | Replace the top-of-stack integer with a bool: =top > n=.                                                                        |
-| Equal        | =i8=      | Replace the top-of-stack integer with a bool: =top == n=.                                                                       |
+| LoadInt      | i8        | Push a small integer literal onto the stack.                                                                                    |
+| LoadConst    | u8        | Push a constant from the function's constant table onto the stack.                                                              |
+| LoadLocal    | u8        | Push a local variable (by index into the current stack frame) onto the stack.                                                   |
+| SetLocal     | u8        | Set a local variable (by index into the current stack frame) from the top of the stack.                                         |
+| JumpIf       | i8        | Skip the next =n= instructions if the top of the stack is truthy.                                                               |
+| Jump         | i8        | Skip the next =n= instructions unconditionally.                                                                                 |
+| Binop        | Binop     | Apply a binary operation to the top two stack values, leaving the result.                                                       |
+| AddN         | i8        | Add a small integer literal to the top-of-stack integer in place.                                                               |
+| LessThan     | i8        | Replace the top-of-stack integer with a bool: =top < n=.                                                                        |
+| GreaterThan  | i8        | Replace the top-of-stack integer with a bool: =top > n=.                                                                        |
+| Equal        | i8        | Replace the top-of-stack integer with a bool: =top == n=.                                                                       |
 | StringLength |           | Replace the top-of-stack string with its integer length.                                                                        |
-| Dup          | =u8=      | Duplicate the top-of-stack value.                                                                                               |
+| Dup          | u8        | Duplicate the top-of-stack value.                                                                                               |
 
 ** Benchmark
 
-I used ~add(1+2, 3+4)~ and ~fib(12)~ as the benchmark. I handcoded the
-following bytecode functions for the stack based bytecode interpreter. The ~fib~
-function takes a single parameter that is stored at index =0=. The ~add~
-function takes 4 arguments stored at index =0=, =1=, =2=, and =3=.
+I used ~add(1+2, 3+4)~ and ~fib(12)~ as the benchmark. I handcoded the following
+bytecode functions for the stack based bytecode interpreter. The ~fib~ function
+takes a single parameter that is stored at index =0=. The ~add~ function takes 4
+arguments stored at index =0=, =1=, =2=, and =3=.
 
 #+BEGIN_SRC rust
 /// Register and return a recursive Fibonacci function.
@@ -345,7 +351,7 @@ Take the following example:
    added. There is no fetching of the data byte, just performing the addition to
    the top value of the stack.
 
-For a few common values, the optimized implementation may help. For fibonacci
+For a few common values, the optimized implementation may help. For =fibonacci=
 specifically, this can be more optimal when performing the =n - 2= and =n - 1=
 operations.
 
@@ -402,14 +408,14 @@ pub(crate) fn add_n_const_fn<const N: i64>(vm: &mut Vm, mut frame: StackFrame) -
 
 This adds two extra specializations. For the adder, ~triop_add_fn~ fuses two
 consecutive ~Binop::Add~ instructions into a single three-operand add. This one
-is rather simple compared to the fibonacci instruction...
+is rather simple compared to the =fibonacci= instruction...
 
-For fibonacci, ~jump_if_local0_lt2_fn~ performs a jump if register ~0~ is less
+For =fibonacci=, ~jump_if_local0_lt2_fn~ performs a jump if register ~0~ is less
 than ~2~. The =enum -> function= converter automatically detects these patterns
 and uses the specialized functions when appropriate.
 
-~jump_if_local0_lt2_fn~ alone handles the first 3 operations in each fibonacci
-call. This is significant as each fibonacci call executes 5 instructions for the
+~jump_if_local0_lt2_fn~ alone handles the first 3 operations in each =fibonacci=
+call. This is significant as each =fibonacci= call executes 5 instructions for the
 base case and 11 instructions for the recursive call case.
 
 #+BEGIN_SRC rust
@@ -452,18 +458,16 @@ pub(crate) fn jump_if_local0_lt2_fn(vm: &mut Vm, mut frame: StackFrame) -> Resul
 | Fn Ptr Hyper   |            0.0448 |       +2% |          6.2 |      -13% |
 #+TBLFM:
 
-#+BEGIN_SRC gnuplot :file results-add.svg :exports results
-set terminal svg size 600,300 background "#1e1e2e" font "Inter,13"
-set style data histogram
+#+BEGIN_SRC gnuplot :file results-add.svg :exports results :term svg size 600,300
 set style fill solid 0.8 border -1
 set boxwidth 0.6
 set yrange [0:0.07]
-set ylabel "microseconds" textcolor "#cdd6f4"
-set title "add(1+2, 3+4) benchmark" textcolor "#cdd6f4"
-set border lc rgb "#cdd6f4"
-set tics textcolor "#cdd6f4"
+set ylabel "microseconds"
+set title "add(1+2, 3+4) benchmark"
 set key off
 set xtics rotate by -20
+set style line 1 lc rgb '#a020f0'
+
 $data << EOD
 "Opcodes" 0.044
 "Fn Ptr" 0.0503
@@ -471,24 +475,23 @@ $data << EOD
 "Fn Ptr Spec" 0.0451
 "Fn Ptr Hyper" 0.0448
 EOD
-plot $data using 2:xtic(1) lc rgb "#89b4fa"
+
+plot $data using 0:2:xtic(1) with boxes ls 1
 #+END_SRC
 
 #+RESULTS:
 [[file:results-add.svg]]
 
-#+BEGIN_SRC gnuplot :file results-fib.svg :exports results
-set terminal svg size 600,300 background "#1e1e2e" font "Inter,13"
-set style data histogram
+
+#+BEGIN_SRC gnuplot :file results-fib.svg :exports results :term svg size 600,300
 set style fill solid 0.8 border -1
 set boxwidth 0.6
 set yrange [0:15]
-set ylabel "microseconds" textcolor "#cdd6f4"
-set title "fib(12) benchmark" textcolor "#cdd6f4"
-set border lc rgb "#cdd6f4"
-set tics textcolor "#cdd6f4"
+set ylabel "microseconds"
+set title "fib(12) benchmark"
 set key off
 set xtics rotate by -20
+set style line 1 lc rgb '#a020f0'
 $data << EOD
 "Opcodes" 7.2
 "Fn Ptr" 11.1
@@ -496,7 +499,8 @@ $data << EOD
 "Fn Ptr Spec" 8.8
 "Fn Ptr Hyper" 6.2
 EOD
-plot $data using 2:xtic(1) lc rgb "#89b4fa"
+
+plot $data using 2:xtic(1) with boxes ls 1
 #+END_SRC
 
 #+RESULTS:
@@ -507,36 +511,70 @@ plot $data using 2:xtic(1) lc rgb "#89b4fa"
 *** Function Pointer
 
 Function pointers are dramatically slower, but heavy specialization can beat
-enum dispatch. The simple adder function has =15%= higher run time with
-fibonacci having a =54%= penalty!
+enum dispatch. The simple adder function takes =15%= longer with =fibonacci=
+taking =54%= longer!
 
-The lazy fetching results are inconclusive — ~add~ improves slightly while ~fib~
-regresses slightly. The right tradeoff depends on the instruction mix of a real
-program.
+In the =Fn Ptr Slim=, instead of fetching =(next_function, databyte)=, we only
+fetch =next_function=. The function itself will have to manually get the
+databyte if needed. This one was better for =fibonacci=, but worse for
+=add=. This is somewhat expected and depends on the code. if the =databyte= is
+usually used, then prefetching it and storing it in the proper register is
+good. If not, then copying it around just adds to our overhead.
 
 *** Specialization
 
-Specialization greatly improves the cost of fibonacci while the adder is around
-the same level. Adding the silly ~jump_if_local0_lt2_fn~ greatly improves
-performance and makes fibonacci come out ahead. The adder benchmark only gets
-the ~triop_add_fn~ specialization which was a small win. We could probably do
-something better here to beat the original bytecode's performance.
+Specialization greatly improves the cost of =fibonacci= while the =add= is
+around the same level. As a refresher, specialization allowed us to replace some
+special instructions with more optimized versions. The main optimization is that
+the functions have constants built-in instead of relying on the value in the
+=databyte=.
 
-Note that if the interpreter evolves, the performance implications may
-change. As we add more complexity and branches, function pointers give the
-branch predictor a stable target per instruction type. A large =match= has a
-single indirect branch with many possible targets.
+#+CAPTION: The following special cases affected our benchmarks.
+#+BEGIN_SRC rust
+// Used in both fib and adder
+Instruction::LoadLocal(0) => (load_local_const_fn::<0> as InstructionFn, 0),
 
-Two microbenchmarks aren't enough to characterize a dispatch mechanism. Results
-may look very different with a more diverse or realistic workload.
+// Used only in fib
+Instruction::AddN(-2) => (add_n_const_fn::<-2> as InstructionFn, 0),
+Instruction::AddN(-1) => (add_n_const_fn::<-1> as InstructionFn, 0),
+Instruction::LessThan(2) => (less_than_const_fn::<2> as InstructionFn, 0),
+Instruction::EvalRecursive(1) => (eval_recursive_const_fn::<1> as InstructionFn, 0),
 
-** Clarity
+// Used only in adder
+Instruction::LoadLocal(1) => (load_local_const_fn::<1> as InstructionFn, 0),
+Instruction::LoadLocal(2) => (load_local_const_fn::<2> as InstructionFn, 0),
+Instruction::LoadLocal(3) => (load_local_const_fn::<3> as InstructionFn, 0),
+
+#+END_SRC
+
+
+For hyper specialization, I added the silly ~jump_if_local0_lt2_fn~ function
+which greatly improves performance for =fibonacci= and this pushes it ahead of
+the original instruction =enum= based implementation. The adder benchmark only
+gets the ~triop_add_fn~ specialization which was a tiny win; We could probably
+muck around with better specializations to optimize =add= further, but it's not
+a very good exercise.
+
+The takeaway here is that with the added flexibility, we can hack up some
+functions to improve our benchmark scores. Two microbenchmarks aren't enough to
+characterize a dispatch mechanism. Results may look very different with a more
+diverse or realistic workload.
+
+#+begin_quote
+*Note*: As the interpreter evolves, the performance implications may change. As
+we add more complexity and branches, function pointers give the branch predictor
+a stable target per instruction type. A large =match= has a single indirect
+branch with many possible targets.
+#+end_quote
+
+
+** Readability & Maintainability
 
 Despite being a bit slower, it was actually easier to add specialized
 instructions when using functions. ~jump_if_local0_lt2_fn~ was easy to patch in
-without increasing complexity too much. In addition to implementing the
-~jump_if_local0_lt2_fn~, here is the matching compiler optimization code within
-our compiler phase:
+without increasing complexity too much. To implement ~jump_if_local0_lt2_fn~ we
+had to implement the Rust function and the compiler optimziation pass. The pass
+that introduces the function is rather simple:
 
 #+BEGIN_SRC rust
 // Pattern: LoadLocal(0), LessThan(2), JumpIf(n) -> combined fast path + 2 nops.
@@ -567,8 +605,9 @@ if let (
 
 The next thing I want to try out is using the bare enum in Tiny Skia instead of
 the [[https://github.com/linebender/tiny-skia/blob/main/src/pipeline/highp.rs#L59][function table]]. Unlike a general interpreter, Tiny Skia runs a predetermined
-pipeline — the same sequence of operations applied repeatedly across batches of
-pixels.
+pipeline that is repeatedly applied across many pixels. This use case is much
+different than a general purpose interpreter so I'm not sure what the results
+will be.
 
 * Footnotes
 

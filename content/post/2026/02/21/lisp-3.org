@@ -95,8 +95,7 @@ variables. However, the ~Environment~ can also fallback to a parent
 digraph {
   graph [ dpi = 300 ];
   bgcolor=transparent;
-  node[shape=record, fontname=Inter, color=white, fontcolor=white];
-  edge[color=white];
+  node[shape=record, fontname=Sen];
   RequestVariable -> LocalEnvironment1 -> LocalEnvironment2 -> GlobalEnvironment;
   RequestVariable[shape=oval];
 }
@@ -189,8 +188,7 @@ environment.
 digraph {
     graph [ dpi = 300 ];
     bgcolor=transparent;
-    node[shape=record, fontname=Inter, color=white, fontcolor=white];
-    edge[color=white, fontcolor=white];
+    node[shape=record, fontname=Sen];
     GlobalEnvironment -> Env1[label=" child"];
     Env1 -> Env2[label=" child"];
     Env1[label="Environment: (lambda (x) ...)"];

@@ -113,6 +113,7 @@ scenario:
    definition.
 3. I use the "unused function". It's somehow broken.
 
+#+ATTR_HTML: :style max-width:64px;height:auto;
 [[file:shocked-pikachu-face.png]]
 
 Although annoying, this hasn't been a deal breaker. Perhaps future

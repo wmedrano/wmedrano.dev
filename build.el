@@ -24,7 +24,6 @@
 <link rel=\"icon\" type=\"image/svg+xml\" href=\"/favicon.svg\">
 <link rel=\"icon\" type=\"image/png\" href=\"/favicon.png\">
 <link rel=\"icon\" href=\"/favicon.ico\" sizes=\"any\">
-<link rel=\"stylesheet\" href=\"/css/htmlize-styles.css\">
 <link rel=\"stylesheet\" href=\"/css/styles.css\">
 "
  ;; When doing syntax highlighting, output as CSS classes instead of the default
