@@ -3,6 +3,9 @@
 #+author: Will S. Medrano
 
 * Introduction
+:PROPERTIES:
+:ID:       021a6bcc-7349-4267-a6dd-1f3169a286f7
+:END:
 
 I was working on the 2D rendering library [[https://github.com/linebender/tiny-skia][Tiny Skia]] and was surprised to find a
 little compiler and virtual machine for filling out a gradient. I was also
@@ -18,6 +21,9 @@ implementation was generally faster. See the [[id:89620a29-0426-4063-8f03-fa8a5c
 [[file:2pt-conical.svg]]
 
 ** Tiny Skia
+:PROPERTIES:
+:ID:       9b6fc685-08c5-4011-ba2d-5295c7ae91bc
+:END:
 
 Tiny Skia is a Rust library that handles 2D rendering on the CPU. It is fairly
 performant and powers [[https://github.com/linebender/resvg][resvg]], the svg to png converter library/binary.
@@ -47,8 +53,14 @@ fn transform(p: &mut Pipeline) {
 #+END_SRC
 
 ** Bytecode Interpreter? Function Pointers?
+:PROPERTIES:
+:ID:       8ca0d356-09ab-49f0-a695-0d2c95e16af5
+:END:
 
 *** Bytecode Interpreter
+:PROPERTIES:
+:ID:       758e9193-0daa-4aeb-babd-14ffb81deafb
+:END:
 
 A bytecode interpreter is a program that executes instructions encoded as
 compact binary data (bytecode). A bytecode interpreter defines its own virtual
@@ -82,6 +94,9 @@ impl Vm {
 #+END_SRC
 
 *** Example
+:PROPERTIES:
+:ID:       493c352a-38f1-4fbf-b1b7-590d3b50e18e
+:END:
 
 For example, computing ~1 + 2~ compiles to three instructions. Each step either
 pushes a value onto the stack or pops values and pushes a result:
@@ -94,6 +109,9 @@ pushes a value onto the stack or pops values and pushes a result:
 |    4 | Return      | []     |
 
 *** Performance Considerations
+:PROPERTIES:
+:ID:       567bfc52-eb44-4d66-9702-cee82a5eac91
+:END:
 
 The size of data structures is very important to an interpreter's
 performance. Smaller datastructures are preferred as:
@@ -113,6 +131,9 @@ function pointer approach is surprising: it uses a ~8 byte pointer~ instead of a
 more compact enum opcode.
 
 ** Function Pointers vs Enum Instruction
+:PROPERTIES:
+:ID:       f41c09ff-8142-454b-b298-ef2a2e448dde
+:END:
 
 Since we want to shrink the size of data, using a function pointer[fn:fnptr]
 instead of a more compact representation is interesting. Although it may induce
@@ -168,12 +189,18 @@ impl Vm {
 #+END_SRC
 
 * Setup & Benchmark
+:PROPERTIES:
+:ID:       2560761a-1987-4788-bcd3-f9335997e0f8
+:END:
 
 I built a simple bytecode interpreter to test how the performance of the
 function pointers approach is. Since it's just a toy, I made only the VM, no
 parser. The repository can be found on [[https://github.com/wmedrano/function-ptr-experiment/commits/main/][GitHub]].
 
 ** Hypothesis
+:PROPERTIES:
+:ID:       d73da4b1-a415-4ea3-b761-7f848285e7e0
+:END:
 
 Function pointers should be slower as:
 
@@ -188,6 +215,9 @@ Function pointers should be slower as:
   representations or add/remove code.
 
 ** Instructions
+:PROPERTIES:
+:ID:       bda813fb-9d3b-4d5f-a8e0-ae2430f5a9e6
+:END:
 
 The following instruction set seems powerful enough to test. Don't worry,
 despite looking small, instructions like ~Return~ and ~Eval~ have a lot of
@@ -212,6 +242,9 @@ complexity.
 | Dup          | u8        | Duplicate the top-of-stack value.                                                                                               |
 
 ** Benchmark
+:PROPERTIES:
+:ID:       04315c2b-4c75-4916-b969-ccfdf7654a3f
+:END:
 
 I used ~add(1+2, 3+4)~ and ~fib(12)~ as the benchmark. I handcoded the following
 bytecode functions for the stack based bytecode interpreter. The ~fib~ function
@@ -265,8 +298,14 @@ pub fn make_adder() -> Val {
 #+END_SRC
 
 ** Instruction Variants
+:PROPERTIES:
+:ID:       de4fce32-d163-418a-a1a9-26bcbe65c661
+:END:
 
 *** OpCodes: Enum Instructions
+:PROPERTIES:
+:ID:       45b0f924-9eaf-45f3-8929-52370077f6ea
+:END:
 
 With the simple op code based interpreter, the representation of a function is
 mostly the instructions. The VM iterates and jumps around the ~instructions~.
@@ -284,6 +323,9 @@ struct FuncInner {
 #+END_SRC
 
 *** Fn Ptr: Function pointer with data byte instruction
+:PROPERTIES:
+:ID:       dee86198-32e3-489d-8213-6797172a69c3
+:END:
 
 With function pointer, the ~Instruction~ enum is converted to a function and a
 data byte. The data byte provides extra context for the function. The data byte
@@ -311,6 +353,9 @@ pub(crate) fn load_int_fn(vm: &mut Vm, mut frame: StackFrame, data: u8) -> Resul
 #+END_SRC
 
 *** Fn Ptr Slim: Function pointer instruction
+:PROPERTIES:
+:ID:       d169555f-aba9-4045-95d6-db1d5191f401
+:END:
 
 This is similar to ~Fn Ptr~, but the data byte is not passed as a function
 argument. Instead, instructions that need it fetch it themselves by manually
@@ -340,6 +385,9 @@ pub(crate) fn load_int_fn(vm: &mut Vm, mut frame: StackFrame) -> Result<Val> {
 #+END_SRC
 
 *** Fn Ptr Spec: Specialization
+:PROPERTIES:
+:ID:       dc219e17-576e-4427-beff-94595cfb296b
+:END:
 
 This introduces more functions based on the instruction. It can be seen as
 inlining some of the instructions parameters. Take the following compilation
@@ -405,6 +453,9 @@ pub(crate) fn add_n_const_fn<const N: i64>(vm: &mut Vm, mut frame: StackFrame) -
 #+END_SRC
 
 *** Fn Ptr Hyper: Ridiculous level of specialization
+:PROPERTIES:
+:ID:       838a9737-afa4-4bf7-8e57-b4d75e0b1296
+:END:
 
 This adds two extra specializations. For the adder, ~triop_add_fn~ fuses two
 consecutive ~Binop::Add~ instructions into a single three-operand add. This one
@@ -507,8 +558,14 @@ plot $data using 2:xtic(1) with boxes ls 1
 [[file:results-fib.svg]]
 
 ** Performance
+:PROPERTIES:
+:ID:       a31f3c62-b932-4c36-ba23-c960d0059e30
+:END:
 
 *** Function Pointer
+:PROPERTIES:
+:ID:       fe798f01-1c56-49f3-808a-633496daef60
+:END:
 
 Function pointers are dramatically slower, but heavy specialization can beat
 enum dispatch. The simple adder function takes =15%= longer with =fibonacci=
@@ -522,6 +579,9 @@ usually used, then prefetching it and storing it in the proper register is
 good. If not, then copying it around just adds to our overhead.
 
 *** Specialization
+:PROPERTIES:
+:ID:       d6cfc478-1fd2-4b52-8f8e-d11416fe6bd7
+:END:
 
 Specialization greatly improves the cost of =fibonacci= while the =add= is
 around the same level. As a refresher, specialization allowed us to replace some
@@ -569,6 +629,9 @@ branch with many possible targets.
 
 
 ** Readability & Maintainability
+:PROPERTIES:
+:ID:       6f853762-53a2-47b4-bf74-b3f3ed1413cf
+:END:
 
 Despite being a bit slower, it was actually easier to add specialized
 instructions when using functions. ~jump_if_local0_lt2_fn~ was easy to patch in
@@ -602,6 +665,9 @@ if let (
 #+END_SRC
 
 ** Future Work
+:PROPERTIES:
+:ID:       62b4b71a-b318-4c67-b043-b5afef0519e1
+:END:
 
 The next thing I want to try out is using the bare enum in Tiny Skia instead of
 the [[https://github.com/linebender/tiny-skia/blob/main/src/pipeline/highp.rs#L59][function table]]. Unlike a general interpreter, Tiny Skia runs a predetermined
@@ -610,6 +676,9 @@ different than a general purpose interpreter so I'm not sure what the results
 will be.
 
 * Footnotes
+:PROPERTIES:
+:ID:       49b48ced-71e4-4d70-a32f-cde514b3ddc0
+:END:
 
 [fn:fnptr] In this post, "function" and "function pointer" are used
 interchangeably. In Rust, a function pointer (~fn(...) -> ...~) is a pointer to

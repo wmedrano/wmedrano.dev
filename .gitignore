@@ -3,7 +3,6 @@
 .sass-cache
 /.packages/
 _site
-deploy.sh
 public/
 target/
 vendor
