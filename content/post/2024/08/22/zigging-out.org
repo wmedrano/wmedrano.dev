@@ -1,6 +1,6 @@
 #+title: Zigging Out
 #+author: Will Medrano
-#+date: 2024-08-21
+#+date: 2024-08-22
 
 * Zigging Out
 

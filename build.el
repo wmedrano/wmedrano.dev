@@ -40,6 +40,9 @@
 </div>"
  ;; Set the home link to the homepage.
  org-html-link-home "/"
+ ;; Fix '_' and '^' behavior
+ org-use-sub-superscripts nil
+ org-export-with-sub-superscripts nil
  ;; The postamble shows up at the foot of the page.
  org-html-postamble t
  ;; We overwrite the default postamble to remove the broken "Validation" link.
