@@ -34,7 +34,7 @@ Tiny Skia compiles to a ~Context~ to store parameters and a sequence of simple
 enums is converted into a sequence of function pointers that run one after
 another.
 
-#+CAPTION: Implementation of the ~Transform~ step. It tweaks some registers and moves on to the next stage.
+#+CAPTION: Implementation of the Transform step. It tweaks some registers and moves on to the next stage.
 #+BEGIN_SRC rust
 fn transform(p: &mut Pipeline) {
     let ts = &p.ctx.transform;
@@ -658,7 +658,7 @@ if let (
 
     // The combined instruction sits at the LoadLocal(0) slot, so the jump offset
     // must be increased by 2 to reach the same target as the original JumpIf.
-    data.extend_from_slice(&[n.wrapping_add(2) as u8, 0, 0]);
+    data.extend_from_slice(&[n as u8 + 2, 0, 0]);
     i += 3;
     continue;
 }

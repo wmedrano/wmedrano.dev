@@ -63,7 +63,7 @@ th {
     font-size: 18px;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Baskervville";
+    font-family: "Baskervville", serif;
 }
 h1 { font-size: 36px; }
 h2 { font-size: 32px; }
@@ -80,14 +80,24 @@ label.org-src-name {
     font-size: 14px;
     color: #666666;
 }
+.post-date {
+    font-size: 14px;
+    color: #666666;
+}
+.figure p {
+    margin: 0 !important;
+    font-size: 14px;
+    color: #666666;
+}
+div.figure {
+    margin: 1.5rem 0;
+}
 code, pre {
-    font-family: "Fira Code";
+    font-family: "Fira Code", monospace;
     font-size: 14px;
+
 }
-code {
-    font-size: 14px;
-    border: 1px solid #e5e5e5;
-}
+code {border: 1px solid #e5e5e5;}
 div.org-src-container {
     margin: 1rem 0;
 }
@@ -113,33 +123,12 @@ div.footdef {
 #postamble > div:first-child { display: none; }
 #postamble p { margin: 0; }
 
-.org-comment {
-    color: #b22222;
-}
-.org-comment-delimiter {
-    color: #b22222;
-}
-.org-constant {
-    color: #008b8b;
-}
-.org-doc {
-    color: #8b2252;
-}
-.org-function-name {
-    color: #0000ff;
-}
-.org-keyword {
-    color: #a020f0;
-}
-.org-preprocessor {
-    color: #483d8b;
-}
-.org-string {
-    color: #8b2252;
-}
-.org-type {
-    color: #228b22;
-}
-.org-variable-name {
-    color: #a0522d;
-}
+
+.org-builtin, .org-preprocessor {color: #483d8b;}
+.org-comment, .org-comment-delimiter {color: #b22222;}
+.org-constant {color: #008b8b;}
+.org-doc, .org-string {color: #8b2252;}
+.org-function-name, .org-css-selector {color: #0000ff;}
+.org-keyword, .org-variable-name, .org-css-property {color: #a020f0;}
+.org-type {color: #228b22;}
+.org-variable-name {color: #a0522d;}
