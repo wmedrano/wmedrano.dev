@@ -2,18 +2,21 @@
 #+date: <2026-04-11 Sat>
 #+author: Will S. Medrano
 
+/(Reading time: 5-10 minutes)/
+
 * Introduction
 :PROPERTIES:
 :ID:       8441fc9d-1865-439c-95de-5de5833e41f0
 :END:
+
 
 I just completed my first full quarter on my new team[fn:startdate], the Google
 Fonts team. It went about as I expected; I learned a lot of stuff, but wish I
 had learned it all faster.
 
 So what does the Google Fonts team do? Quite a bit of random stuff here and
-there, some of it internal to Google, and some of it open source. It's easy to
-talk about the more open stuff than the internal.
+there, some of it internal to Google, and some of it open source. It's tricky to
+talk about the internal stuff, but I can comment on the open source efforts.
 
 ** Google Fonts
 :PROPERTIES:
@@ -34,11 +37,12 @@ you can embed the font files into your website.
 <link href="https://fonts.googleapis.com/css2?family=Baskervville:wght@700&family=Sen:wght@400..800&display=swap" rel="stylesheet">
 #+END_SRC
 
-The neat part about the Google Fonts API is thatit provides the font hosting. No
-need to download and serve the fonts. If you look at the generated CSS, you can
-see a few different technologies to better serve fonts.
+The neat part about Google Fonts is that the API takes care of the font
+hosting. No need to download and serve the fonts. If you look at the generated
+CSS, you can see how the serving is optimized compared to serving simple static
+files.
 
-#+CAPTION: Note the use of =woff2= and =unicode-range= to serve only the required glyphs. This page actually only needs the /latin/ range.
+#+CAPTION: Note the use of =woff2= and =unicode-range= to serve only the required glyphs. This blog post actually only needs the /latin/ range.
 #+BEGIN_SRC css
 /* latin-ext */
 @font-face {
@@ -79,9 +83,11 @@ see a few different technologies to better serve fonts.
 :ID:       346f6172-0f28-4b18-b41f-a27789e7c580
 :END:
 
-Google maintains and develops [[https://github.com/googlefonts/fontc][fontc]], a Rust-based compiler that takes font sources
-and converts them into ttf/otf files. It's a lot quicker than the previous Python
-font compiler, [[https://github.com/googlefonts/fontmake][fontmake]], which was also developed and maintained by Google.
+Google maintains and develops [[https://github.com/googlefonts/fontc][fontc]], a Rust-based compiler that takes font
+sources and converts them into the binary ttf and otf files. Font sources come
+in various formats, but usually boil down to definitions for outlines, kerning,
+metadata and more. It's a lot quicker than the previous Python font compiler,
+[[https://github.com/googlefonts/fontmake][fontmake]], which was also developed and maintained by Google.
 
 ** Fontations
 :PROPERTIES:
@@ -102,17 +108,25 @@ open source. Since it's open source, I can actually present some of the stuff
 I've done.
 
 ** Better Gradients for Resvg+TinySkia
+:PROPERTIES:
+:ID:       44143173-9bff-4337-8cf8-9a6edcad2636
+:END:
 
 *** Task
+:PROPERTIES:
+:ID:       bd821425-fc63-4e7c-9db2-e4211d5f6ae5
+:END:
 
-My starter project was to fix [[https://github.com/googlefonts/sleipnir][Sleipnir]] rendering of color fonts like
+My starter project was to fix [[https://github.com/googlefonts/sleipnir][Sleipnir]] rendering of color fonts like emojis and
 [[https://fonts.google.com/specimen/Nabla?query=nabla&preview.script=Latn][Nabla]]. Sleipnir is a Rust library that can render text and icons into png or
 svg.
 
 This one was quite a rabbit hole. The most important skill I picked up was
-understanding the font format. Fonts (ttf/otf files) are composed of tables. The
-tables define things such as contours, supported unicodes, ligatures, kerning,
-and lots of other stuff; it's a fairly extensible format.
+understanding the font format. Fonts (binary ttf/otf files) are composed of
+tables. The tables define things such as outline contours, supported unicodes,
+ligatures, kerning, and lots of other stuff; it's a fairly extensible
+format. Font's can make use any assortment of the spec to accomplish the
+goal. The spec is fairly complicated due to decades of legacy.
 
 To inspect the contents of a font, you can open it with the =ttx= command from
 [[https://github.com/fonttools/fonttools][fonttools]]. This produces an =xml= representation of the tables. To help me out,
@@ -120,12 +134,15 @@ I even made an Emacs package that adds the ability to open ttf, otf, and
 woff2[fn:woff2] font files. Check out [[https://github.com/wmedrano/ttx-mode][=ttx-mode=]] if interested.
 
 *** Detour
+:PROPERTIES:
+:ID:       6a3f92bf-8748-4d06-998e-c1cac7374ef7
+:END:
 
-It turns out that getting Nabla to work was not too complicated. However, the
-underlying 2D graphics library did not have the full expressiveness of Radial
-Gradients and was missing Sweep Gradients entirely. I originally was going to
-leave it as is, but my manager encouraged me to continue. So I ended up learning
-some math and implementing [[https://github.com/linebender/tiny-skia/pull/164][radial gradient]] and [[https://github.com/linebender/tiny-skia/pull/166][sweep gradients]].
+It turns out that getting Nabla to work was not too complicated. However,
+=tiny-skia=, the underlying 2D graphics library, did not have fully support
+Radial Gradients and was missing Sweep Gradients entirely. I originally was
+going to leave it as is, but my manager encouraged me to continue. So I ended up
+learning some math and implementing [[https://github.com/linebender/tiny-skia/pull/164][radial gradient]] and [[https://github.com/linebender/tiny-skia/pull/166][sweep gradients]].
 
 What's rewarding about this is that it affects a few other users. Once /typst/
 updates their dependencies, they should have better gradients ([[https://github.com/typst/typst/issues/7760][issues]]). I also
@@ -144,29 +161,34 @@ are pretty popular open source tools.
 :END:
 
 The main project I should be working on at the moment is landing IFT on the
-client. I said should since I've spent most of this quarter procrastinating and
-failing to comprehend specs. At least I've made a bit of progress.
+client. IFT is a font technology that reduces the size of fonts on the web. I
+said /should/ since I've spent most of this quarter procrastinating and failing
+to comprehend specs. At least I've made a bit of progress.
 
 IFT stands for Incremental Font Transfer. It is a font technology that
-theoretically enables more efficient transfer of fonts. One of my coworkers has
-been working on the spec and prototype for a while. He's done a great job at
-authoring the [[https://www.w3.org/TR/IFT/][W3 Spec]] for it.
+theoretically enables more efficient transfer of fonts. My coworker, Garret, has
+been working on the spec and prototype for a while. The spec can be seen on
+[[https://www.w3.org/TR/IFT/][W3.org]].
 
 IFT requires 2 components:
 
-1. A font must be IFT encoded. This splits the font into a base font and a
-   collection of patches.
+1. An IFT encoded font. This splits the font into a base font and a collection
+   of patches.
 2. Client support. Clients (web browsers) must be able to request and apply the
    patches as needed.
 
 #+BEGIN_SRC dot :file ift-encoder.svg :exports results
 digraph IFT {
   rankdir=LR;
-  node [fontname="sans-serif"; fontsize=12; shape=record;];
-  font [label="Font File"];
-  base [label="Base Font"];
-  patches [label="Patch 0|Patch 1|⋮|Patch N"];
-  encoder [label="IFT\nEncoder"];
+  bgcolor="transparent";
+  node [fontname="sans-serif", fontsize=12, style="filled", penwidth=1.2];
+  edge [color="#555", arrowsize=0.8];
+
+  font    [label="Font File", shape=note, fillcolor="#fff7e6", color="#b07a2b"];
+  encoder [label="IFT\nEncoder", shape=box, style="filled", fillcolor="#e6f0fb", color="#2b5a9b"];
+  base    [label="Base Font", shape=note, fillcolor="#fff7e6", color="#b07a2b"];
+  patches [label="Patch 0|Patch 1|⋮|Patch N", shape=record, fillcolor="#fff7e6", color="#b07a2b"];
+
   font -> encoder;
   encoder -> base;
   encoder -> patches;
@@ -181,19 +203,23 @@ digraph IFT {
 #+BEGIN_SRC dot :file ift-client.svg :exports results
 digraph IFTClient {
   rankdir=LR;
-  node [fontname="sans-serif"; fontsize=12; shape=record;];
+  bgcolor="transparent";
+  node [fontname="sans-serif", fontsize=12, style="filled", penwidth=1.2];
+  edge [color="#555", arrowsize=0.8];
 
-  webpage [label="Web Page"];
-  browser [label="Browser"];
+  webpage [label="Web Page", shape=note, fillcolor="#fff7e6", color="#b07a2b"];
+  browser [label="Browser", shape=box, style="filled", fillcolor="#e6f0fb", color="#2b5a9b"];
 
   subgraph cluster_cdn {
     label="CDN";
-    color=gray;
     fontname="sans-serif";
     fontsize=12;
+    style="filled";
+    bgcolor="#f9f9f9";
+    color="#bbb";
 
-    basefont [label="Base Font"];
-    patches [label="Patches"];
+    basefont [label="Base Font", shape=note, fillcolor="#fff7e6", color="#b07a2b"];
+    patches  [label="Patches",   shape=note, fillcolor="#fff7e6", color="#b07a2b"];
   }
 
   webpage -> browser;
@@ -209,48 +235,52 @@ digraph IFTClient {
 
 So why is it useful to split up a font? This is all to reduce download sizes and
 make things load quickly and more consistently. When using a font, a web page
-may not need all the glyphs (characters) or styles (italic/bold/underline).
+may not need all the glyphs (characters) or styles (italic/bold).
 
 *** Actual Deliverables
 :PROPERTIES:
 :ID:       0894041b-86cb-4551-818e-95c382fee073
 :END:
 
-Well, I've been really procrastinating on this since it's rather
-intimidating. I've read some spec, IFT code, and Chromium code, but that's not
-really a deliverable[fn:ift-progress].
+Well, I've been really procrastinating on IFT since it's rather
+intimidating. I've read some spec, encoding code, decoding code, and Chromium
+code, but that's not really a deliverable[fn:ift-progress].
 
-However, at the end of the quarter I managed to squeeze in =fonttools= support
-([[https://github.com/fonttools/fonttools/pull/4072][PR]]). This allows us to inspect the =IFT= table with the very useful =ttx=
-tool[fn:ttx]. This is useful for debugging the feature as =IFT= contains all the
-metadata for defining the available patches.
+However, I kind of lied about not having any deliverables. At the end of the
+quarter I managed to squeeze in =IFT= support ([[https://github.com/fonttools/fonttools/pull/4072][PR]]) into =ttx=. This will allow
+us to inspect the =IFT= table as human readable =XML=. This is useful for
+inspecting the patch definitions while we debug quirks of our new =IFT=
+implementation.
 
 *** Next
 :PROPERTIES:
 :ID:       ac6005e1-8823-4c19-be1e-b92839a10764
 :END:
 
-My Q2 goal is to have working IFT support in the browser. This means understanding
-the Chromium code, implementing the feature, and shipping it behind a flag.
+My Q2 goal is to have working IFT support in the browser. This means
+understanding the Chromium code, implementing the feature, and shipping it
+behind an experimental flag.
 
 ** An Appreciation for Typeface
+:PROPERTIES:
+:ID:       3136f878-0e28-4bac-a78e-368b9db7fb4e
+:END:
 
-#+CAPTION: It's a typeface Steve.
-#+ATTR_HTML: :style width:50%;margin:auto;
+#+ATTR_HTML: :style width:50%;margin:auto; :alt Tuxedo Winnie the Pooh meme: regular Pooh labeled "font", fancy tuxedo Pooh labeled "typeface".
 [[./pooh.jpg]]
 
 I've also gained an appreciation for typeface[fn:typeface]. I've liked tweaking
 around the monospace font I use after I started programming. Here's where I've
 landed for now:
 
-| Context | Purpose     | Typeface     | Designer                         |
-|---------+-------------+--------------+----------------------------------|
-| OS      | Interface   | [[https://indestructibletype.com/Jost.html][Jost*]]        | [[https://indestructibletype.com/BuyJost.html][indestructible type*]] (Owen Earl) |
-| OS      | Body Text   | [[https://rsms.me/inter/][Inter]]        | [[https://rsms.me/inter/download/][rsms]]  (Rasmus)                   |
-| OS      | Terminal    | [[http://levien.com/type/myfonts/inconsolata.html][Inconsolata]]  | [[https://github.com/raphlinus][raphlinus]] ([[https://tug.org/tc/devfund/][TUG]] for funding)      |
-| OS/Blog | Code        | [[https://github.com/tonsky/FiraCode][Fira Code]]    | [[https://carrois.com/studio/][Carrois Type Design]] & [[https://github.com/tonsky][tonsky]]     |
-| Blog    | Blog Header | [[https://anrt-nancy.fr/en/fonts/baskervville][Baskervville]] | [[https://anrt-nancy.fr/en][ANRT]] ([[https://www.rosaliewagner.com/][Rosalie Wagner]] & [[https://ko-fi.com/rosaliewagner][ko-fi]])    |
-| Blog    | Body Text   | [[https://philatype.com/sen][Sen]]          | [[https://philatype.com/][PHILATYPE]] (Kosal Sen)            |
+| Context | Purpose   | Typeface     | Designer                         |
+|---------+-----------+--------------+----------------------------------|
+| OS      | Interface | [[https://indestructibletype.com/Jost.html][Jost*]]        | [[https://indestructibletype.com/BuyJost.html][indestructible type*]] (Owen Earl) |
+| OS      | Body      | [[https://rsms.me/inter/][Inter]]        | [[https://rsms.me/inter/download/][rsms]] (Rasmus)                    |
+| OS      | Terminal  | [[http://levien.com/type/myfonts/inconsolata.html][Inconsolata]]  | [[https://github.com/raphlinus][raphlinus]] ([[https://tug.org/tc/devfund/][TUG]] for funding)      |
+| OS/Blog | Code      | [[https://github.com/tonsky/FiraCode][Fira Code]]    | [[https://carrois.com/studio/][Carrois Type Design]] & [[https://github.com/tonsky][tonsky]]     |
+| Blog    | Header    | [[https://anrt-nancy.fr/en/fonts/baskervville][Baskervville]] | [[https://anrt-nancy.fr/en][ANRT]] ([[https://www.rosaliewagner.com/][Rosalie Wagner]], on [[https://ko-fi.com/rosaliewagner][ko-fi]])  |
+| Blog    | Body      | [[https://philatype.com/sen][Sen]]          | [[https://philatype.com/][PHILATYPE]] (Kosal Sen)            |
 
 * Footnotes
 :PROPERTIES:
@@ -265,9 +295,6 @@ days.
 
 [fn:ift-progress] At the time this was written, my grasp is a lot better. That's
 a relief, but it would be a 2026Q2 update!
-
-[fn:ttx] You know, the thing I talked about earlier. The font file to xml
-converter.
 
 [fn:typeface] Typeface is the design, for example, the Helvetica typeface. The
 font is the digital representation manifested into bytes.
