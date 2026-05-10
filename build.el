@@ -13,6 +13,7 @@
 (package-install 'htmlize)
 (package-install 'zig-mode)
 (package-install 'rust-mode)
+(package-install 'markdown-mode)
 
 (require 'ox-publish)
 

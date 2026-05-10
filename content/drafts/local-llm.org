@@ -1,0 +1,117 @@
+#+title: Local LLM
+#+date: <2026-05-10 Sat>
+#+author: Will S. Medrano
+
+/(Reading time: TODO)/
+
+* Tests
+
+I tested 4 local models and 2 cloud models with Ollama.
+
+| Model          | Category | Description                                                                    |
+|----------------+----------+--------------------------------------------------------------------------------|
+| Kimi K2.6      | Cloud    | An open weight MoE model with 1 trillion parameters and 32b active parameters. |
+| Gemini 3 Flash | Cloud    | Google's fast model.                                                           |
+| Qwen3.6 27b    | Local    | A 27b dense model.                                                             |
+| Qwen3.6 35b    | Local    | A 35b MoE model with 3b active parameters.                                     |
+| Gemma4 26b     | Local    | A 26b MoE model with 4b active parameters.                                     |
+
+For the tests, I did a short conversation about `podman`. All the answers seemed
+generally correct. This first test is just a quick one to get a feel. In real
+performance, I expect the prompt/input to be longer as smaller models need more
+context. Larger models can be used as a "Google" of sorts, but smaller models
+should aim to provide good reasoning given good context since less knowledge can
+fit.
+
+** Prompt
+
+The test is a conversation with 3 prompts. The initial prompt starts with a
+system like prompt to "Respond concisely" and asks for a list of podman
+containers. The next prompt then asks for how to get the volumes. The final
+prompt is more complex and asks to perform a backup and restore on a volume.
+
+#+CAPTION: A system prompt and basic command.
+#+BEGIN_SRC md
+Respond concisely and with code snippets: List all podman containers
+#+END_SRC
+
+#+CAPTION: A follow up command.
+#+BEGIN_SRC markdown
+List all podman volumes
+#+END_SRC
+
+#+CAPTION: Something a little more complex and specific.
+#+BEGIN_SRC markdown
+```sh
+podman volume ls
+DRIVER      VOLUME NAME
+local       forgejo-data
+```
+
+1. Back up the `forgejo-data` volume.
+2. How can this volume be restored later?
+#+END_SRC
+
+** Response Quality
+
+All responses were adequate. Since the Qwen models are small, they can't pack as
+much information in. However, for `podman` all models did well. The final step
+used a little bit of reasoning and models provided similar solutions. However,
+Gemini 3 Flash may have known a little bit extra and it used the volume import
+and export functionality.
+
+** Speed
+
+*** Turn 1
+
+| Model          | Total Duration | Prompt Eval Count | Eval Count |
+|----------------+----------------+-------------------+------------|
+| Kimi K2.6      | 3.6s           | 21 tokens         | 147 tokens |
+| Gemini 3 Flash | 2.2s           | 13 tokens         | 296 tokens |
+| Qwen3.6 27b    | 24s            | 24 tokens         | 273 tokens |
+| Qwen3.6 35b    | 9.3s           | 24 tokens         | 384 tokens |
+| Gemma4 31b     | 11.2s          | 28 tokens         | 114 tokens |
+| Gemma4 26b     | 3.8s           | 28 tokens         | 176 tokens |
+
+| Model       | Prompt Rate | Eval Rate |
+|-------------+-------------+-----------|
+| Qwen3.6 27b | 103.5 t/s   | 11.2 t/s  |
+| Qwen3.6 35b | 197.1 t/s   | 43.2 t/s  |
+| Gemma4 31b  | 277.9 t/s   | 10.5 t/s  |
+| Gemma4 26b  | 283.9       | 51.8 t/s  |
+
+*** Turn 2
+
+| Model          | Total Duration | Prompt Eval Count | Eval Count |
+|----------------+----------------+-------------------+------------|
+| Kimi K2.6      | 6.1s           | 91 tokens         | 124 tokens |
+| Gemini 3 Flash | 1.6s           | 102 tokens        | 145 tokens |
+| Qwen3.6 27b    | 40s            | 63 tokens         | 441 tokens |
+| Qwen3.6 35b    | 6.9s           | 69 tokens         | 279 tokens |
+| Gemma4 31b     | 5.7s           | 82 tokens         | 55 tokens  |
+| Gemma4 26b     | 2.1s           | 82 tokens         | 92 tokens  |
+
+| Model       | Prompt Rate | Eval Rate |
+|-------------+-------------+-----------|
+| Qwen3.6 27b | 225.46 t/s  | 11.0 t/s  |
+| Qwen3.6 35b | 338.7 t/s   | 42.9 t/s  |
+| Gemma4 31b  | 277 t/s     | 10.6 t/s  |
+| Gemma4 26b  | 813.4 t/s   | 52.2 t/s  |
+
+*** Turn 3
+
+| Model        | Total Duration | Prompt Eval Count | Eval Count  |
+|--------------+----------------+-------------------+-------------|
+| Kimi K2.6    | 29.1s          | 181 tokens        | 1655 tokens |
+| Gemini Flash | 4.7s           | 215 tokens        | 914 tokens  |
+| Qwen3.6 27b  | 208.5s         | 128 tokens        | 2256 tokens |
+| Qwen3.6 35b  | 46.5           | 153 tokens        | 1949 tokens |
+| Gemma4 31b   | 65.1s          | 147 tokens        | 649 tokens  |
+| Gemma4 26b   | 18.0s          | 155 tokens        | 870 tokens  |
+
+| Model       | Prompt Rate | Eval Rate |
+|-------------+-------------+-----------|
+| Qwen3.6 27b | 256.7 t/s   | 10.9 t/s  |
+| Qwen3.6 35b | 542.0 t/s   | 42.7 t/s  |
+| Gemma4 31b  | 443.3 t/s   | 10.1 t/s  |
+| Gemma4 26b  | 1272.0 t/s  | 49.7 t/s  |
