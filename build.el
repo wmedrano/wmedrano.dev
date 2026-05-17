@@ -25,10 +25,11 @@
 <link rel=\"icon\" type=\"image/svg+xml\" href=\"/favicon.svg\">
 <link rel=\"icon\" type=\"image/png\" href=\"/favicon.png\">
 <link rel=\"icon\" href=\"/favicon.ico\" sizes=\"any\">
+
 <link rel=\"stylesheet\" href=\"/css/styles.css\">
 <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">
 <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>
-<link href=\"https://fonts.googleapis.com/css2?family=Baskervville:wght@700&family=Fira+Code:wght@300..700&family=Sen:wght@400..800&display=swap\" rel=\"stylesheet\">
+<link href=\"https://fonts.googleapis.com/css2?family=Baskervville:wght@700&family=Jost:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap\" rel=\"stylesheet\">
 "
  ;; When doing syntax highlighting, output as CSS classes instead of the default
  ;; inline CSS. The color theme is defined in ./content/css/htmlize-styles.css. To get
