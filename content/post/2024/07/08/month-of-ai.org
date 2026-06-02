@@ -23,16 +23,14 @@ contest platform. I even skimmed the top placement’s creative
 solutions. It was fun and all, but it was mostly the end of my machine
 learning explorations.
 
-Round 2: Over the years I didn’t use much machine learning. If
-anything, I’ve been looking on how to reduce technological
-distractions around me. When GitHub Copilot came out for technical
-preview around Mid 2021, I signed up immediately. My expectations were
-low, but I was impressed by the technology and curious to see how well
-it would do. As expected, I was impressed with GitHub Copilot’s
-technical achievement. As a tool though, I found the code generation
-somewhat distracting (expected), but it was great and generating
-docstrings on all my public ~structs~ and ~functions~, an unexpected
-surprise.
+Round 2: Over the years I didn’t use much machine learning. If anything, I’ve
+been looking on how to reduce technological distractions around me. When GitHub
+Copilot came out for technical preview around Mid 2021, I signed up
+immediately. My expectations were low, but I was impressed by the technology and
+curious to see how well it would do. As expected, I was impressed with GitHub
+Copilot’s technical achievement. As a tool though, I found the code generation
+somewhat distracting (expected), but it was great at generating docstrings on
+all my public ~structs~ and ~functions~, an unexpected surprise.
 
 ** Round 3: What I Did
 

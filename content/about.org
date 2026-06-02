@@ -4,13 +4,18 @@
 
 I'm me.
 
+A software engineer at Google on the Fonts team, where I work on font
+infrastructure and rendering in Rust. Before that, I spent nearly a decade
+wrangling big data on Search Analytics. Outside of work, I maintain a few Rust
+audio crates and tinker with programming language implementations.
+
 ** Professional Work
 
 *** Fonts @ Google
 
 November 2025 - Present
 
-I'll be working on fonts. I'm a fonts guy now.
+I've been working on fonts. I'm a fonts guy now.
 
 *** Gigantic Data, Huge @ Google
 
@@ -48,6 +53,6 @@ performance.
 * Contact
 
 #+ATTR_HTML: :style width:auto;
-| @@html:<img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" style="width:16px; height:16px; vertical-align: middle;">@@ | [[https://github.com/wmedrano][wmedrano]] |
-| @@html:<img src="https://joinmastodon.org/logos/logo-purple.svg" style="width:16px; height:16px; vertical-align: middle;">@@ | [[https://fosstodon.org/@wmedrano][@wmedrano]] |
-| 📧 | will at wmedrano.dev |
+| @@html:<img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" style="width:16px; height:16px; vertical-align: middle;">@@ | [[https://github.com/wmedrano][wmedrano]]             |
+| @@html:<img src="https://joinmastodon.org/logos/logo-purple.svg" style="width:16px; height:16px; vertical-align: middle;">@@                      | [[https://fosstodon.org/@wmedrano][@wmedrano]]            |
+| 📧                                                                                                                                                | will at wmedrano.dev |

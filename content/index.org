@@ -7,9 +7,9 @@
 
 [[file:post/2026/03/31/function-ptrs.org][Functional Dispatch]] @@html:<span class="post-date">2026-03-31</span>@@
 
-[[file:post/2026/02/21/lisp-3.org][Building a Lisp Interpreter (with Rust) Part 3]] @@html:<span class="post-date">2026-02-21</span>@@
+[[file:post/2026/02/21/lisp-3.org][Building a Lisp Interpreter (in Rust) Part 3]] @@html:<span class="post-date">2026-02-21</span>@@
 
-[[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (with Rust) Part 2]] @@html:<span class="post-date">2026-01-25</span>@@
+[[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (in Rust) Part 2]] @@html:<span class="post-date">2026-01-25</span>@@
 
 
 * Archive
@@ -18,7 +18,7 @@
 
 [[file:post/2026/03/31/function-ptrs.org][Functional Dispatch]] @@html:<span class="post-date">2026-03-31</span>@@
 
-[[file:post/2024/12/18/new-years-resolution-evaluation-reading.org][New Years Resolution Evaluation - Reading]] @@html:<span class="post-date">2024-12-18</span>@@
+[[file:post/2024/12/18/new-years-resolution-evaluation-reading.org][New Year's Resolution Evaluation - Reading]] @@html:<span class="post-date">2024-12-18</span>@@
 
 [[file:post/2024/08/22/zigging-out.org][Zigging Out]] @@html:<span class="post-date">2024-08-22</span>@@
 
@@ -34,8 +34,8 @@
 
 ** Tutorials
 
-[[file:post/2025/11/15/lisp-1.org][Building a Lisp Interpreter (with Rust) Part 1]] @@html:<span class="post-date">2025-11-15</span>@@
+[[file:post/2025/11/15/lisp-1.org][Building a Lisp Interpreter (in Rust) Part 1 - Parsing S-expressions]] @@html:<span class="post-date">2025-11-15</span>@@
 
-[[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (with Rust) Part 2]] @@html:<span class="post-date">2026-01-25</span>@@
+[[file:post/2026/01/25/lisp-2.org][Building a Lisp Interpreter (in Rust) Part 2 - Eval, variables, and if]] @@html:<span class="post-date">2026-01-25</span>@@
 
-[[file:post/2026/02/21/lisp-3.org][Building a Lisp Interpreter (with Rust) Part 3]] @@html:<span class="post-date">2026-02-21</span>@@
+[[file:post/2026/02/21/lisp-3.org][Building a Lisp Interpreter (in Rust) Part 3 - Lambdas and closures]] @@html:<span class="post-date">2026-02-21</span>@@

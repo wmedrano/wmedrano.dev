@@ -1,4 +1,4 @@
-#+title: New Years Resolution Evaluation - Reading
+#+title: New Year's Resolution Evaluation - Reading
 #+author: Will Medrano
 #+date: 2024-12-18
 
@@ -106,7 +106,8 @@ stolen way too much attention.
 So how did I do? I did pretty well in the past 2 months. Although I should've
 put more effort at the start of the year, I did read a lot and it was
 enjoyable. Next year I will focus on my Piano skills, but will probably continue
-to read[fn:post-blog-readings] and combat the urge to burn time on form content.
+to read[fn:post-blog-readings] and combat the urge to burn time on shortform
+content.
 
 [fn:favorite-documentation] Some of my favorite documentation includes [[https://www.gnu.org/software/guile/manual/html_node/][The Guile Reference
 Manual]] and [[https://wiki.libsdl.org/SDL3/FrontPage][SDL Wiki]].
