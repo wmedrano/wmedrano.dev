@@ -8,18 +8,16 @@
 
 *** Rust Background
 
-As a Rust developer, I've had it. I've designed my last type system,
-hacked around my last borrow/ownership issue and will claim back some
-CPU cycles. Hyperbole aside, I've been developing with Rust since
-early 2016 and have mostly enjoyed it. The type system and ownership
-model has been good for my development as a programmer. It has made me
-aware of many common memory issues and race conditions. Prior to this,
-I was used to debugging segfaults and invalidated objects in C++ and
-sometimes Go. In the beginning, Rust lacked lots of library and had an
-ecosystem that was easily eclipsed by the more mature
-languages. However, at this point, I consider it to have one of the
-most polished ecosystem in certain niches. Some of my favorite
-libraries include:
+As a Rust developer, I've had it. I've designed my last type system, hacked
+around my last borrow/ownership issue and will claim back some CPU
+cycles. Hyperbole aside, I've been developing with Rust since early 2016 and
+have mostly enjoyed it. The type system and ownership model has been good for my
+development as a programmer. It has made me aware of many common memory issues
+and race conditions. Prior to this, I was used to debugging segfaults and
+invalidated objects in C++ and sometimes Go. In the beginning, Rust lacked
+library support and had an ecosystem that was easily eclipsed by the more mature
+languages. However, at this point, I consider it to have one of the most
+polished ecosystem in certain niches. Some of my favorite libraries include:
 
 - [[https://ratatui.rs/][https://ratatui.rs/]] - TUI library.
 - [[https://rapier.rs/][https://rapier.rs/]] - Physics engine.
@@ -27,8 +25,8 @@ libraries include:
   library built in C, but has a great Rust API.
 
 Despite how good Rust is, I'm reaching for a new low level programming
-language. The main reason for this is to try something new, but there
-are some things about Rust I'm happy to take a break from like:
+language. The main reason for this is to try something new, but there are some
+things about Rust I'm happy to take a break from like:
 
 - Large refactors. Rust's rigid type system (where lifetime is part of
   the type) often necessitates more rewrites than other programming
@@ -39,11 +37,10 @@ are some things about Rust I'm happy to take a break from like:
 
 *** Why Zig
 
-This is arbitrary. I've heard of Zig. I've listened to some random
-talks. The creator, Andrew Kelley seems like an enthusiastic guy. I
-was able to ~sudo dnf install zig~ and things worked without much
-friction. This is a great recipe to get started. For some real
-reasons, here are some things I like about Zig:
+This is arbitrary. I've heard of Zig. I've listened to some random talks. The
+creator, Andrew Kelley seems like an enthusiastic guy. I was able to ~sudo dnf
+install zig~ and things worked without much friction. This is a great recipe to
+get started. For some real reasons, here are some things I like about Zig:
 
 - Good C interop story. If there's something that I don't want to
   write, I can probably reach for a C library.
@@ -71,14 +68,14 @@ compiling. The following still compiles!
 const Struct = struct {
     x: i64 = 0,
     pub fn badFunction(self: *Struct) void {
-        return self.y;
+        return self.y; // self does not have `y`.
     }
 };
 
 pub fn main() void {
     const s = Struct{};
     if (false) {
-        s.functionThatDoesNotExist();
+        s.functionThatDoesNotExist(); // Function is not defined
     }
 }
 #+END_SRC

@@ -291,7 +291,7 @@ When parsing the next token, the options are:
      that our interpreter will use to bind variables and function names.
 3. When a closing parenthesis is encountered, then its an ~ReadItem::EndExpr~. In a
    normal context this is syntax error.
-4. An opening parenthesis is encounterd, then we recursively call
+4. An opening parenthesis is encountered, then we recursively call
    ~read_next_impl~ until a ~ReadItem::EndExpr~ is encountered.
 
 #+BEGIN_SRC rust

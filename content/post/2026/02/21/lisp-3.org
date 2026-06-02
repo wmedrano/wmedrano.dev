@@ -87,7 +87,7 @@ through a call to ~eval~. Within a lambda call, the arguments are part of the
 environment. However, so is the parent global environment. In the case of nested
 lambda, a lambda's lambda parent can also be in scope.
 
-To do this, we will create a new ~Environment~ to store are arguments and local
+To do this, we will create a new ~Environment~ to store our arguments and local
 variables. However, the ~Environment~ can also fallback to a parent
 ~Environment~ to retrieve variables.
 

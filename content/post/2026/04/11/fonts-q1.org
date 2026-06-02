@@ -125,7 +125,7 @@ This one was quite a rabbit hole. The most important skill I picked up was
 understanding the font format. Fonts (binary ttf/otf files) are composed of
 tables. The tables define things such as outline contours, supported unicodes,
 ligatures, kerning, and lots of other stuff; it's a fairly extensible
-format. Font's can make use any assortment of the spec to accomplish the
+format. Font's can make use of any assortment of the spec to accomplish the
 goal. The spec is fairly complicated due to decades of legacy.
 
 To inspect the contents of a font, you can open it with the =ttx= command from

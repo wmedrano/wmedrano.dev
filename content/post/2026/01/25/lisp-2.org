@@ -76,7 +76,7 @@ x ;; 12
 
 * Data structures
 
-We defined a basic datastructure in [[file:../../../2025/11/15/lisp-1.org][Lisp 1]]. Before continuing, they need a
+We defined a basic data structure in [[file:../../../2025/11/15/lisp-1.org][Lisp 1]]. Before continuing, they need a
 little more refinement. We want to support:
 
 1. Functions - To be defined in native Rust at the moment.

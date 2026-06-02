@@ -636,7 +636,7 @@ branch with many possible targets.
 Despite being a bit slower, it was actually easier to add specialized
 instructions when using functions. ~jump_if_local0_lt2_fn~ was easy to patch in
 without increasing complexity too much. To implement ~jump_if_local0_lt2_fn~ we
-had to implement the Rust function and the compiler optimziation pass. The pass
+had to implement the Rust function and the compiler optimization pass. The pass
 that introduces the function is rather simple:
 
 #+BEGIN_SRC rust

@@ -5,10 +5,10 @@
 * Introduction
 
 GitHub and GitLab are code hosting platforms. After using both, I prefer to keep
-my solo developments needs on GitHub due to GitHub's larger community and faster
+my solo development needs on GitHub due to GitHub's larger community and faster
 page loads.
 
-* Basics 
+* Basics
 
 Although GitLab also sells itself as a DevOps platform, both GitLab and GitHub
 essentially have the same functionality. This is especially true for a
@@ -32,7 +32,7 @@ that GitLab takes ~2.5s~ to display code, while GitHub does so in ~1.0s~.
 Really, speed is the make or break feature for my usage. The latency GitLab
 introduces is enough time for me to get distracted. This is especially
 bothersome for the moments where I’m locked in and highly productive. Although
-I’m very sensitive to latency, others may not mind. 
+I’m very sensitive to latency, others may not mind.
 
 ** Community
 
@@ -43,7 +43,7 @@ happen. It’s even better when someone contributes back a feature or two.
 
 GitHub’s community eclipses GitLab. Anecdotally, I’ve noticed most projects I
 use tend to be on GitHub. In terms of contributions, GitHub projects seem to be
-more lively as well. 
+more lively as well.
 
 *** Library Engagement Caveats
 
@@ -52,7 +52,7 @@ GitLab. Libraries tend to attract at least a few users so it may be worth it for
 me to experiment by developing some libraries on GitLab to get a better sense of
 engagement. Unfortunately, my main job eats a lot of my time and energy leaving
 very little for my side projects. Despite this, it does feel like the libraries
-I find on GitHub tend to have more contributors than the ones on GitLab. 
+I find on GitHub tend to have more contributors than the ones on GitLab.
 
 *** CI
 
@@ -72,7 +72,7 @@ lack of reusable actions, GitLab does have better artifacts support. Artifacts
 are files that are produced by the CI. These can include anything like the
 binary build, intermediate data, or, very nicely formatted HTML reports. In
 GitLab, I enjoyed setting up several reports. My CI would build and test and
-produce several neat artifacts like 
+produce several neat artifacts like
 
 - Code coverage report highlighting all lines that executed during the tests,
   bringing attention to those that had no coverage.
