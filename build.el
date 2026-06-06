@@ -66,6 +66,11 @@
                      :publishing-directory "./public"
                      :publishing-function 'org-html-publish-to-html))
       ;; Define recipe for exporting static assets.
+      ;; Publish files that must live at the domain root (verification, robots, sitemap, etc.).
+      (meta (list "site meta"
+                   :base-directory "./meta"
+                   :publishing-directory "./public"
+                   :publishing-function 'org-publish-attachment))
       (images (list "wmedrano dot dev images"
                     :recursive t
                     :base-directory "./content"
@@ -73,7 +78,7 @@
                     :publishing-directory "./public"
                     :publishing-function 'org-publish-attachment)))
   (setq-local org-publish-project-alist
-              (list website images))
+              (list website meta images))
   (org-publish-all t))
 
 (provide 'build)

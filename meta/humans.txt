@@ -1,0 +1,9 @@
+/* TEAM */
+Name: Will Medrano
+Site: wmedrano.dev
+
+/* SITE */
+Built with: Org-mode, Emacs
+
+/* THANKS */
+Emacs, Org-mode
