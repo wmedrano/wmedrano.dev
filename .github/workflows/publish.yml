@@ -34,7 +34,7 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Build with Emacs
         run: |
-          sh ./build.sh
+          sh tools/build.sh
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
