@@ -46,6 +46,7 @@ a:visited {
     }
 }
 table {
+    font-family: Sen, sans-serif;
     margin: 1rem auto;
     border-collapse: collapse;
     font-size: 1rem;
