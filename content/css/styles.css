@@ -31,7 +31,9 @@ a {
 a:visited {
     color: #8b008b;
 }
-
+body {
+    background: "#F0F4F8";
+}
 .content {
     margin: 0 auto;
     padding: 0 4px;
