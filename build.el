@@ -20,7 +20,7 @@
 ;; Set options for exporting Org to HTML.
 (setq
  ;; Do not use the built-in org mode html styling. Instead, import the custom
- ;; stylesheet defined at ./content/css/styles.css.
+ ;; stylesheet defined at ./static/css/styles.css.
  org-html-style-default "
 <link rel=\"icon\" type=\"image/svg+xml\" href=\"/favicon.svg\">
 <link rel=\"icon\" type=\"image/png\" href=\"/favicon.png\">
@@ -32,7 +32,7 @@
 <link href=\"https://fonts.googleapis.com/css2?family=Baskervville:wght@700&family=Jost:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Sen:wght@400..800&display=swap\" rel=\"stylesheet\">
 "
  ;; When doing syntax highlighting, output as CSS classes instead of the default
- ;; inline CSS. The color theme is defined in ./content/css/htmlize-styles.css. To get
+ ;; inline CSS. The color theme is defined in ./static/css/styles.css. To get
  ;; the CSS for the current theme, `(org-html-htmlize-generate-css)'.
  org-html-htmlize-output-type 'css
  ;; HTML shows home and up buttons at the top. We overwrite the default with our
@@ -65,20 +65,22 @@
                      :base-directory "./content"
                      :publishing-directory "./public"
                      :publishing-function 'org-html-publish-to-html))
-      ;; Define recipe for exporting static assets.
-      ;; Publish files that must live at the domain root (verification, robots, sitemap, etc.).
-      (meta (list "site meta"
-                   :base-directory "./meta"
-                   :publishing-directory "./public"
-                   :publishing-function 'org-publish-attachment))
+      ;; Publish files served verbatim from the site root (favicons,
+      ;; verification, robots, css, etc.).
+      (static (list "site static"
+                    :recursive t
+                    :base-directory "./static"
+                    :base-extension 'any
+                    :publishing-directory "./public"
+                    :publishing-function 'org-publish-attachment))
       (images (list "wmedrano dot dev images"
                     :recursive t
                     :base-directory "./content"
-                    :base-extension "png\\|jpg\\|svg\\|ico\\|css\\|woff2\\|ogg"
+                    :base-extension "png\\|jpg\\|svg\\|ico\\|ogg"
                     :publishing-directory "./public"
                     :publishing-function 'org-publish-attachment)))
   (setq-local org-publish-project-alist
-              (list website meta images))
+              (list website static images))
   (org-publish-all t))
 
 (provide 'build)
