@@ -18,7 +18,7 @@
 .navbar a:last-child {
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: #444;
   text-decoration: none;
   padding: 6px 14px;
   letter-spacing: 0.02em;
@@ -26,13 +26,13 @@
 
 a {
     text-decoration: none;
-    color: #3a5fcd;
+    color: #cb6e10;
 }
 a:visited {
-    color: #8b008b;
+    color: #28728b;
 }
 body {
-    background: "#F0F4F8";
+    background: #f6f8f9;
 }
 .content {
     margin: 0 auto;
@@ -52,6 +52,7 @@ table {
     margin: 1rem auto;
     border-collapse: collapse;
     font-size: 1rem;
+    background: #fafafa;
     border: 1px solid #ccc;
     display: block;
     overflow-x: auto;
@@ -64,7 +65,7 @@ th, td {
     text-align: left;
 }
 th {
-    background-color: #fff;
+    background-color: #f0eef6;
     font-weight: bold;
 }
 
@@ -73,6 +74,7 @@ th {
 }
 h1, h2, h3, h4, h5, h6 {
     font-family: "Baskervville", serif;
+    color: #3e225a;
 }
 h1 { font-size: 36px; }
 h2 { font-size: 32px; }
@@ -83,7 +85,8 @@ h6 { font-size: 16px; }
 img {
     display: block;
     width: 100%;
-    border: 1px solid #eee;
+    background: #fafafa;
+    border: 1px solid #ccc;
 }
 label.org-src-name {
     font-size: 14px;
@@ -113,7 +116,8 @@ div.org-src-container {
 }
 .src {
     overflow-x: auto;
-    border: 1px solid #eee;
+    background: #fafafa;
+    border: 1px solid #ccc;
     padding: 6px;
     margin: 0;
 }
@@ -134,11 +138,9 @@ div.footdef {
 #postamble p { margin: 0; }
 
 
-.org-builtin, .org-preprocessor {color: #483d8b;}
-.org-comment, .org-comment-delimiter {color: #b22222;}
-.org-constant {color: #008b8b;}
-.org-doc, .org-string {color: #8b2252;}
-.org-function-name, .org-css-selector {color: #0000ff; }
-.org-keyword, .org-variable-name, .org-css-property {color: #a020f0;}
-.org-type {color: #228b22;}
-.org-variable-name {color: #a0522d;}
+.org-comment, .org-comment-delimiter {color: #5c7e8a;}
+.org-keyword, .org-builtin, .org-preprocessor {color: #3e225a;}
+.org-function-name, .org-css-selector {color: #28728b;}
+.org-type, .org-constant {color: #28728b;}
+.org-variable-name, .org-css-property {color: #cb6e10;}
+.org-doc, .org-string {color: #cb6e10;}

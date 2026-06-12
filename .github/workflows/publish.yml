@@ -2,7 +2,7 @@ name: publish_site
 
 on:
   push:
-    branchs: ['main']
+    branches: ['main']
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub

@@ -510,14 +510,17 @@ pub(crate) fn jump_if_local0_lt2_fn(vm: &mut Vm, mut frame: StackFrame) -> Resul
 #+TBLFM:
 
 #+BEGIN_SRC gnuplot :file results-add.svg :exports results :term svg size 600,300
-set style fill solid 0.8 border -1
+# Site palette: warm accent #cb6e21, cool accent #28728b, heading #663894.
+set style fill solid 0.85 border rgb '#222'
 set boxwidth 0.6
 set yrange [0:0.07]
-set ylabel "microseconds"
-set title "add(1+2, 3+4) benchmark"
+set ylabel "microseconds" textcolor rgb '#222'
+set title "add(1+2, 3+4) benchmark" textcolor rgb '#222'
 set key off
-set xtics rotate by -20
-set style line 1 lc rgb '#a020f0'
+set xtics rotate by -20 textcolor rgb '#222'
+set ytics textcolor rgb '#222'
+set border 11 lw 1.5 lc rgb '#444'
+set style line 1 lc rgb '#7e22d3'
 
 $data << EOD
 "Opcodes" 0.044
@@ -535,14 +538,17 @@ plot $data using 0:2:xtic(1) with boxes ls 1
 
 
 #+BEGIN_SRC gnuplot :file results-fib.svg :exports results :term svg size 600,300
-set style fill solid 0.8 border -1
+# Site palette: warm accent #cb6e21, cool accent #28728b, heading #663894.
+set style fill solid 0.85 border rgb '#222'
 set boxwidth 0.6
 set yrange [0:15]
-set ylabel "microseconds"
-set title "fib(12) benchmark"
+set ylabel "microseconds" textcolor rgb '#222'
+set title "fib(12) benchmark" textcolor rgb '#222'
 set key off
-set xtics rotate by -20
-set style line 1 lc rgb '#a020f0'
+set xtics rotate by -20 textcolor rgb '#222'
+set ytics textcolor rgb '#222'
+set border 11 lw 1.5 lc rgb '#444'
+set style line 1 lc rgb '#7e22d3'
 $data << EOD
 "Opcodes" 7.2
 "Fn Ptr" 11.1

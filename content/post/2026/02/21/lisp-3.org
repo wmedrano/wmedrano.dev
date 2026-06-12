@@ -91,19 +91,22 @@ To do this, we will create a new ~Environment~ to store our arguments and local
 variables. However, the ~Environment~ can also fallback to a parent
 ~Environment~ to retrieve variables.
 
-#+BEGIN_SRC dot :file env.png :exports results
+#+BEGIN_SRC dot :file env.svg :exports results
 digraph {
-  graph [ dpi = 300 ];
-  bgcolor=transparent;
-  node[shape=record, fontname=Sen];
+  graph [ bgcolor=transparent, fontname="sans-serif" ];
+  node [ shape=box, style=filled, fontcolor="#222", margin="0.2,0.1" ];
+  edge [ color="#444", penwidth=1.2, fontcolor="#444" ];
   RequestVariable -> LocalEnvironment1 -> LocalEnvironment2 -> GlobalEnvironment;
-  RequestVariable[shape=oval];
+  RequestVariable [ fillcolor="#f0c3a0", label="Request variable" ];
+  LocalEnvironment1 [ fillcolor="#9b5bd4", label="Local Environment" ];
+  LocalEnvironment2 [ fillcolor="#9b5bd4", label="Local Environment" ];
+  GlobalEnvironment [ fillcolor="#9b5bd4", label="Global Environment" ];
 }
 #+END_SRC
 
 #+ATTR_HTML: :style width:40%
 #+RESULTS:
-[[file:env.png]]
+[[file:env.svg]]
 
 * Implementation
 
@@ -184,21 +187,22 @@ The inner ~(lambda (y) (+ x y))~ refers to the variable ~x~ which, is defined in
 its parent ~Environment~. When we create a lambda, we will capture the current
 environment.
 
-#+BEGIN_SRC dot :file env2.png :exports results
+#+BEGIN_SRC dot :file env2.svg :exports results
 digraph {
-    graph [ dpi = 300 ];
-    bgcolor=transparent;
-    node[shape=record, fontname=Sen];
-    GlobalEnvironment -> Env1[label=" child"];
-    Env1 -> Env2[label=" child"];
-    Env1[label="Environment: (lambda (x) ...)"];
-    Env2[label="Environment: (lambda (y) ...)"];
+    graph [ bgcolor=transparent, fontname="sans-serif" ];
+    node [ shape=box, style=filled, fontcolor="#222", margin="0.2,0.1" ];
+    edge [ color="#444", penwidth=1.2, fontcolor="#444" ];
+    GlobalEnvironment -> Env1 [label=" child"];
+    Env1 -> Env2 [label=" child"];
+    GlobalEnvironment [ fillcolor="#9b5bd4", label="Global Environment" ];
+    Env1 [ fillcolor="#9b5bd4", label="Environment: (lambda (x) ...)" ];
+    Env2 [ fillcolor="#9b5bd4", label="Environment: (lambda (y) ...)" ];
 }
 #+END_SRC
 
 #+ATTR_HTML: :style width:40%
 #+RESULTS:
-[[file:env2.png]]
+[[file:env2.svg]]
 
 This makes our final ~Val~ and ~Lambda~ values be:
 
