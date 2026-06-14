@@ -1,16 +1,18 @@
 .navbar {
-  font-family: 'Jost', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1.1rem 2rem;
-  border-bottom: 0.5px solid #eee;
+  border-bottom: 0.5px solid #f3f0f7;
+  margin: 0 auto;
+  max-width: 800px;
 }
 
 .navbar a:first-child {
   font-size: 22px;
   font-weight: 800;
-  color: inherit;
+  color: #522184;
   text-decoration: none;
   letter-spacing: -0.5px;
 }
@@ -26,29 +28,30 @@
 
 a {
     text-decoration: none;
-    color: #cb6e10;
-}
-a:visited {
     color: #28728b;
 }
+a:visited {
+    color: #cb6e10;
+}
 body {
-    background: #f6f8f9;
+    background: #fafbfc;
 }
 .content {
     margin: 0 auto;
-    padding: 0 4px;
-    font-family: Jost, sans-serif;
+    max-width: 800px;
+    padding: 0 1rem;
+    font-family: "Crimson Pro", serif;
     font-size: 18px;
     color: #222;
     line-height: 1.5;
 }
 @media (min-width: 800px) {
     .content {
-        max-width: 640px;
+        padding: 0 2rem;
     }
 }
 table {
-    font-family: Sen, sans-serif;
+    font-family: "Crimson Pro", serif;
     margin: 1rem auto;
     border-collapse: collapse;
     font-size: 1rem;
@@ -73,11 +76,12 @@ th {
     font-size: 18px;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: "Baskervville", serif;
-    color: #3e225a;
+    font-family: "DM Sans", sans-serif;
+    color: #522184;
 }
 h1 { font-size: 36px; }
 h2 { font-size: 32px; }
+h3, h4, h5, h6 { margin-bottom: 0; }
 h3 { font-size: 28px; }
 h4 { font-size: 24px; }
 h5 { font-size: 20px; }
@@ -91,6 +95,9 @@ img {
 label.org-src-name {
     font-size: 14px;
     color: #444;
+}
+label.org-src-name code {
+    font-size: 11px;
 }
 .post-date {
     font-size: 14px;
@@ -106,7 +113,7 @@ div.figure {
 }
 code, pre {
     font-family: "Roboto Mono", monospace;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.1;
 
 }

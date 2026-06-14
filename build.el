@@ -61,7 +61,7 @@
 <link rel=\"stylesheet\" href=\"/css/styles.css\">
 <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">
 <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>
-<link href=\"https://fonts.googleapis.com/css2?family=Baskervville:wght@700&family=Jost:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Sen:wght@400..800&display=swap\" rel=\"stylesheet\">
+<link href=\"https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Roboto+Mono:wght@100..700&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&display=swap\" rel=\"stylesheet\">
 "
  ;; When doing syntax highlighting, output as CSS classes instead of the default
  ;; inline CSS. The color theme is defined in ./static/css/styles.css. To get
