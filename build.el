@@ -17,6 +17,38 @@
 
 (require 'ox-publish)
 
+(defvar wm-content-dir (expand-file-name "./content"))
+
+(defun wm-org-html-canonical-url (input-file)
+  "Return the canonical URL for INPUT-FILE relative to `wm-content-dir'."
+  (let* ((rel (if (and input-file (string-prefix-p wm-content-dir input-file))
+                  (substring input-file (length wm-content-dir))
+                (file-relative-name (or input-file "") wm-content-dir)))
+         (path (replace-regexp-in-string "^/" "" rel)))
+    (concat "https://wmedrano.dev/"
+            (cond
+             ((string-match "\\(?:^\\|/\\)index\\.org$" path)
+              (let ((dir (substring path 0 (match-beginning 0))))
+                (if (equal dir "") "" (concat dir "/"))))
+             (t (file-name-sans-extension path))))))
+
+(defun wm-org-html-canonical-link (text backend info)
+  (when (eq backend 'html)
+    (let ((url (wm-org-html-canonical-url (plist-get info :input-file))))
+      (replace-regexp-in-string "</head>"
+                                (format "<link rel=\"canonical\" href=\"%s\">\n</head>" url)
+                                text))))
+(add-to-list 'org-export-filter-final-output-functions
+             'wm-org-html-canonical-link)
+
+(defun wm-strip-html-extension (text backend _info)
+  "Strip .html extension from internal links in HTML output."
+  (when (eq backend 'html)
+    (unless (string-match-p "href=\"https?://" text)
+      (replace-regexp-in-string "\\.html\\([#\"]\\)" "\\1" text))))
+(add-to-list 'org-export-filter-link-functions
+             'wm-strip-html-extension)
+
 ;; Set options for exporting Org to HTML.
 (setq
  ;; Do not use the built-in org mode html styling. Instead, import the custom
@@ -41,7 +73,7 @@
 <div class=\"navbar\" id=\"org-div-home-and-up\">
  <!--Ignore %s-->
  <a accesskey=\"H\" href=\"%s\">wmedrano dot dev</a>
- <a href=\"/about.html\">About</a>
+  <a href=\"/about\">About</a>
 </div>"
  ;; Set the home link to the homepage.
  org-html-link-home "/"
