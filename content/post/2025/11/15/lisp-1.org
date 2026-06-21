@@ -2,27 +2,31 @@
 #+date: 2025-11-15
 #+author: Will S. Medrano
 
-* Why Lisp
+This is Part 1 (Parsing) of a 3-part series.
+Reading: [[file:../../../2026/01/25/lisp-2.org][Part 2 (Evaluation)]] | [[file:../../../2026/02/21/lisp-3.org][Part 3 (Lambdas)]]
 
-Implementing a compiler or interpreter may seem like a daunting task, but a Lisp
-interpreter is an easy starting point.
+* Part 1: Parsing
 
-To write Lisp code, you write down the Lisp data structure itself. Evaluating a
-Lisp program involves two steps:
+** Why Lisp
+
+Implementing a compiler or interpreter may seem like a daunting task, but a
+Lisp's simplicity makes it an easy starting point.
+
+Evaluating a Lisp program boils down to two steps:
 
 1. ~read~ - Read the text into a Lisp data structure.
 2. ~eval~ - Evaluate that structure according to Lisp’s simple rules.
 
 #+BEGIN_SRC scheme
-12 ;; An integer, 12
-#true ;; A boolean
+12 ;; An integer, 12. (eval (read "12"))    => 12
+#true ;; A boolean    (eval (read "#true")) => #true
 
 ;; A list containing the identifier +,
 ;; and the integers 1 and 2.  This
 ;; expression specifically invokes the +
 ;; function with arguments 1 and 2.  The
 ;; result of evaluating this list is 3.
-(+ 1 2)
+(+ 1 2) ;;            (eval (read "(+ 1 2)"))     => 3
 #+END_SRC
 
 * Goal
@@ -39,7 +43,8 @@ implementation, check out the [[https://r7rs.org/][Scheme R7RS specification]].
 * Representing Lisp Data
 
 Lisp is dynamically typed, like JavaScript or Python. Dynamic typing means that
-the type of a variable is determined at runtime. The type may also change.
+the type of a variable is determined at runtime. The type may also change. In
+the following example, observe how the type of ~x~ freely changes.
 
 #+BEGIN_SRC scheme
 (define x 100) ;; x is an integer

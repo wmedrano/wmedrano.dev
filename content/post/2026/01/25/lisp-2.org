@@ -2,6 +2,9 @@
 #+date: 2026-01-25
 #+author: Will S. Medrano
 
+This is Part 2 (Evaluation) of a 3-part series.
+Reading: [[file:../../../2025/11/15/lisp-1.org][Part 1 (Parsing)]] | [[file:../../../2026/02/21/lisp-3.org][Part 3 (Lambdas)]]
+
 * Introduction
 
 This is part 2 of 3 of the ~Building a Lisp Interpreter (in Rust)~ series. In
@@ -599,7 +602,7 @@ fn eval_define(args: &[Val], env: &mut Environment) -> Result<Val, Error> {
 * Conclusion
 
 With function evaluation, ~if~ and ~define~, we can now write some non-trivial
-programs. In the next part, we'll add user-defined functions with ~lambda~.
+programs. In [[file:../../02/21/lisp-3.org][Part 3]], we'll add user-defined functions with ~lambda~.
 
 Preview:
 

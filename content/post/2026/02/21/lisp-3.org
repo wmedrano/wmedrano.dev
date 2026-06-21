@@ -2,6 +2,9 @@
 #+date: 2026-02-21
 #+author: Will S. Medrano
 
+This is Part 3 (Lambdas) of a 3-part series.
+Reading: [[file:../../../2025/11/15/lisp-1.org][Part 1 (Parsing)]] | [[file:../../../2026/01/25/lisp-2.org][Part 2 (Evaluation)]]
+
 * Introduction
 
 This is the third and final part of the ~Building a Lisp Interpreter (in Rust)~
