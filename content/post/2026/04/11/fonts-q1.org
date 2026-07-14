@@ -180,14 +180,14 @@ IFT requires 2 components:
 #+BEGIN_SRC dot :file ift-encoder.svg :exports results
 digraph IFT {
   rankdir=LR;
-  bgcolor="transparent";
+  bgcolor="#f4f2ef";
   node [fontname="sans-serif", fontsize=12, style="filled", penwidth=1.2];
-  edge [color="#555", arrowsize=0.8];
+  edge [color="#a0a1a7", arrowsize=0.8];
 
-  font    [label="Font File", shape=note, fillcolor="#fff7e6", color="#b07a2b"];
-  encoder [label="IFT\nEncoder", shape=box, style="filled", fillcolor="#e6f0fb", color="#2b5a9b"];
-  base    [label="Base Font", shape=note, fillcolor="#fff7e6", color="#b07a2b"];
-  patches [label="Patch 0|Patch 1|⋮|Patch N", shape=record, fillcolor="#fff7e6", color="#b07a2b"];
+  font    [label="Font File", shape=note, fillcolor="#fafafa", color="#c18401"];
+  encoder [label="IFT\nEncoder", shape=box, style="filled", fillcolor="#f3f0f7", color="#4078f2"];
+  base    [label="Base Font", shape=note, fillcolor="#fafafa", color="#c18401"];
+  patches [label="Patch 0|Patch 1|⋮|Patch N", shape=record, fillcolor="#fafafa", color="#c18401"];
 
   font -> encoder;
   encoder -> base;
@@ -203,23 +203,23 @@ digraph IFT {
 #+BEGIN_SRC dot :file ift-client.svg :exports results
 digraph IFTClient {
   rankdir=LR;
-  bgcolor="transparent";
+  bgcolor="#f4f2ef";
   node [fontname="sans-serif", fontsize=12, style="filled", penwidth=1.2];
-  edge [color="#555", arrowsize=0.8];
+  edge [color="#a0a1a7", arrowsize=0.8];
 
-  webpage [label="Web Page", shape=note, fillcolor="#fff7e6", color="#b07a2b"];
-  browser [label="Browser", shape=box, style="filled", fillcolor="#e6f0fb", color="#2b5a9b"];
+  webpage [label="Web Page", shape=note, fillcolor="#fafafa", color="#c18401"];
+  browser [label="Browser", shape=box, style="filled", fillcolor="#f3f0f7", color="#4078f2"];
 
   subgraph cluster_cdn {
     label="CDN";
     fontname="sans-serif";
     fontsize=12;
     style="filled";
-    bgcolor="#f9f9f9";
-    color="#bbb";
+    bgcolor="#f4f2ef";
+    color="#e0dcd5";
 
-    basefont [label="Base Font", shape=note, fillcolor="#fff7e6", color="#b07a2b"];
-    patches  [label="Patches",   shape=note, fillcolor="#fff7e6", color="#b07a2b"];
+    basefont [label="Base Font", shape=note, fillcolor="#fafafa", color="#c18401"];
+    patches  [label="Patches",   shape=note, fillcolor="#fafafa", color="#c18401"];
   }
 
   webpage -> browser;

@@ -30,7 +30,7 @@
              ((string-match "\\(?:^\\|/\\)index\\.org$" path)
               (let ((dir (substring path 0 (match-beginning 0))))
                 (if (equal dir "") "" (concat dir "/"))))
-             (t (file-name-sans-extension path))))))
+             (t (concat (file-name-sans-extension path) ".html"))))))
 
 (defun wm-org-html-canonical-link (text backend info)
   (when (eq backend 'html)
@@ -45,7 +45,7 @@
   "Strip .html extension from internal links in HTML output."
   (when (eq backend 'html)
     (unless (string-match-p "href=\"https?://" text)
-      (replace-regexp-in-string "\\.html\\([#\"]\\)" "\\1" text))))
+      (replace-regexp-in-string "/index\\.html\\([#\"]\\)" "/\\1" text))))
 (add-to-list 'org-export-filter-link-functions
              'wm-strip-html-extension)
 
@@ -61,7 +61,7 @@
 <link rel=\"stylesheet\" href=\"/css/styles.css\">
 <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">
 <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>
-<link href=\"https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Roboto+Mono:wght@100..700&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&display=swap\" rel=\"stylesheet\">
+ <link href=\"https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap\" rel=\"stylesheet\">
 "
  ;; When doing syntax highlighting, output as CSS classes instead of the default
  ;; inline CSS. The color theme is defined in ./static/css/styles.css. To get

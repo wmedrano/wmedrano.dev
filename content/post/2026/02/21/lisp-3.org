@@ -97,17 +97,17 @@ variables. However, the ~Environment~ can also fallback to a parent
 #+BEGIN_SRC dot :file env.svg :exports results
 digraph {
   graph [ bgcolor=transparent, fontname="sans-serif" ];
-  node [ shape=box, style=filled, fontcolor="#222", margin="0.2,0.1" ];
-  edge [ color="#444", penwidth=1.2, fontcolor="#444" ];
+  node [ shape=box, style=filled, fontcolor="#333", margin="0.2,0.1", penwidth=1.5 ];
+  edge [ color="#a0a1a7", penwidth=1.2, fontcolor="#a0a1a7" ];
   RequestVariable -> LocalEnvironment1 -> LocalEnvironment2 -> GlobalEnvironment;
-  RequestVariable [ fillcolor="#f0c3a0", label="Request variable" ];
-  LocalEnvironment1 [ fillcolor="#9b5bd4", label="Local Environment" ];
-  LocalEnvironment2 [ fillcolor="#9b5bd4", label="Local Environment" ];
-  GlobalEnvironment [ fillcolor="#9b5bd4", label="Global Environment" ];
+  RequestVariable [ fillcolor="#febdb2", color="#e45649", label="Request variable" ];
+  LocalEnvironment1 [ fillcolor="#c1c6fb", color="#4078f2", label="Local Environment" ];
+  LocalEnvironment2 [ fillcolor="#c1c6fb", color="#4078f2", label="Local Environment" ];
+  GlobalEnvironment [ fillcolor="#c1c6fb", color="#4078f2", label="Global Environment" ];
 }
 #+END_SRC
 
-#+ATTR_HTML: :style width:40%
+#+ATTR_HTML: :style width:30%
 #+RESULTS:
 [[file:env.svg]]
 
@@ -193,13 +193,13 @@ environment.
 #+BEGIN_SRC dot :file env2.svg :exports results
 digraph {
     graph [ bgcolor=transparent, fontname="sans-serif" ];
-    node [ shape=box, style=filled, fontcolor="#222", margin="0.2,0.1" ];
-    edge [ color="#444", penwidth=1.2, fontcolor="#444" ];
+    node [ shape=box, style=filled, fontcolor="#333", margin="0.2,0.1", penwidth=1.5 ];
+    edge [ color="#a0a1a7", penwidth=1.2, fontcolor="#a0a1a7" ];
     GlobalEnvironment -> Env1 [label=" child"];
     Env1 -> Env2 [label=" child"];
-    GlobalEnvironment [ fillcolor="#9b5bd4", label="Global Environment" ];
-    Env1 [ fillcolor="#9b5bd4", label="Environment: (lambda (x) ...)" ];
-    Env2 [ fillcolor="#9b5bd4", label="Environment: (lambda (y) ...)" ];
+    GlobalEnvironment [ fillcolor="#c1c6fb", color="#4078f2", label="Global Environment" ];
+    Env1 [ fillcolor="#c1c6fb", color="#4078f2", label="Environment: (lambda (x) ...)" ];
+    Env2 [ fillcolor="#c1c6fb", color="#4078f2", label="Environment: (lambda (y) ...)" ];
 }
 #+END_SRC
 

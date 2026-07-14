@@ -7,12 +7,19 @@
   border-bottom: 0.5px solid #f3f0f7;
   margin: 0 auto;
   max-width: 800px;
+  color: #5b4a8a;
+}
+
+.navbar a {
+  color: #5b4a8a;
+}
+.navbar a:hover {
+  color: #3d2d6e;
 }
 
 .navbar a:first-child {
   font-size: 22px;
   font-weight: 800;
-  color: #522184;
   text-decoration: none;
   letter-spacing: -0.5px;
 }
@@ -20,55 +27,59 @@
 .navbar a:last-child {
   font-size: 14px;
   font-weight: 500;
-  color: #444;
   text-decoration: none;
   padding: 6px 14px;
   letter-spacing: 0.02em;
 }
 
 a {
+    color: #4078f2;
     text-decoration: none;
-    color: #28728b;
+    transition: color 0.15s ease;
 }
-a:visited {
-    color: #cb6e10;
+a:hover {
+    color: #2666d6;
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 body {
-    background: #fafbfc;
+    background: #f4f2ef;
 }
 .content {
     margin: 0 auto;
     max-width: 800px;
     padding: 0 1rem;
-    font-family: "Crimson Pro", serif;
+    font-family: "DM Sans", sans-serif;
     font-size: 18px;
-    color: #222;
     line-height: 1.5;
+    color: #2d2d2d;
 }
 @media (min-width: 800px) {
     .content {
         padding: 0 2rem;
     }
 }
+table, img, .src {
+    background: #fafafa;
+}
 table {
-    font-family: "Crimson Pro", serif;
+    font-family: "Sen", sans-serif;
     margin: 1rem auto;
     border-collapse: collapse;
     font-size: 1rem;
-    background: #fafafa;
-    border: 1px solid #ccc;
+    border: 1px solid #e0dcd5;
     display: block;
     overflow-x: auto;
     width: max-content;
     max-width: 100%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 th, td {
     padding: 0.5em 1em;
-    border: 1px solid #ccc;
+    border: 1px solid #e0dcd5;
     text-align: left;
 }
 th {
-    background-color: #f0eef6;
     font-weight: bold;
 }
 
@@ -77,7 +88,7 @@ th {
 }
 h1, h2, h3, h4, h5, h6 {
     font-family: "DM Sans", sans-serif;
-    color: #522184;
+    color: #5b4a8a;
 }
 h1 { font-size: 36px; }
 h2 { font-size: 32px; }
@@ -85,48 +96,47 @@ h3, h4, h5, h6 { margin-bottom: 0; }
 h3 { font-size: 28px; }
 h4 { font-size: 24px; }
 h5 { font-size: 20px; }
-h6 { font-size: 16px; }
+h6 { font-size: 18px; }
 img {
     display: block;
     width: 100%;
-    background: #fafafa;
-    border: 1px solid #ccc;
+    border: 1px solid #e0dcd5;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 label.org-src-name {
-    font-size: 14px;
-    color: #444;
+    font-size: 16px;
 }
 label.org-src-name code {
-    font-size: 11px;
+    font-size: 14px;
 }
 .post-date {
     font-size: 14px;
-    color: #444;
 }
 .figure p {
     margin: 0 !important;
     font-size: 14px;
-    color: #444;
 }
 div.figure {
     margin: 1.5rem 0;
 }
 code, pre {
-    font-family: "Roboto Mono", monospace;
-    font-size: 12px;
+    font-family: "DM Mono", monospace;
+    font-size: 14px;
     line-height: 1.1;
 
 }
-code {border: 1px solid #aaa;}
+code {border: 1px solid #e0dcd5; background: #f0ede6; border-radius: 3px; padding: 1px 4px;}
 div.org-src-container {
     margin: 1rem 0;
 }
 .src {
     overflow-x: auto;
-    background: #fafafa;
-    border: 1px solid #ccc;
+    border: 1px solid #e0dcd5;
+    border-radius: 6px;
     padding: 6px;
     margin: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 div.footdef {
     margin: 1rem 0;
@@ -137,17 +147,50 @@ div.footdef {
 #postamble {
   border-top: 1px solid #333;
   padding-top: 0.5rem;
-  font-size: 13px;
+  font-size: 10px;
   opacity: 0.5;
 }
 
 #postamble > div:first-child { display: none; }
 #postamble p { margin: 0; }
 
-
-.org-comment, .org-comment-delimiter {color: #5c7e8a;}
-.org-keyword, .org-builtin, .org-preprocessor {color: #3e225a;}
-.org-function-name, .org-css-selector {color: #28728b;}
-.org-type, .org-constant {color: #28728b;}
-.org-variable-name, .org-css-property {color: #cb6e10;}
-.org-doc, .org-string {color: #cb6e10;}
+/* Atom One Light syntax highlighting */
+.org-keyword,
+.org-preprocessor {
+  color: #a626a4;
+}
+.org-builtin,
+.org-function-name {
+  color: #4078f2;
+}
+.org-type {
+  color: #c18401;
+}
+.org-variable-name,
+.org-css-property,
+.org-negation-char,
+.org-rust-question-mark {
+  color: #e45649;
+}
+.org-constant,
+.org-markdown-inline-code {
+  color: #986801;
+}
+.org-string {
+  color: #50a14f;
+}
+.org-comment,
+.org-comment-delimiter,
+.org-doc,
+.org-markdown-markup {
+  color: #a0a1a7;
+}
+.org-comment-delimiter {
+  font-style: italic;
+}
+.org-markdown-language-keyword {
+  color: #a626a4;
+}
+.org-markdown-list {
+  color: #4078f2;
+}
