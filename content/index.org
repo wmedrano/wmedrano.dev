@@ -3,6 +3,8 @@
 
 * Recent
 
+[[file:post/2026/07/17/fonts-q2.org][Fonts Q2]] @@html:<span class="post-date">2026-07-17</span>@@
+
 [[file:post/2026/04/11/fonts-q1.org][Fonts Q1]] @@html:<span class="post-date">2026-04-11</span>@@
 
 [[file:post/2026/03/31/function-ptrs.org][Functional Dispatch]] @@html:<span class="post-date">2026-03-31</span>@@
@@ -27,6 +29,8 @@
 [[file:post/2024/05/13/github-gitlab.org][GitHub or GitLab for Hobby Projects]] @@html:<span class="post-date">2024-05-13</span>@@
 
 ** Retrospectives
+
+[[file:post/2026/07/17/fonts-q2.org][Fonts Q2]] @@html:<span class="post-date">2026-07-17</span>@@
 
 [[file:post/2026/04/11/fonts-q1.org][Fonts Q1]] @@html:<span class="post-date">2026-04-11</span>@@
 

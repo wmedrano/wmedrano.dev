@@ -1,0 +1,146 @@
+#+title: Fonts Q2
+#+date: <2026-07-17 Fri>
+#+author: Will S. Medrano
+
+/(Reading time: 5 minutes)/
+
+* Introduction
+:PROPERTIES:
+:ID:       3777f68d-93d3-4880-884a-f9b6ecd7fcf0
+:END:
+
+I just completed my second full quarter on my new team. I wrote about my first
+quarter at [[file:../../04/11/fonts-q1.org][Fonts Q1]]. As a short recap, I joined the Google Fonts team in
+November 2025. This will probably be my last quarterly update as quarterly
+updates aren't very interesting. Quarterly reflections are useful to me, but as
+pieces of writing, project- or idea-based posts are much better.
+
+* Fog of War
+:PROPERTIES:
+:ID:       f7d3e2c1-5a6b-4c8d-9e0f-1a2b3c4d5e6f
+:END:
+
+I was on my previous team for about 10 years. By the time I left, I knew most
+nooks and plenty of crannies.
+
+The fog of war[fn:fog-of-war] when switching teams was not surprising, but it's
+definitely real. At the end of my first fonts quarter, I felt like I understood
+what a font can be, in a technical sense. At the end of this quarter, I have a
+better understanding, but a new level of depth has been unlocked. I know more
+about where the font space is moving and additionally how, who, and where. I'm
+not going to pretend I know **much** of it, but the fog of war is lifting.
+
+* Stuff
+:PROPERTIES:
+:ID:       a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+:END:
+
+To not make it seem like I did nothing but the next item, I will say I did
+stuff. You know, general dev stuff. Small changes here and there, ran some
+benchmarks, updated dependencies, fixed some broken tests. Not interesting but a
+(sometimes relaxing) part of the job.
+
+* Incremental Font Transfer
+:PROPERTIES:
+:ID:       6d5c4b3a-2f1e-4d9c-8b7a-0e1d2c3b4a5f
+:END:
+
+The main thing I've been working on is implementing the
+[[https://www.w3.org/TR/IFT/][Incremental Font Transfer]] spec in Chromium. This is the quarter I stopped
+procrastinating and set up my Chromium dev environment[fn:chromium-build] and read the code.
+
+Last quarter I set the goal of shipping IFT behind an experimental flag — I'm
+not there yet, but a working local demo feels like solid progress.
+
+** What is IFT
+:PROPERTIES:
+:ID:       9e8d7c6b-5a4f-4e3d-2c1b-0a9f8e7d6c5b
+:END:
+
+I covered the concept of IFT in my [[file:../../04/11/fonts-q1.org][previous post]]. IFT is a new "web font"
+feature that reduces transfer sizes. Compared to a similar technique (unicode
+range subsetting), IFT theoretically reduces transfer sizes by 50% and removes
+some visual glitches. There are 2 parts to this:
+
+1. An encoder splits a font into a small base font plus a set of patches. This
+   is up to the font hoster, such as... [[https://fonts.google.com/]].
+2. The browser downloads the small bace font and the set of patches it
+   needs. The set of patches it needs is determined by what characters and
+   styles (such as italic, weight, optical size...) that the page needs.
+
+The motivation is that a page rarely uses every glyph or style in a font.
+An IFT starts tiny and grows on demand.
+
+Opting in from CSS is one extra ~src~ entry:
+
+#+begin_src css
+@font-face {
+  font-family: 'MyFont';
+  src: url('myfont-ift.woff2') tech(incremental),
+       url('myfont.woff2') format('woff2');
+}
+#+end_src
+
+A browser that supports ~tech(incremental)~ uses the ~myfont-ift.woff2~ IFT
+font. Otherwise, the browser will fall back to the larger ~myfont.woff2~ font.
+
+To use the IFT font, the browser roughly does the following:
+
+1. Load the small initial font.
+2. Attempt to render the page. Record any glyphs (characters) or styles that are
+   not supported by the font.
+3. Use the patch tables to determine what patches are required based on the
+   missing glyphs and styles.
+3. Download and apply those patches to the font.
+
+** Progress
+:PROPERTIES:
+:ID:       1f2e3d4c-5b6a-4f9e-8d7c-0b9a8f7e6d5c
+:END:
+
+So, how far did I get? I did a lot of the paperwork to ask the Chromium
+bureaucracy for permission to implement the experimental feature. I filed some
+forms that I assume may be looked at some point. I also ended up on some message
+board to get an "OK I guess" from a high-level engineer. This "OK I guess" is my
+golden hall pass. Additionally, I have found some reviewers for my work. As a
+non-Chromium contributor, I need 2 approvals for each change.
+
+For the actual work, I have a working local demo! In my build of Chromium, I
+observed a test web page patching fonts on the fly! I'm still working on
+cleaning it up and implementing an important requirement: when ~font~ becomes
+~font-patched~, subsequent requests should patch on top of ~font-patched~
+instead of starting over from the original ~font~ and reapplying
+everything. This needs a bit more work, but should be done soon. In the
+meantime, I have checked in some [[https://chromium-review.googlesource.com/q/author:wmedrano+mergedafter:2026-05-01+mergedbefore:2026-07-20][minor changes]]. I'm polishing up a design doc
+before I send out the more complicated changes. Which takes me to my last
+musing...
+
+* Landing Changes
+:PROPERTIES:
+:ID:       2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d
+:END:
+
+I'll actually do a blog post on this, but the main idea is that: Landing changes
+can be hard.
+
+Maintainers have different levels of caution in accepting changes. As a
+professional[fn:professional], it is my job to make it as easy as possible for
+the system to accept my changes. As a non-professional, forking is ok 😝.
+
+* Footnotes
+:PROPERTIES:
+:ID:       3c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f
+:END:
+
+[fn:chromium-build] Chromium is pretty annoying to develop for. It takes almost an hour to do
+a clean build on my ~AMD Ryzen 9950x~, at least incremental compile times are
+not bad. Additionally, I insist on using Chromium's experimental ~JJ~ support,
+despite the fact that I'm new and Chromium doesn't even use a standard ~git~
+setup, likely due to scale.
+
+[fn:fog-of-war] In real-time strategy games, the fog of war hides unexplored parts of the
+map until you venture there — same feeling when switching to an unfamiliar
+codebase.
+
+[fn:professional] A professional is technically someone who gets paid. But in
+this case, I mean the expected behavior.
