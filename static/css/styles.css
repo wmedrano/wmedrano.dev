@@ -50,7 +50,7 @@ body {
     max-width: 800px;
     padding: 0 1rem;
     font-family: "DM Sans", sans-serif;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1.5;
     color: #2d2d2d;
 }
@@ -84,10 +84,10 @@ th {
 }
 
 #table-of-contents {
-    font-size: 18px;
+    font-size: 16px;
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: "DM Sans", sans-serif;
+    font-family: "DM Serif Display", serif;
     color: #5b4a8a;
 }
 h1 { font-size: 36px; }
@@ -104,29 +104,31 @@ img {
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
-label.org-src-name {
-    font-size: 16px;
-}
-label.org-src-name code {
-    font-size: 14px;
-}
-.post-date {
+label.org-src-name, label.org-src-name code {
     font-size: 14px;
 }
 .figure p {
     margin: 0 !important;
     font-size: 14px;
 }
+.post-date {
+    font-size: 12px;
+}
 div.figure {
     margin: 1.5rem 0;
 }
 code, pre {
     font-family: "DM Mono", monospace;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.1;
 
 }
-code {border: 1px solid #e0dcd5; background: #f0ede6; border-radius: 3px; padding: 1px 4px;}
+code {
+    border: 1px solid #e0dcd5;
+    background: #f0ede6;
+    border-radius: 3px;
+    padding: 0px;
+}
 div.org-src-container {
     margin: 1rem 0;
 }
