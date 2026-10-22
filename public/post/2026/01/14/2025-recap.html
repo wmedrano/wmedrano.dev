@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-10-21 Wed 20:12 -->
+<!-- 2026-10-21 Wed 21:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>2025 Recap</title>
@@ -13,11 +13,11 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-
-<link rel="stylesheet" href="/css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Sometype+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/syntax.css">
 <link rel="canonical" href="https://wmedrano.dev/post/2026/01/14/2025-recap.html">
 </head>
 <body>
@@ -32,20 +32,20 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org7454d98">1. Scheme Interpreter</a></li>
-<li><a href="#org220aaa6">2. Self-Hosted Git + JJ</a>
+<li><a href="#org44d88e4">1. Scheme Interpreter</a></li>
+<li><a href="#orgc2289fd">2. Self-Hosted Git + JJ</a>
 <ul>
-<li><a href="#org7916b57">2.1. ForgeJo</a></li>
-<li><a href="#orgdc432b6">2.2. JJ</a></li>
+<li><a href="#org8565104">2.1. ForgeJo</a></li>
+<li><a href="#org15394cf">2.2. JJ</a></li>
 </ul>
 </li>
-<li><a href="#org3bcdeef">3. 3D Printer</a></li>
-<li><a href="#org498c710">4. New Job</a></li>
+<li><a href="#org2cdf6a9">3. 3D Printer</a></li>
+<li><a href="#orge46c783">4. New Job</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org7454d98" class="outline-2">
-<h2 id="org7454d98"><span class="section-number-2">1.</span> Scheme Interpreter</h2>
+<div id="outline-container-org44d88e4" class="outline-2">
+<h2 id="org44d88e4"><span class="section-number-2">1.</span> Scheme Interpreter</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 I actually started writing an interpreter in Zig (and Rust) in 2024. In 2025, I
@@ -69,19 +69,19 @@ might reboot the effort and start a new interpreter.
 </p>
 
 
-<div id="orgc20a97a" class="figure">
+<div id="org223f791" class="figure">
 <p><img src="szl.png" alt="szl.png" />
 </p>
 <p><span class="figure-number">Figure 1: </span>It even has error messages</p>
 </div>
 </div>
 </div>
-<div id="outline-container-org220aaa6" class="outline-2">
-<h2 id="org220aaa6"><span class="section-number-2">2.</span> Self-Hosted Git + JJ</h2>
+<div id="outline-container-orgc2289fd" class="outline-2">
+<h2 id="orgc2289fd"><span class="section-number-2">2.</span> Self-Hosted Git + JJ</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org7916b57" class="outline-3">
-<h3 id="org7916b57"><span class="section-number-3">2.1.</span> ForgeJo</h3>
+<div id="outline-container-org8565104" class="outline-3">
+<h3 id="org8565104"><span class="section-number-3">2.1.</span> ForgeJo</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 For my meaningless personal projects, I use my self-hosted <a href="https://forgejo.org/">ForgeJo</a>
@@ -91,15 +91,15 @@ downside, I really notice the latency when using other source control systems.
 </p>
 
 
-<div id="org336979a" class="figure">
+<div id="org163b110" class="figure">
 <p><img src="forgejo.png" alt="forgejo.png" />
 </p>
 <p><span class="figure-number">Figure 2: </span>So fast</p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgdc432b6" class="outline-3">
-<h3 id="orgdc432b6"><span class="section-number-3">2.2.</span> JJ</h3>
+<div id="outline-container-org15394cf" class="outline-3">
+<h3 id="org15394cf"><span class="section-number-3">2.2.</span> JJ</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 I also switched from Mercurial and Git to purely <a href="https://github.com/jj-vcs/jj">jj</a>. I didn't have gripes with
@@ -130,8 +130,8 @@ of:
 </div>
 </div>
 </div>
-<div id="outline-container-org3bcdeef" class="outline-2">
-<h2 id="org3bcdeef"><span class="section-number-2">3.</span> 3D Printer</h2>
+<div id="outline-container-org2cdf6a9" class="outline-2">
+<h2 id="org2cdf6a9"><span class="section-number-2">3.</span> 3D Printer</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 I got a 3D printer, the Prusa Mini+! Very cool, I can see why they were so hyped
@@ -140,15 +140,15 @@ year I can learn Blender and CAD to make better use of it.
 </p>
 
 
-<div id="org200bed4" class="figure">
+<div id="org61bbde9" class="figure">
 <p><img src="lisp.jpg" alt="lisp.jpg" />
 </p>
 <p><span class="figure-number">Figure 3: </span>3D Printed Lisp Alien</p>
 </div>
 </div>
 </div>
-<div id="outline-container-org498c710" class="outline-2">
-<h2 id="org498c710"><span class="section-number-2">4.</span> New Job</h2>
+<div id="outline-container-orge46c783" class="outline-2">
+<h2 id="orge46c783"><span class="section-number-2">4.</span> New Job</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 🎵New Job🎶New Job🎵
@@ -170,11 +170,7 @@ steady progress and expect things to smooth out soon.
 </div>
 </div>
 <div id="postamble" class="status">
-
-<div></div>
-<p class="postamble-title">Title: 2025 Recap</p>
-<p class="author">Author: Will S. Medrano</p>
-<p class="date">Date: 2026-01-14</p>
+<p>Will S. Medrano · 2026-01-14</p>
 </div>
 </body>
 </html>

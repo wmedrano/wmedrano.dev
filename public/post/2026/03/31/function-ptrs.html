@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-10-21 Wed 20:12 -->
+<!-- 2026-10-21 Wed 21:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Functional Dispatch</title>
@@ -13,11 +13,11 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-
-<link rel="stylesheet" href="/css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Sometype+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/syntax.css">
 <link rel="canonical" href="https://wmedrano.dev/post/2026/03/31/function-ptrs.html">
 </head>
 <body>
@@ -32,53 +32,53 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orga0cc64a">1. Introduction</a>
+<li><a href="#orgf8768b3">1. Introduction</a>
 <ul>
-<li><a href="#org75fba16">1.1. Tiny Skia</a></li>
-<li><a href="#orgf6d44df">1.2. Bytecode Interpreter? Function Pointers?</a>
+<li><a href="#orgaa079d3">1.1. Tiny Skia</a></li>
+<li><a href="#orge4d4650">1.2. Bytecode Interpreter? Function Pointers?</a>
 <ul>
-<li><a href="#orgf39bba0">1.2.1. Bytecode Interpreter</a></li>
-<li><a href="#org5180471">1.2.2. Example</a></li>
-<li><a href="#orgf554bbf">1.2.3. Performance Considerations</a></li>
+<li><a href="#org54f3dee">1.2.1. Bytecode Interpreter</a></li>
+<li><a href="#org473d9ed">1.2.2. Example</a></li>
+<li><a href="#orgdd42736">1.2.3. Performance Considerations</a></li>
 </ul>
 </li>
-<li><a href="#orgcd83544">1.3. Function Pointers vs Enum Instruction</a></li>
+<li><a href="#orgdb116bd">1.3. Function Pointers vs Enum Instruction</a></li>
 </ul>
 </li>
-<li><a href="#org4f8070f">2. Setup &amp; Benchmark</a>
+<li><a href="#org493c1ec">2. Setup &amp; Benchmark</a>
 <ul>
-<li><a href="#org65633b5">2.1. Hypothesis</a></li>
-<li><a href="#org78df422">2.2. Instructions</a></li>
-<li><a href="#org1af4f13">2.3. Benchmark</a></li>
-<li><a href="#org0ab71bd">2.4. Instruction Variants</a>
+<li><a href="#orgda1a3e5">2.1. Hypothesis</a></li>
+<li><a href="#orgd541a62">2.2. Instructions</a></li>
+<li><a href="#orgff8ba80">2.3. Benchmark</a></li>
+<li><a href="#org9a80f53">2.4. Instruction Variants</a>
 <ul>
-<li><a href="#orgc6b4a6b">2.4.1. OpCodes: Enum Instructions</a></li>
-<li><a href="#orgb4d5762">2.4.2. Fn Ptr: Function pointer with data byte instruction</a></li>
-<li><a href="#orgb66a236">2.4.3. Fn Ptr Slim: Function pointer instruction</a></li>
-<li><a href="#orgce3ccd1">2.4.4. Fn Ptr Spec: Specialization</a></li>
-<li><a href="#org0bf2ff9">2.4.5. Fn Ptr Hyper: Ridiculous level of specialization</a></li>
+<li><a href="#org3443612">2.4.1. OpCodes: Enum Instructions</a></li>
+<li><a href="#org61423f6">2.4.2. Fn Ptr: Function pointer with data byte instruction</a></li>
+<li><a href="#org2d9b614">2.4.3. Fn Ptr Slim: Function pointer instruction</a></li>
+<li><a href="#org6577dfb">2.4.4. Fn Ptr Spec: Specialization</a></li>
+<li><a href="#org1a5b30e">2.4.5. Fn Ptr Hyper: Ridiculous level of specialization</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org7bee97d">3. Results</a>
+<li><a href="#org9e660c8">3. Results</a>
 <ul>
-<li><a href="#org028bd99">3.1. Numbers</a></li>
-<li><a href="#org79187b4">3.2. Performance</a>
+<li><a href="#orgeeff10a">3.1. Numbers</a></li>
+<li><a href="#orga190e4b">3.2. Performance</a>
 <ul>
-<li><a href="#org9e9d9c4">3.2.1. Function Pointer</a></li>
-<li><a href="#org40a44cd">3.2.2. Specialization</a></li>
+<li><a href="#orgae17929">3.2.1. Function Pointer</a></li>
+<li><a href="#orga487e39">3.2.2. Specialization</a></li>
 </ul>
 </li>
-<li><a href="#org3aded29">3.3. Readability &amp; Maintainability</a></li>
-<li><a href="#org591da94">3.4. Future Work</a></li>
+<li><a href="#orgbf51928">3.3. Readability &amp; Maintainability</a></li>
+<li><a href="#org11fe5e1">3.4. Future Work</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orga0cc64a" class="outline-2">
-<h2 id="orga0cc64a"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-orgf8768b3" class="outline-2">
+<h2 id="orgf8768b3"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 I was working on the 2D rendering library <a href="https://github.com/linebender/tiny-skia">Tiny Skia</a> and was surprised to find a
@@ -93,18 +93,18 @@ This got me curious on why? Is it faster? More flexible?
 
 <p>
 Spoiler: For my use case and set of benchmarks, the more compact <code>enum</code>
-implementation was generally faster. See the <a href="#org7bee97d">Results section</a>.
+implementation was generally faster. See the <a href="#org9e660c8">Results section</a>.
 </p>
 
 
-<div id="org1b8a926" class="figure">
+<div id="org056f1f2" class="figure">
 <p><img src="2pt-conical.svg" alt="2pt-conical.svg" class="org-svg" />
 </p>
 <p><span class="figure-number">Figure 1: </span>A two-point radial gradient</p>
 </div>
 </div>
-<div id="outline-container-org75fba16" class="outline-3">
-<h3 id="org75fba16"><span class="section-number-3">1.1.</span> Tiny Skia</h3>
+<div id="outline-container-orgaa079d3" class="outline-3">
+<h3 id="orgaa079d3"><span class="section-number-3">1.1.</span> Tiny Skia</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Tiny Skia is a Rust library that handles 2D rendering on the CPU. It is fairly
@@ -138,12 +138,12 @@ another.
 </div>
 </div>
 </div>
-<div id="outline-container-orgf6d44df" class="outline-3">
-<h3 id="orgf6d44df"><span class="section-number-3">1.2.</span> Bytecode Interpreter? Function Pointers?</h3>
+<div id="outline-container-orge4d4650" class="outline-3">
+<h3 id="orge4d4650"><span class="section-number-3">1.2.</span> Bytecode Interpreter? Function Pointers?</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
-<div id="outline-container-orgf39bba0" class="outline-4">
-<h4 id="orgf39bba0"><span class="section-number-4">1.2.1.</span> Bytecode Interpreter</h4>
+<div id="outline-container-org54f3dee" class="outline-4">
+<h4 id="org54f3dee"><span class="section-number-4">1.2.1.</span> Bytecode Interpreter</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 A bytecode interpreter is a program that executes instructions encoded as
@@ -156,7 +156,7 @@ languages like Python and Ruby.
 The core of most bytecode interpreters is a <i>dispatch loop</i>.
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -211,15 +211,15 @@ The core of most bytecode interpreters is a <i>dispatch loop</i>.
 </div>
 </div>
 </div>
-<div id="outline-container-org5180471" class="outline-4">
-<h4 id="org5180471"><span class="section-number-4">1.2.2.</span> Example</h4>
+<div id="outline-container-org473d9ed" class="outline-4">
+<h4 id="org473d9ed"><span class="section-number-4">1.2.2.</span> Example</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 For example, computing <code>1 + 2</code> compiles to three instructions. Each step either
 pushes a value onto the stack or pops values and pushes a result:
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -264,8 +264,8 @@ pushes a value onto the stack or pops values and pushes a result:
 </table>
 </div>
 </div>
-<div id="outline-container-orgf554bbf" class="outline-4">
-<h4 id="orgf554bbf"><span class="section-number-4">1.2.3.</span> Performance Considerations</h4>
+<div id="outline-container-orgdd42736" class="outline-4">
+<h4 id="orgdd42736"><span class="section-number-4">1.2.3.</span> Performance Considerations</h4>
 <div class="outline-text-4" id="text-1-2-3">
 <p>
 The size of data structures is very important to an interpreter's
@@ -294,8 +294,8 @@ more compact enum opcode.
 </div>
 </div>
 </div>
-<div id="outline-container-orgcd83544" class="outline-3">
-<h3 id="orgcd83544"><span class="section-number-3">1.3.</span> Function Pointers vs Enum Instruction</h3>
+<div id="outline-container-orgdb116bd" class="outline-3">
+<h3 id="orgdb116bd"><span class="section-number-3">1.3.</span> Function Pointers vs Enum Instruction</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 Since we want to shrink the size of data, using a function pointer<sup><a id="fnr.fnptr" class="footref" href="#fn.fnptr" role="doc-backlink">2</a></sup>
@@ -360,8 +360,8 @@ implementations. Each instruction is now a function that
 </div>
 </div>
 </div>
-<div id="outline-container-org4f8070f" class="outline-2">
-<h2 id="org4f8070f"><span class="section-number-2">2.</span> Setup &amp; Benchmark</h2>
+<div id="outline-container-org493c1ec" class="outline-2">
+<h2 id="org493c1ec"><span class="section-number-2">2.</span> Setup &amp; Benchmark</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 I built a simple bytecode interpreter to test how the performance of the
@@ -369,8 +369,8 @@ function pointers approach is. Since it's just a toy, I made only the VM, no
 parser. The repository can be found on <a href="https://github.com/wmedrano/function-ptr-experiment/commits/main/">GitHub</a>.
 </p>
 </div>
-<div id="outline-container-org65633b5" class="outline-3">
-<h3 id="org65633b5"><span class="section-number-3">2.1.</span> Hypothesis</h3>
+<div id="outline-container-orgda1a3e5" class="outline-3">
+<h3 id="orgda1a3e5"><span class="section-number-3">2.1.</span> Hypothesis</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Function pointers should be slower as:
@@ -389,8 +389,8 @@ representations or add/remove code.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org78df422" class="outline-3">
-<h3 id="org78df422"><span class="section-number-3">2.2.</span> Instructions</h3>
+<div id="outline-container-orgd541a62" class="outline-3">
+<h3 id="orgd541a62"><span class="section-number-3">2.2.</span> Instructions</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 The following instruction set seems powerful enough to test. Don't worry,
@@ -398,7 +398,7 @@ despite looking small, instructions like <code>Return</code> and <code>Eval</cod
 complexity.
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -509,8 +509,8 @@ complexity.
 </table>
 </div>
 </div>
-<div id="outline-container-org1af4f13" class="outline-3">
-<h3 id="org1af4f13"><span class="section-number-3">2.3.</span> Benchmark</h3>
+<div id="outline-container-orgff8ba80" class="outline-3">
+<h3 id="orgff8ba80"><span class="section-number-3">2.3.</span> Benchmark</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 I used <code>add(1+2, 3+4)</code> and <code>fib(12)</code> as the benchmark. I handcoded the following
@@ -567,12 +567,12 @@ arguments stored at index <code>0</code>, <code>1</code>, <code>2</code>, and <c
 </div>
 </div>
 </div>
-<div id="outline-container-org0ab71bd" class="outline-3">
-<h3 id="org0ab71bd"><span class="section-number-3">2.4.</span> Instruction Variants</h3>
+<div id="outline-container-org9a80f53" class="outline-3">
+<h3 id="org9a80f53"><span class="section-number-3">2.4.</span> Instruction Variants</h3>
 <div class="outline-text-3" id="text-2-4">
 </div>
-<div id="outline-container-orgc6b4a6b" class="outline-4">
-<h4 id="orgc6b4a6b"><span class="section-number-4">2.4.1.</span> OpCodes: Enum Instructions</h4>
+<div id="outline-container-org3443612" class="outline-4">
+<h4 id="org3443612"><span class="section-number-4">2.4.1.</span> OpCodes: Enum Instructions</h4>
 <div class="outline-text-4" id="text-2-4-1">
 <p>
 With the simple op code based interpreter, the representation of a function is
@@ -593,8 +593,8 @@ mostly the instructions. The VM iterates and jumps around the <code>instructions
 </div>
 </div>
 </div>
-<div id="outline-container-orgb4d5762" class="outline-4">
-<h4 id="orgb4d5762"><span class="section-number-4">2.4.2.</span> Fn Ptr: Function pointer with data byte instruction</h4>
+<div id="outline-container-org61423f6" class="outline-4">
+<h4 id="org61423f6"><span class="section-number-4">2.4.2.</span> Fn Ptr: Function pointer with data byte instruction</h4>
 <div class="outline-text-4" id="text-2-4-2">
 <p>
 With function pointer, the <code>Instruction</code> enum is converted to a function and a
@@ -625,8 +625,8 @@ jump or which argument to fetch.
 </div>
 </div>
 </div>
-<div id="outline-container-orgb66a236" class="outline-4">
-<h4 id="orgb66a236"><span class="section-number-4">2.4.3.</span> Fn Ptr Slim: Function pointer instruction</h4>
+<div id="outline-container-org2d9b614" class="outline-4">
+<h4 id="org2d9b614"><span class="section-number-4">2.4.3.</span> Fn Ptr Slim: Function pointer instruction</h4>
 <div class="outline-text-4" id="text-2-4-3">
 <p>
 This is similar to <code>Fn Ptr</code>, but the data byte is not passed as a function
@@ -659,8 +659,8 @@ depend on how often the data byte is needed.
 </div>
 </div>
 </div>
-<div id="outline-container-orgce3ccd1" class="outline-4">
-<h4 id="orgce3ccd1"><span class="section-number-4">2.4.4.</span> Fn Ptr Spec: Specialization</h4>
+<div id="outline-container-org6577dfb" class="outline-4">
+<h4 id="org6577dfb"><span class="section-number-4">2.4.4.</span> Fn Ptr Spec: Specialization</h4>
 <div class="outline-text-4" id="text-2-4-4">
 <p>
 This introduces more functions based on the instruction. It can be seen as
@@ -736,8 +736,8 @@ operations.
 </div>
 </div>
 </div>
-<div id="outline-container-org0bf2ff9" class="outline-4">
-<h4 id="org0bf2ff9"><span class="section-number-4">2.4.5.</span> Fn Ptr Hyper: Ridiculous level of specialization</h4>
+<div id="outline-container-org1a5b30e" class="outline-4">
+<h4 id="org1a5b30e"><span class="section-number-4">2.4.5.</span> Fn Ptr Hyper: Ridiculous level of specialization</h4>
 <div class="outline-text-4" id="text-2-4-5">
 <p>
 This adds two extra specializations. For the adder, <code>triop_add_fn</code> fuses two
@@ -784,14 +784,14 @@ base case and 11 instructions for the recursive call case.
 </div>
 </div>
 </div>
-<div id="outline-container-org7bee97d" class="outline-2">
-<h2 id="org7bee97d"><span class="section-number-2">3.</span> Results</h2>
+<div id="outline-container-org9e660c8" class="outline-2">
+<h2 id="org9e660c8"><span class="section-number-2">3.</span> Results</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org028bd99" class="outline-3">
-<h3 id="org028bd99"><span class="section-number-3">3.1.</span> Numbers</h3>
+<div id="outline-container-orgeeff10a" class="outline-3">
+<h3 id="orgeeff10a"><span class="section-number-3">3.1.</span> Numbers</h3>
 <div class="outline-text-3" id="text-3-1">
-<table id="org0db4c30" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table id="org3d05f03">
 
 
 <colgroup>
@@ -857,25 +857,27 @@ base case and 11 instructions for the recursive call case.
 </tbody>
 </table>
 
-<div id="orgb8ca538" class="figure">
+<div id="org370f0a8" class="figure">
 <p><img src="results-add.svg" alt="results-add.svg" class="org-svg" />
 </p>
+<p><span class="figure-number">Figure 2: </span><code>add(1+2, 3+4)</code> benchmark. The dashed line marks the Opcodes baseline.</p>
 </div>
 
 
 
-<div id="org57dabc2" class="figure">
+<div id="orgbe0020b" class="figure">
 <p><img src="results-fib.svg" alt="results-fib.svg" class="org-svg" />
 </p>
+<p><span class="figure-number">Figure 3: </span><code>fib(12)</code> benchmark. The dashed line marks the Opcodes baseline.</p>
 </div>
 </div>
 </div>
-<div id="outline-container-org79187b4" class="outline-3">
-<h3 id="org79187b4"><span class="section-number-3">3.2.</span> Performance</h3>
+<div id="outline-container-orga190e4b" class="outline-3">
+<h3 id="orga190e4b"><span class="section-number-3">3.2.</span> Performance</h3>
 <div class="outline-text-3" id="text-3-2">
 </div>
-<div id="outline-container-org9e9d9c4" class="outline-4">
-<h4 id="org9e9d9c4"><span class="section-number-4">3.2.1.</span> Function Pointer</h4>
+<div id="outline-container-orgae17929" class="outline-4">
+<h4 id="orgae17929"><span class="section-number-4">3.2.1.</span> Function Pointer</h4>
 <div class="outline-text-4" id="text-3-2-1">
 <p>
 Function pointers are dramatically slower, but heavy specialization can beat
@@ -893,8 +895,8 @@ good. If not, then copying it around just adds to our overhead.
 </p>
 </div>
 </div>
-<div id="outline-container-org40a44cd" class="outline-4">
-<h4 id="org40a44cd"><span class="section-number-4">3.2.2.</span> Specialization</h4>
+<div id="outline-container-orga487e39" class="outline-4">
+<h4 id="orga487e39"><span class="section-number-4">3.2.2.</span> Specialization</h4>
 <div class="outline-text-4" id="text-3-2-2">
 <p>
 Specialization greatly improves the cost of <code>fibonacci</code> while the <code>add</code> is
@@ -950,8 +952,8 @@ branch with many possible targets.
 </div>
 </div>
 </div>
-<div id="outline-container-org3aded29" class="outline-3">
-<h3 id="org3aded29"><span class="section-number-3">3.3.</span> Readability &amp; Maintainability</h3>
+<div id="outline-container-orgbf51928" class="outline-3">
+<h3 id="orgbf51928"><span class="section-number-3">3.3.</span> Readability &amp; Maintainability</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 Despite being a bit slower, it was actually easier to add specialized
@@ -988,8 +990,8 @@ that introduces the function is rather simple:
 </div>
 </div>
 </div>
-<div id="outline-container-org591da94" class="outline-3">
-<h3 id="org591da94"><span class="section-number-3">3.4.</span> Future Work</h3>
+<div id="outline-container-org11fe5e1" class="outline-3">
+<h3 id="org11fe5e1"><span class="section-number-3">3.4.</span> Future Work</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 The next thing I want to try out is using the bare enum in Tiny Skia instead of
@@ -1026,11 +1028,7 @@ support on GitHub</a>.
 </div>
 </div></div>
 <div id="postamble" class="status">
-
-<div></div>
-<p class="postamble-title">Title: Functional Dispatch</p>
-<p class="author">Author: Will S. Medrano</p>
-<p class="date">Date: 2026-03-31</p>
+<p>Will S. Medrano · 2026-03-31</p>
 </div>
 </body>
 </html>

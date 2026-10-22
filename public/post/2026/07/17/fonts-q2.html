@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-10-21 Wed 20:12 -->
+<!-- 2026-10-21 Wed 21:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Fonts Q2</title>
@@ -13,11 +13,11 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-
-<link rel="stylesheet" href="/css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Sometype+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/syntax.css">
 <link rel="canonical" href="https://wmedrano.dev/post/2026/07/17/fonts-q2.html">
 </head>
 <body>
@@ -32,24 +32,24 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org11eef3c">1. Introduction</a></li>
-<li><a href="#org5e8d18f">2. Fog of War</a></li>
-<li><a href="#org5b54e5a">3. Stuff</a></li>
-<li><a href="#org5f207fb">4. Incremental Font Transfer</a>
+<li><a href="#org61f0b8b">1. Introduction</a></li>
+<li><a href="#orgcb3d8ed">2. Fog of War</a></li>
+<li><a href="#org4bcb613">3. Stuff</a></li>
+<li><a href="#org696cafd">4. Incremental Font Transfer</a>
 <ul>
-<li><a href="#orgeae2380">4.1. What is IFT</a></li>
-<li><a href="#org08bfc61">4.2. Progress</a></li>
+<li><a href="#orgaf1427a">4.1. What is IFT</a></li>
+<li><a href="#org3d73fcb">4.2. Progress</a></li>
 </ul>
 </li>
-<li><a href="#org75aaf58">5. Landing Changes</a></li>
+<li><a href="#org7a2f9b1">5. Landing Changes</a></li>
 </ul>
 </div>
 </div>
 <p>
 <i>(Reading time: 5 minutes)</i>
 </p>
-<div id="outline-container-org11eef3c" class="outline-2">
-<h2 id="org11eef3c"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org61f0b8b" class="outline-2">
+<h2 id="org61f0b8b"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 I just completed my second full quarter on my new team. I wrote about my first
@@ -60,8 +60,8 @@ pieces of writing, project- or idea-based posts are much better.
 </p>
 </div>
 </div>
-<div id="outline-container-org5e8d18f" class="outline-2">
-<h2 id="org5e8d18f"><span class="section-number-2">2.</span> Fog of War</h2>
+<div id="outline-container-orgcb3d8ed" class="outline-2">
+<h2 id="orgcb3d8ed"><span class="section-number-2">2.</span> Fog of War</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 I was on my previous team for about 10 years. By the time I left, I knew most
@@ -78,8 +78,8 @@ not going to pretend I know <b><b>much</b></b> of it, but the fog of war is lift
 </p>
 </div>
 </div>
-<div id="outline-container-org5b54e5a" class="outline-2">
-<h2 id="org5b54e5a"><span class="section-number-2">3.</span> Stuff</h2>
+<div id="outline-container-org4bcb613" class="outline-2">
+<h2 id="org4bcb613"><span class="section-number-2">3.</span> Stuff</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 To not make it seem like I did nothing but the next item, I will say I did
@@ -89,8 +89,8 @@ benchmarks, updated dependencies, fixed some broken tests. Not interesting but a
 </p>
 </div>
 </div>
-<div id="outline-container-org5f207fb" class="outline-2">
-<h2 id="org5f207fb"><span class="section-number-2">4.</span> Incremental Font Transfer</h2>
+<div id="outline-container-org696cafd" class="outline-2">
+<h2 id="org696cafd"><span class="section-number-2">4.</span> Incremental Font Transfer</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 The main thing I've been working on is implementing the
@@ -103,8 +103,8 @@ Last quarter I set the goal of shipping IFT behind an experimental flag — I'm
 not there yet, but a working local demo feels like solid progress.
 </p>
 </div>
-<div id="outline-container-orgeae2380" class="outline-3">
-<h3 id="orgeae2380"><span class="section-number-3">4.1.</span> What is IFT</h3>
+<div id="outline-container-orgaf1427a" class="outline-3">
+<h3 id="orgaf1427a"><span class="section-number-3">4.1.</span> What is IFT</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 I covered the concept of IFT in my <a href="../../04/11/fonts-q1.html">previous post</a>. IFT is a new "web font"
@@ -158,8 +158,8 @@ missing glyphs and styles.</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-org08bfc61" class="outline-3">
-<h3 id="org08bfc61"><span class="section-number-3">4.2.</span> Progress</h3>
+<div id="outline-container-org3d73fcb" class="outline-3">
+<h3 id="org3d73fcb"><span class="section-number-3">4.2.</span> Progress</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 So, how far did I get? I did a lot of the paperwork to ask the Chromium
@@ -184,8 +184,8 @@ musing&hellip;
 </div>
 </div>
 </div>
-<div id="outline-container-org75aaf58" class="outline-2">
-<h2 id="org75aaf58"><span class="section-number-2">5.</span> Landing Changes</h2>
+<div id="outline-container-org7a2f9b1" class="outline-2">
+<h2 id="org7a2f9b1"><span class="section-number-2">5.</span> Landing Changes</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 I'll actually do a blog post on this, but the main idea is that: Landing changes
@@ -226,11 +226,7 @@ this case, I mean the expected behavior.
 </div>
 </div></div>
 <div id="postamble" class="status">
-
-<div></div>
-<p class="postamble-title">Title: Fonts Q2</p>
-<p class="author">Author: Will S. Medrano</p>
-<p class="date">Date: 2026-07-17 Fri 00:00</p>
+<p>Will S. Medrano · 2026-07-17 Fri 00:00</p>
 </div>
 </body>
 </html>

@@ -1,0 +1,210 @@
+:root {
+  --font-body: "Spectral", Georgia, serif;
+  --font-mono: "Sometype Mono", ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+  --measure: 90ch;
+  --gutter: 16px;
+  --color-text: #222;
+  --color-heading: #111;
+  --color-muted: #6b6b6b;
+  /* Lightest gray that still passes WCAG AA for small text on white. */
+  --color-faint: #767676;
+  --color-link: #2b4a6b;
+  --color-link-underline: #c8c8c8;
+  --color-code-bg: #f8f8f8;
+  --color-code-border: #e6e6e6;
+  --color-border: #e2e2de;
+  --color-rule: #333;
+}
+
+body {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-heading);
+}
+
+/* Links: muted accent with a light underline that darkens on hover. */
+a {
+  color: var(--color-link);
+  text-decoration-color: var(--color-link-underline);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Code blocks scroll horizontally instead of overflowing the column. */
+pre {
+  overflow-x: auto;
+  padding: 0.75em 1em;
+  background: var(--color-code-bg);
+  border: 1px solid var(--color-code-border);
+  border-radius: 4px;
+  font-size: 0.875em;
+  line-height: 1.5;
+}
+
+/* Set on code too, since browsers give code its own default monospace. */
+pre,
+code {
+  font-family: var(--font-mono);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Wide tables scroll horizontally instead of overflowing the column. */
+table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  padding: 0.35em 0.75em;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+/* Booktabs style: strong rules at the top and bottom, lighter under the header.
+   Borders go on cells since the block-level table would draw them full width. */
+th {
+  font-weight: 700;
+  border-top: 1.5px solid var(--color-rule);
+  border-bottom-color: var(--color-muted);
+}
+
+/* Tables without a header row still get the top rule. */
+table:not(:has(thead)) tbody:first-of-type tr:first-child td {
+  border-top: 1.5px solid var(--color-rule);
+}
+
+tbody:last-child tr:last-child td {
+  border-bottom: 1.5px solid var(--color-rule);
+}
+
+/* Org tags each cell with its column's alignment. */
+.org-left { text-align: left; }
+.org-right { text-align: right; }
+.org-center { text-align: center; }
+
+/* Post list: title on the left, date on the right. Wraps on narrow screens. */
+p:has(> .post-date) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  column-gap: 1em;
+  margin: 0.5em 0;
+}
+
+/* The page is all links, so titles only underline on hover. */
+p:has(> .post-date) a {
+  text-decoration: none;
+}
+
+p:has(> .post-date) a:hover {
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+}
+
+.post-date {
+  color: var(--color-faint);
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+/* Homepage sections read as quiet labels so the post titles lead. */
+.outline-2:has(.post-date) > h2 {
+  margin: 2em 0 0.5em;
+  color: var(--color-muted);
+  font-size: 0.8em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.outline-3:has(.post-date) > h3 {
+  margin: 1.25em 0 0.25em;
+  color: var(--color-muted);
+  font-size: 1em;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Header: site name on the left, links on the right. */
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5em 1.25em;
+  padding: 1em 0 0.75em;
+  margin-bottom: 2em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navbar a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+.navbar a:first-of-type {
+  margin-right: auto;
+  font-weight: 700;
+}
+
+/* Figures: centered, with a smaller muted caption underneath. */
+.figure {
+  margin: 2em 0;
+  text-align: center;
+}
+
+.figure p {
+  margin: 0.5em 0;
+}
+
+.figure p + p {
+  color: var(--color-muted);
+  font-size: 0.875em;
+}
+
+/* Posts set some figures to 33% or 50% wide, which is unreadable on phones.
+   min-width wins over the inline width without needing !important. */
+@media (max-width: 600px) {
+  .figure img {
+    min-width: 80%;
+  }
+}
+
+/* Footer: a thin rule matching the header, then one small muted line. */
+#postamble {
+  margin-top: 3em;
+  padding: 0.75em 0 2em;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.875em;
+}
+
+#postamble p {
+  margin: 0;
+}

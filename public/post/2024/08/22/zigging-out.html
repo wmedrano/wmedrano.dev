@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-10-21 Wed 20:12 -->
+<!-- 2026-10-21 Wed 21:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Zigging Out</title>
@@ -13,11 +13,11 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-
-<link rel="stylesheet" href="/css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Sometype+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/syntax.css">
 <link rel="canonical" href="https://wmedrano.dev/post/2024/08/22/zigging-out.html">
 </head>
 <body>
@@ -32,40 +32,40 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org1db478f">1. Zigging Out</a>
+<li><a href="#orgf75e27b">1. Zigging Out</a>
 <ul>
-<li><a href="#org5bb3f40">1.1. Introduction</a>
+<li><a href="#orgdc0283a">1.1. Introduction</a>
 <ul>
-<li><a href="#org15e1c4a">1.1.1. Rust Background</a></li>
-<li><a href="#org654938c">1.1.2. Why Zig</a></li>
+<li><a href="#org2e384b4">1.1.1. Rust Background</a></li>
+<li><a href="#orgb5be0c9">1.1.2. Why Zig</a></li>
 </ul>
 </li>
-<li><a href="#org200a619">1.2. Zig Features</a>
+<li><a href="#org671be8c">1.2. Zig Features</a>
 <ul>
-<li><a href="#org3ce7450">1.2.1. Lazy Compiler</a></li>
-<li><a href="#orgd8fb4b0">1.2.2. Explicit Memory Allocations</a></li>
-<li><a href="#org199b0b8">1.2.3. No Interfaces, we have ducktyping at home</a></li>
-<li><a href="#org61fee9f">1.2.4. Metaprogramming with Comptime (largely untested)</a></li>
-<li><a href="#org69c0328">1.2.5. C Interoperability (untested)</a></li>
-<li><a href="#org5c98039">1.2.6. Tooling</a></li>
+<li><a href="#org51d6d4d">1.2.1. Lazy Compiler</a></li>
+<li><a href="#org933a0ca">1.2.2. Explicit Memory Allocations</a></li>
+<li><a href="#org38a6932">1.2.3. No Interfaces, we have ducktyping at home</a></li>
+<li><a href="#org542259b">1.2.4. Metaprogramming with Comptime (largely untested)</a></li>
+<li><a href="#org3783cc0">1.2.5. C Interoperability (untested)</a></li>
+<li><a href="#orgdffe769">1.2.6. Tooling</a></li>
 </ul>
 </li>
-<li><a href="#org0812901">1.3. Conclusion</a></li>
+<li><a href="#org52e817b">1.3. Conclusion</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org1db478f" class="outline-2">
-<h2 id="org1db478f"><span class="section-number-2">1.</span> Zigging Out</h2>
+<div id="outline-container-orgf75e27b" class="outline-2">
+<h2 id="orgf75e27b"><span class="section-number-2">1.</span> Zigging Out</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org5bb3f40" class="outline-3">
-<h3 id="org5bb3f40"><span class="section-number-3">1.1.</span> Introduction</h3>
+<div id="outline-container-orgdc0283a" class="outline-3">
+<h3 id="orgdc0283a"><span class="section-number-3">1.1.</span> Introduction</h3>
 <div class="outline-text-3" id="text-1-1">
 </div>
-<div id="outline-container-org15e1c4a" class="outline-4">
-<h4 id="org15e1c4a"><span class="section-number-4">1.1.1.</span> Rust Background</h4>
+<div id="outline-container-org2e384b4" class="outline-4">
+<h4 id="org2e384b4"><span class="section-number-4">1.1.1.</span> Rust Background</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 As a Rust developer, I've had it. I've designed my last type system, hacked
@@ -103,8 +103,8 @@ but it doesn't feel quite as "Rusty".</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org654938c" class="outline-4">
-<h4 id="org654938c"><span class="section-number-4">1.1.2.</span> Why Zig</h4>
+<div id="outline-container-orgb5be0c9" class="outline-4">
+<h4 id="orgb5be0c9"><span class="section-number-4">1.1.2.</span> Why Zig</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <p>
 This is arbitrary. I've heard of Zig. I've listened to some random talks. The
@@ -130,12 +130,12 @@ language.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-org200a619" class="outline-3">
-<h3 id="org200a619"><span class="section-number-3">1.2.</span> Zig Features</h3>
+<div id="outline-container-org671be8c" class="outline-3">
+<h3 id="org671be8c"><span class="section-number-3">1.2.</span> Zig Features</h3>
 <div class="outline-text-3" id="text-1-2">
 </div>
-<div id="outline-container-org3ce7450" class="outline-4">
-<h4 id="org3ce7450"><span class="section-number-4">1.2.1.</span> Lazy Compiler</h4>
+<div id="outline-container-org51d6d4d" class="outline-4">
+<h4 id="org51d6d4d"><span class="section-number-4">1.2.1.</span> Lazy Compiler</h4>
 <div class="outline-text-4" id="text-1-2-1">
 <p>
 Zig has one of the laziest compilers. During compilation, only things
@@ -202,7 +202,7 @@ definition.</li>
 </ol>
 
 
-<div id="org8339caa" class="figure">
+<div id="org6138c4b" class="figure">
 <p><img src="shocked-pikachu-face.png" alt="shocked-pikachu-face.png" style="max-width:64px;height:auto;" />
 </p>
 </div>
@@ -223,8 +223,8 @@ source of developer unvelocity.
 </p>
 </div>
 </div>
-<div id="outline-container-orgd8fb4b0" class="outline-4">
-<h4 id="orgd8fb4b0"><span class="section-number-4">1.2.2.</span> Explicit Memory Allocations</h4>
+<div id="outline-container-org933a0ca" class="outline-4">
+<h4 id="org933a0ca"><span class="section-number-4">1.2.2.</span> Explicit Memory Allocations</h4>
 <div class="outline-text-4" id="text-1-2-2">
 <p>
 In Zig, memory allocations are explicitly managed. You pass in the
@@ -278,9 +278,9 @@ frees to debug.
 </div>
 </div>
 <ol class="org-ol">
-<li><a id="orgd19c74b"></a>Arenas<br />
+<li><a id="orgd173b53"></a>Arenas<br />
 <ol class="org-ol">
-<li><a id="org5cb48eb"></a>Arena Refresher<br />
+<li><a id="orgf3c4b3c"></a>Arena Refresher<br />
 <div class="outline-text-6" id="text-1-2-2-1-1">
 <p>
 For a quick refresher, a program may ask the memory allocator for
@@ -318,7 +318,7 @@ code so it never occurred to me that arenas could be clean.
 </p>
 </div>
 </li>
-<li><a id="org0427296"></a>Arenas In Practice<br />
+<li><a id="orgf86ec68"></a>Arenas In Practice<br />
 <div class="outline-text-6" id="text-1-2-2-1-2">
 <p>
 Arena's are usually used when trying to squeeze out every little bit
@@ -377,8 +377,8 @@ module_ok = <span class="org-constant">true</span>;
 </li>
 </ol>
 </div>
-<div id="outline-container-org199b0b8" class="outline-4">
-<h4 id="org199b0b8"><span class="section-number-4">1.2.3.</span> No Interfaces, we have ducktyping at home</h4>
+<div id="outline-container-org38a6932" class="outline-4">
+<h4 id="org38a6932"><span class="section-number-4">1.2.3.</span> No Interfaces, we have ducktyping at home</h4>
 <div class="outline-text-4" id="text-1-2-3">
 <p>
 Most languages that take generic parameters have the concept of an
@@ -451,8 +451,8 @@ request is having generally useful compiler errors.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org61fee9f" class="outline-4">
-<h4 id="org61fee9f"><span class="section-number-4">1.2.4.</span> Metaprogramming with Comptime (largely untested)</h4>
+<div id="outline-container-org542259b" class="outline-4">
+<h4 id="org542259b"><span class="section-number-4">1.2.4.</span> Metaprogramming with Comptime (largely untested)</h4>
 <div class="outline-text-4" id="text-1-2-4">
 <p>
 In most languages, metaprogramming feels completely different than
@@ -490,8 +490,8 @@ exploring the library of <a href="https://ziglang.org/documentation/master/#Buil
 </p>
 </div>
 </div>
-<div id="outline-container-org69c0328" class="outline-4">
-<h4 id="org69c0328"><span class="section-number-4">1.2.5.</span> C Interoperability (untested)</h4>
+<div id="outline-container-org3783cc0" class="outline-4">
+<h4 id="org3783cc0"><span class="section-number-4">1.2.5.</span> C Interoperability (untested)</h4>
 <div class="outline-text-4" id="text-1-2-5">
 <p>
 Zig's C interoperability is clean. Unlike many object-oriented
@@ -544,8 +544,8 @@ change when actually using it in anger.
 </p>
 </div>
 </div>
-<div id="outline-container-org5c98039" class="outline-4">
-<h4 id="org5c98039"><span class="section-number-4">1.2.6.</span> Tooling</h4>
+<div id="outline-container-orgdffe769" class="outline-4">
+<h4 id="orgdffe769"><span class="section-number-4">1.2.6.</span> Tooling</h4>
 <div class="outline-text-4" id="text-1-2-6">
 <p>
 My main setup is Emacs + LSP + <code>M-x compile</code>. Overall, the Zig tooling
@@ -553,7 +553,7 @@ is usable, but I'm looking forward to more polish in the future.
 </p>
 </div>
 <ol class="org-ol">
-<li><a id="orgc125ef6"></a>Build System<br />
+<li><a id="org9d359bd"></a>Build System<br />
 <div class="outline-text-5" id="text-1-2-6-1">
 <p>
 Although Zig is pre-1.0 and subject to changes, its build system has
@@ -575,7 +575,7 @@ programs in Zig yet.
 </p>
 </div>
 </li>
-<li><a id="org9bca078"></a>ZLS - LSP<br />
+<li><a id="org0658bc5"></a>ZLS - LSP<br />
 <div class="outline-text-5" id="text-1-2-6-2">
 <p>
 <a href="https://github.com/zigtools/zls">ZLS</a> is Zig's <a href="https://en.wikipedia.org/wiki/Language_Server_Protocol">language server</a>.
@@ -599,7 +599,7 @@ compiler would check. Not really that useful yet.</li>
 </ul>
 </div>
 </li>
-<li><a id="org861abf7"></a>Compiler Checks<br />
+<li><a id="orgfc987de"></a>Compiler Checks<br />
 <div class="outline-text-5" id="text-1-2-6-3">
 <p>
 The biggest pain point was ZLS syntax checking. The main workaround to
@@ -609,13 +609,13 @@ that are parsed.
 </p>
 
 
-<div id="org1963ab6" class="figure">
+<div id="org0c2ab57" class="figure">
 <p><img src="emacs-compile.png" alt="emacs-compile.png" />
 </p>
 </div>
 </div>
 </li>
-<li><a id="org1b49479"></a>Performance Tooling<br />
+<li><a id="org3e50e52"></a>Performance Tooling<br />
 <div class="outline-text-5" id="text-1-2-6-4">
 <p>
 My main project in Zig is building an interpreted programming
@@ -637,7 +637,7 @@ linux <code>time</code> program.
 </p>
 
 
-<div id="orgc199e3a" class="figure">
+<div id="orgc2d6f37" class="figure">
 <p><img src="criterion.png" alt="criterion.png" />
 </p>
 </div>
@@ -651,7 +651,7 @@ unlabeled.
 </p>
 
 
-<div id="org722ded0" class="figure">
+<div id="orgbb6c8a4" class="figure">
 <p><img src="flamegraph.svg" alt="flamegraph.svg" class="org-svg" />
 </p>
 </div>
@@ -665,15 +665,15 @@ Valgrind</a> for some performance testing.
 </ol>
 </div>
 </div>
-<div id="outline-container-org0812901" class="outline-3">
-<h3 id="org0812901"><span class="section-number-3">1.3.</span> Conclusion</h3>
+<div id="outline-container-org52e817b" class="outline-3">
+<h3 id="org52e817b"><span class="section-number-3">1.3.</span> Conclusion</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 I had a good time using Zig and will continue to tinker around in it
 in the foreseeable future.
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -738,11 +738,7 @@ in the foreseeable future.
 </div>
 </div>
 <div id="postamble" class="status">
-
-<div></div>
-<p class="postamble-title">Title: Zigging Out</p>
-<p class="author">Author: Will Medrano</p>
-<p class="date">Date: 2024-08-22</p>
+<p>Will Medrano · 2024-08-22</p>
 </div>
 </body>
 </html>

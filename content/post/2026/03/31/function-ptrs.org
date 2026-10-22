@@ -509,46 +509,54 @@ pub(crate) fn jump_if_local0_lt2_fn(vm: &mut Vm, mut frame: StackFrame) -> Resul
 | Fn Ptr Hyper   |            0.0448 |       +2% |          6.2 |      -13% |
 #+TBLFM:
 
-#+BEGIN_SRC gnuplot :file results-add.svg :exports results :term svg size 600,300
-# DESIGN.md palette: bar fill #4078f2 (accent blue), text/axes #333
-set style fill solid 0.85 border rgb '#333'
-set boxwidth 0.6
-set yrange [0:0.07]
-set ylabel "microseconds" textcolor rgb '#333'
-set title "add(1+2, 3+4) benchmark" textcolor rgb '#333'
+#+BEGIN_SRC gnuplot :file results-add.svg :exports results :term svg size 600,220 font 'Spectral, Georgia, serif,13' background rgb 'white'
+# Chart house style: horizontal gray bars, the Opcodes baseline in ink with a
+# dashed reference line, and values at the bar ends. The caption is the title.
+ink = '#333333'
+set border 0
 set key off
-set xtics rotate by -20 textcolor rgb '#333'
-set ytics textcolor rgb '#333'
-set border 11 lw 1.5 lc rgb '#333'
-set style line 1 lc rgb '#4078f2'
-
+set lmargin 14
+set rmargin 2
+unset xtics
+set ytics nomirror scale 0 textcolor rgb ink
+set yrange [-4.6:0.6]
+set xrange [0:0.058]
+set xlabel "microseconds (lower is faster)" textcolor rgb '#6b6b6b'
+set style fill solid noborder
+set arrow from 0.0440, graph 0 to 0.0440, graph 1 nohead dt 2 lc rgb ink
 $data << EOD
-"Opcodes" 0.044
+"Opcodes" 0.0440
 "Fn Ptr" 0.0503
 "Fn Ptr Slim" 0.0451
 "Fn Ptr Spec" 0.0451
 "Fn Ptr Hyper" 0.0448
 EOD
-
-plot $data using 0:2:xtic(1) with boxes ls 1
+plot $data using ($2/2):(-$0):($2/2):(0.3):($0 == 0 ? 0x333333 : 0xa8a8a8):ytic(1) \
+       with boxxyerror lc rgb variable, \
+     $data using 2:(-$0):(sprintf("%.4f", $2)) \
+       with labels left offset 0.6,0 textcolor rgb ink
 #+END_SRC
 
+#+CAPTION: ~add(1+2, 3+4)~ benchmark. The dashed line marks the Opcodes baseline.
 #+RESULTS:
 [[file:results-add.svg]]
 
 
-#+BEGIN_SRC gnuplot :file results-fib.svg :exports results :term svg size 600,300
-# DESIGN.md palette: bar fill #4078f2 (accent blue), text/axes #333
-set style fill solid 0.85 border rgb '#333'
-set boxwidth 0.6
-set yrange [0:15]
-set ylabel "microseconds" textcolor rgb '#333'
-set title "fib(12) benchmark" textcolor rgb '#333'
+#+BEGIN_SRC gnuplot :file results-fib.svg :exports results :term svg size 600,220 font 'Spectral, Georgia, serif,13' background rgb 'white'
+# Chart house style: horizontal gray bars, the Opcodes baseline in ink with a
+# dashed reference line, and values at the bar ends. The caption is the title.
+ink = '#333333'
+set border 0
 set key off
-set xtics rotate by -20 textcolor rgb '#333'
-set ytics textcolor rgb '#333'
-set border 11 lw 1.5 lc rgb '#333'
-set style line 1 lc rgb '#4078f2'
+set lmargin 14
+set rmargin 2
+unset xtics
+set ytics nomirror scale 0 textcolor rgb ink
+set yrange [-4.6:0.6]
+set xrange [0:13]
+set xlabel "microseconds (lower is faster)" textcolor rgb '#6b6b6b'
+set style fill solid noborder
+set arrow from 7.2, graph 0 to 7.2, graph 1 nohead dt 2 lc rgb ink
 $data << EOD
 "Opcodes" 7.2
 "Fn Ptr" 11.1
@@ -556,10 +564,13 @@ $data << EOD
 "Fn Ptr Spec" 8.8
 "Fn Ptr Hyper" 6.2
 EOD
-
-plot $data using 2:xtic(1) with boxes ls 1
+plot $data using ($2/2):(-$0):($2/2):(0.3):($0 == 0 ? 0x333333 : 0xa8a8a8):ytic(1) \
+       with boxxyerror lc rgb variable, \
+     $data using 2:(-$0):(sprintf("%.1f", $2)) \
+       with labels left offset 0.6,0 textcolor rgb ink
 #+END_SRC
 
+#+CAPTION: ~fib(12)~ benchmark. The dashed line marks the Opcodes baseline.
 #+RESULTS:
 [[file:results-fib.svg]]
 

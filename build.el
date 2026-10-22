@@ -51,21 +51,20 @@
 
 ;; Set options for exporting Org to HTML.
 (setq
- ;; Do not use the built-in org mode html styling. Instead, import the custom
- ;; stylesheet defined at ./static/css/styles.css.
+ ;; Do not use the built-in org mode html styling.
  org-html-style-default "
 <link rel=\"icon\" type=\"image/svg+xml\" href=\"/favicon.svg\">
 <link rel=\"icon\" type=\"image/png\" href=\"/favicon.png\">
 <link rel=\"icon\" href=\"/favicon.ico\" sizes=\"any\">
-
-<link rel=\"stylesheet\" href=\"/css/styles.css\">
 <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">
 <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>
-<link href=\"https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap\" rel=\"stylesheet\">
+<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Sometype+Mono:ital,wght@0,400;0,700;1,400&display=swap\">
+<link rel=\"stylesheet\" href=\"/css/style.css\">
+<link rel=\"stylesheet\" href=\"/css/syntax.css\">
 "
  ;; When doing syntax highlighting, output as CSS classes instead of the default
- ;; inline CSS. The color theme is defined in ./static/css/styles.css. To get
- ;; the CSS for the current theme, `(org-html-htmlize-generate-css)'.
+ ;; inline CSS. To get the CSS for the current theme,
+ ;; `(org-html-htmlize-generate-css)', or run tools/gen-syntax-css.sh.
  org-html-htmlize-output-type 'css
  ;; HTML shows home and up buttons at the top. We overwrite the default with our
  ;; own custom navigation bar.
@@ -77,19 +76,17 @@
 </div>"
  ;; Set the home link to the homepage.
  org-html-link-home "/"
+ ;; Drop the border/rules/frame attributes on tables; style.css handles them.
+ org-html-table-default-attributes nil
  ;; Fix '_' and '^' behavior
  org-use-sub-superscripts nil
  org-export-with-sub-superscripts nil
  ;; The postamble shows up at the foot of the page.
  org-html-postamble t
- ;; We overwrite the default postamble to remove the broken "Validation" link.
+ ;; A single quiet line with the author and date. This also drops the default
+ ;; postamble's broken "Validation" link.
  org-html-postamble-format
- '(("en" "
-<div></div>
-<p class=\"postamble-title\">Title: %t</p>
-<p class=\"author\">Author: %a</p>
-<p class=\"date\">Date: %d</p>
-")))
+ '(("en" "<p>%a · %d</p>")))
 
 
 (let ((website (list "wmedrano dot dev"

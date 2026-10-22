@@ -96,18 +96,20 @@ variables. However, the ~Environment~ can also fallback to a parent
 
 #+BEGIN_SRC dot :file env.svg :exports results
 digraph {
-  graph [ bgcolor=transparent, fontname="sans-serif" ];
-  node [ shape=box, style=filled, fontcolor="#333", margin="0.2,0.1", penwidth=1.5 ];
-  edge [ color="#a0a1a7", penwidth=1.2, fontcolor="#a0a1a7" ];
+  // Diagram house style: nodes look like code blocks; the active node is solid ink.
+  graph [ bgcolor="white", ranksep=0.35 ];
+  node [ shape=box, fontname="Spectral, Georgia, serif", fontsize=12, fontcolor="#333333", style=filled, fillcolor="#f8f8f8", color="#e0e0e0", penwidth=1, margin="0.14,0.06" ];
+  edge [ color="#8a8a8a", arrowsize=0.6, fontname="Spectral, Georgia, serif", fontsize=11, fontcolor="#6b6b6b" ];
+  node [ width=1.85 ];
   RequestVariable -> LocalEnvironment1 -> LocalEnvironment2 -> GlobalEnvironment;
-  RequestVariable [ fillcolor="#febdb2", color="#e45649", label="Request variable" ];
-  LocalEnvironment1 [ fillcolor="#c1c6fb", color="#4078f2", label="Local Environment" ];
-  LocalEnvironment2 [ fillcolor="#c1c6fb", color="#4078f2", label="Local Environment" ];
-  GlobalEnvironment [ fillcolor="#c1c6fb", color="#4078f2", label="Global Environment" ];
+  RequestVariable [ style=filled, fillcolor="#333333", color="#333333", fontcolor="white", label="Request variable" ];
+  LocalEnvironment1 [ label="Local Environment" ];
+  LocalEnvironment2 [ label="Local Environment" ];
+  GlobalEnvironment [ label="Global Environment" ];
 }
 #+END_SRC
 
-#+ATTR_HTML: :style width:30%
+#+CAPTION: Looking up a variable checks each environment in turn, ending at the global one.
 #+RESULTS:
 [[file:env.svg]]
 
@@ -192,18 +194,20 @@ environment.
 
 #+BEGIN_SRC dot :file env2.svg :exports results
 digraph {
-    graph [ bgcolor=transparent, fontname="sans-serif" ];
-    node [ shape=box, style=filled, fontcolor="#333", margin="0.2,0.1", penwidth=1.5 ];
-    edge [ color="#a0a1a7", penwidth=1.2, fontcolor="#a0a1a7" ];
-    GlobalEnvironment -> Env1 [label=" child"];
-    Env1 -> Env2 [label=" child"];
-    GlobalEnvironment [ fillcolor="#c1c6fb", color="#4078f2", label="Global Environment" ];
-    Env1 [ fillcolor="#c1c6fb", color="#4078f2", label="Environment: (lambda (x) ...)" ];
-    Env2 [ fillcolor="#c1c6fb", color="#4078f2", label="Environment: (lambda (y) ...)" ];
+  // Diagram house style: nodes look like code blocks; the active node is solid ink.
+  graph [ bgcolor="white", ranksep=0.35 ];
+  node [ shape=box, fontname="Spectral, Georgia, serif", fontsize=12, fontcolor="#333333", style=filled, fillcolor="#f8f8f8", color="#e0e0e0", penwidth=1, margin="0.14,0.06" ];
+  edge [ color="#8a8a8a", arrowsize=0.6, fontname="Spectral, Georgia, serif", fontsize=11, fontcolor="#6b6b6b" ];
+  node [ width=2.6 ];
+  GlobalEnvironment -> Env1 [ label=" child" ];
+  Env1 -> Env2 [ label=" child" ];
+  GlobalEnvironment [ label="Global Environment" ];
+  Env1 [ label=<Environment: <FONT FACE="Sometype Mono, monospace">(lambda (x) ...)</FONT>> ];
+  Env2 [ label=<Environment: <FONT FACE="Sometype Mono, monospace">(lambda (y) ...)</FONT>> ];
 }
 #+END_SRC
 
-#+ATTR_HTML: :style width:40%
+#+CAPTION: Each lambda captures the environment it was created in as its parent.
 #+RESULTS:
 [[file:env2.svg]]
 

@@ -180,14 +180,15 @@ IFT requires 2 components:
 #+BEGIN_SRC dot :file ift-encoder.svg :exports results
 digraph IFT {
   rankdir=LR;
-  bgcolor="#f4f2ef";
-  node [fontname="sans-serif", fontsize=12, style="filled", penwidth=1.2];
-  edge [color="#a0a1a7", arrowsize=0.8];
+  bgcolor="white";
+  // Diagram house style: nodes look like code blocks; the active node is solid ink.
+  node [fontname="Spectral, Georgia, serif", fontsize=12, fontcolor="#333333", style=filled, fillcolor="#f8f8f8", color="#e0e0e0", penwidth=1, margin="0.14,0.06"];
+  edge [color="#8a8a8a", arrowsize=0.6];
 
-  font    [label="Font File", shape=note, fillcolor="#fafafa", color="#c18401"];
-  encoder [label="IFT\nEncoder", shape=box, style="filled", fillcolor="#f3f0f7", color="#4078f2"];
-  base    [label="Base Font", shape=note, fillcolor="#fafafa", color="#c18401"];
-  patches [label="Patch 0|Patch 1|⋮|Patch N", shape=record, fillcolor="#fafafa", color="#c18401"];
+  font    [label="Font File", shape=note];
+  encoder [label="IFT\nEncoder", shape=box, style=filled, fillcolor="#333333", color="#333333", fontcolor="white"];
+  base    [label="Base Font", shape=note];
+  patches [label="Patch 0|Patch 1|⋮|Patch N", shape=record];
 
   font -> encoder;
   encoder -> base;
@@ -196,30 +197,30 @@ digraph IFT {
 #+END_SRC
 
 #+CAPTION: The encoder converts a font file into a font and its patches.
-#+ATTR_HTML: :style width:50%;
 #+RESULTS:
 [[file:ift-encoder.svg]]
 
 #+BEGIN_SRC dot :file ift-client.svg :exports results
 digraph IFTClient {
   rankdir=LR;
-  bgcolor="#f4f2ef";
-  node [fontname="sans-serif", fontsize=12, style="filled", penwidth=1.2];
-  edge [color="#a0a1a7", arrowsize=0.8];
+  bgcolor="white";
+  // Diagram house style: nodes look like code blocks; the active node is solid ink.
+  node [fontname="Spectral, Georgia, serif", fontsize=12, fontcolor="#333333", style=filled, fillcolor="#f8f8f8", color="#e0e0e0", penwidth=1, margin="0.14,0.06"];
+  edge [color="#8a8a8a", arrowsize=0.6];
 
-  webpage [label="Web Page", shape=note, fillcolor="#fafafa", color="#c18401"];
-  browser [label="Browser", shape=box, style="filled", fillcolor="#f3f0f7", color="#4078f2"];
+  webpage [label="Web Page", shape=note];
+  browser [label="Browser", shape=box, style=filled, fillcolor="#333333", color="#333333", fontcolor="white"];
 
   subgraph cluster_cdn {
     label="CDN";
-    fontname="sans-serif";
+    fontname="Spectral, Georgia, serif";
     fontsize=12;
-    style="filled";
-    bgcolor="#f4f2ef";
-    color="#e0dcd5";
+    fontcolor="#6b6b6b";
+    style=dashed;
+    color="#c8c8c8";
 
-    basefont [label="Base Font", shape=note, fillcolor="#fafafa", color="#c18401"];
-    patches  [label="Patches",   shape=note, fillcolor="#fafafa", color="#c18401"];
+    basefont [label="Base Font", shape=note];
+    patches  [label="Patches",   shape=note];
   }
 
   webpage -> browser;
@@ -229,7 +230,6 @@ digraph IFTClient {
 #+END_SRC
 
 #+CAPTION: The client must download and apply the relevant patches at runtime.
-#+ATTR_HTML: :style width:33%;
 #+RESULTS:
 [[file:ift-client.svg]]
 

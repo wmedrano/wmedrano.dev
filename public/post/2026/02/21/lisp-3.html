@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-10-21 Wed 20:12 -->
+<!-- 2026-10-21 Wed 21:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Building a Lisp Interpreter (in Rust) - Part 3</title>
@@ -13,11 +13,11 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-
-<link rel="stylesheet" href="/css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Sometype+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/syntax.css">
 <link rel="canonical" href="https://wmedrano.dev/post/2026/02/21/lisp-3.html">
 </head>
 <body>
@@ -32,27 +32,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge73eee1">1. Introduction</a>
+<li><a href="#org766bdaa">1. Introduction</a>
 <ul>
-<li><a href="#orgcc69f85">1.1. Lambda</a></li>
+<li><a href="#orge5d17fb">1.1. Lambda</a></li>
 </ul>
 </li>
-<li><a href="#org85d565c">2. Design</a>
+<li><a href="#orgac4404e">2. Design</a>
 <ul>
-<li><a href="#org9b0c2ad">2.1. Representation</a></li>
-<li><a href="#orgfbd07a5">2.2. Variables</a></li>
+<li><a href="#org0fcf8be">2.1. Representation</a></li>
+<li><a href="#org3186986">2.2. Variables</a></li>
 </ul>
 </li>
-<li><a href="#org826d737">3. Implementation</a>
+<li><a href="#org241b171">3. Implementation</a>
 <ul>
-<li><a href="#orgd895c49">3.1. Environment</a></li>
-<li><a href="#org5df569a">3.2. Closures</a></li>
-<li><a href="#orgcab4365">3.3. Creating Lambdas</a></li>
-<li><a href="#orgb58cf14">3.4. Evaluating Lambdas</a></li>
+<li><a href="#org803b3c5">3.1. Environment</a></li>
+<li><a href="#org1e5a5e2">3.2. Closures</a></li>
+<li><a href="#org831a5ac">3.3. Creating Lambdas</a></li>
+<li><a href="#orgd37c500">3.4. Evaluating Lambdas</a></li>
 </ul>
 </li>
-<li><a href="#org88b2eb8">4. (Optional) Scoping</a></li>
-<li><a href="#org56606d4">5. Conclusion</a></li>
+<li><a href="#org9d7f87d">4. (Optional) Scoping</a></li>
+<li><a href="#org28dc964">5. Conclusion</a></li>
 </ul>
 </div>
 </div>
@@ -60,8 +60,8 @@
 This is Part 3 (Lambdas) of a 3-part series.
 Reading: <a href="../../../2025/11/15/lisp-1.html">Part 1 (Parsing)</a> | <a href="../../../2026/01/25/lisp-2.html">Part 2 (Evaluation)</a>
 </p>
-<div id="outline-container-orge73eee1" class="outline-2">
-<h2 id="orge73eee1"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org766bdaa" class="outline-2">
+<h2 id="org766bdaa"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 This is the third and final part of the <code>Building a Lisp Interpreter (in Rust)</code>
@@ -72,8 +72,8 @@ series. In parts <a href="../../../2025/11/15/lisp-1.html">1</a> and <a href="..
 In this part, we will add user-defined functions via <code>lambda</code>.
 </p>
 </div>
-<div id="outline-container-orgcc69f85" class="outline-3">
-<h3 id="orgcc69f85"><span class="section-number-3">1.1.</span> Lambda</h3>
+<div id="outline-container-orge5d17fb" class="outline-3">
+<h3 id="orge5d17fb"><span class="section-number-3">1.1.</span> Lambda</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 <code>lambda</code> creates a function. It takes a list of argument names followed by one
@@ -142,12 +142,12 @@ We can also create a <code>lambda</code> that creates a <code>lambda</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-org85d565c" class="outline-2">
-<h2 id="org85d565c"><span class="section-number-2">2.</span> Design</h2>
+<div id="outline-container-orgac4404e" class="outline-2">
+<h2 id="orgac4404e"><span class="section-number-2">2.</span> Design</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org9b0c2ad" class="outline-3">
-<h3 id="org9b0c2ad"><span class="section-number-3">2.1.</span> Representation</h3>
+<div id="outline-container-org0fcf8be" class="outline-3">
+<h3 id="org0fcf8be"><span class="section-number-3">2.1.</span> Representation</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Lambdas are regular old objects like integers and &hellip; the Rust based functions
@@ -165,8 +165,8 @@ associated with the lambda.
 </div>
 </div>
 </div>
-<div id="outline-container-orgfbd07a5" class="outline-3">
-<h3 id="orgfbd07a5"><span class="section-number-3">2.2.</span> Variables</h3>
+<div id="outline-container-org3186986" class="outline-3">
+<h3 id="org3186986"><span class="section-number-3">2.2.</span> Variables</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Our Lisp interpreter is able to reference values within then <code>Environment</code>
@@ -182,19 +182,20 @@ variables. However, the <code>Environment</code> can also fallback to a parent
 </p>
 
 
-<div id="org2dff8c2" class="figure">
-<p><img src="env.svg" alt="env.svg" class="org-svg" style="width:30%" />
+<div id="org47ead50" class="figure">
+<p><img src="env.svg" alt="env.svg" class="org-svg" />
 </p>
+<p><span class="figure-number">Figure 1: </span>Looking up a variable checks each environment in turn, ending at the global one.</p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org826d737" class="outline-2">
-<h2 id="org826d737"><span class="section-number-2">3.</span> Implementation</h2>
+<div id="outline-container-org241b171" class="outline-2">
+<h2 id="org241b171"><span class="section-number-2">3.</span> Implementation</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgd895c49" class="outline-3">
-<h3 id="orgd895c49"><span class="section-number-3">3.1.</span> Environment</h3>
+<div id="outline-container-org803b3c5" class="outline-3">
+<h3 id="org803b3c5"><span class="section-number-3">3.1.</span> Environment</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 <code>Environment</code> will keep its existing getters and setters, with updates to use
@@ -267,8 +268,8 @@ reuse the reference.
 </div>
 </div>
 </div>
-<div id="outline-container-org5df569a" class="outline-3">
-<h3 id="org5df569a"><span class="section-number-3">3.2.</span> Closures</h3>
+<div id="outline-container-org1e5a5e2" class="outline-3">
+<h3 id="org1e5a5e2"><span class="section-number-3">3.2.</span> Closures</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 In our example, we created a lambda that referenced its parent <code>Environment</code>.
@@ -288,9 +289,10 @@ environment.
 </p>
 
 
-<div id="org80fd7c1" class="figure">
-<p><img src="env2.svg" alt="env2.svg" class="org-svg" style="width:40%" />
+<div id="orgef194e4" class="figure">
+<p><img src="env2.svg" alt="env2.svg" class="org-svg" />
 </p>
+<p><span class="figure-number">Figure 2: </span>Each lambda captures the environment it was created in as its parent.</p>
 </div>
 
 <p>
@@ -319,8 +321,8 @@ This makes our final <code>Val</code> and <code>Lambda</code> values be:
 </div>
 </div>
 </div>
-<div id="outline-container-orgcab4365" class="outline-3">
-<h3 id="orgcab4365"><span class="section-number-3">3.3.</span> Creating Lambdas</h3>
+<div id="outline-container-org831a5ac" class="outline-3">
+<h3 id="org831a5ac"><span class="section-number-3">3.3.</span> Creating Lambdas</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 Lambda creation will use the same codepath as our other special forms, "if" and
@@ -375,8 +377,8 @@ as is in the body.
 </div>
 </div>
 </div>
-<div id="outline-container-orgb58cf14" class="outline-3">
-<h3 id="orgb58cf14"><span class="section-number-3">3.4.</span> Evaluating Lambdas</h3>
+<div id="outline-container-orgd37c500" class="outline-3">
+<h3 id="orgd37c500"><span class="section-number-3">3.4.</span> Evaluating Lambdas</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 To actually allow calling Lambdas, we will hook into the same spot as
@@ -458,8 +460,8 @@ We probably should have done this earlier, but we introduce an
 </div>
 </div>
 </div>
-<div id="outline-container-org88b2eb8" class="outline-2">
-<h2 id="org88b2eb8"><span class="section-number-2">4.</span> (Optional) Scoping</h2>
+<div id="outline-container-org9d7f87d" class="outline-2">
+<h2 id="org9d7f87d"><span class="section-number-2">4.</span> (Optional) Scoping</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Our Lisp implements <b>lexical scoping</b>, also known as the correct
@@ -546,8 +548,8 @@ Scheme R7RS allows opting into dynamic scoping for some values. This is under
 </div>
 </div>
 </div>
-<div id="outline-container-org56606d4" class="outline-2">
-<h2 id="org56606d4"><span class="section-number-2">5.</span> Conclusion</h2>
+<div id="outline-container-org28dc964" class="outline-2">
+<h2 id="org28dc964"><span class="section-number-2">5.</span> Conclusion</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 With <code>lambda</code>, our interpreter is complete. The final interpreter can handle
@@ -575,11 +577,7 @@ You can see the full implementation on
 </div>
 </div>
 <div id="postamble" class="status">
-
-<div></div>
-<p class="postamble-title">Title: Building a Lisp Interpreter (in Rust) - Part 3</p>
-<p class="author">Author: Will S. Medrano</p>
-<p class="date">Date: 2026-02-21</p>
+<p>Will S. Medrano · 2026-02-21</p>
 </div>
 </body>
 </html>

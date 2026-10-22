@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-10-21 Wed 20:12 -->
+<!-- 2026-10-21 Wed 21:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Building a Lisp Interpreter (in Rust) - Part 2</title>
@@ -13,11 +13,11 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-
-<link rel="stylesheet" href="/css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Sometype+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/syntax.css">
 <link rel="canonical" href="https://wmedrano.dev/post/2026/01/25/lisp-2.html">
 </head>
 <body>
@@ -32,37 +32,37 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org7060627">1. Introduction</a>
+<li><a href="#orged8c773">1. Introduction</a>
 <ul>
-<li><a href="#org1fb1c89">1.1. <code>eval</code> Rules</a></li>
+<li><a href="#orga27602f">1.1. <code>eval</code> Rules</a></li>
 </ul>
 </li>
-<li><a href="#org09127ee">2. Data structures</a>
+<li><a href="#orgef278d5">2. Data structures</a>
 <ul>
-<li><a href="#orga0774b6">2.1. Function Type in Value</a></li>
-<li><a href="#orgd0bbbd0">2.2. Environment/Variables</a></li>
-<li><a href="#orgf2f7d01">2.3. Errors</a></li>
+<li><a href="#orgc1de1bd">2.1. Function Type in Value</a></li>
+<li><a href="#orgb6304ff">2.2. Environment/Variables</a></li>
+<li><a href="#orgd9ec2f5">2.3. Errors</a></li>
 </ul>
 </li>
-<li><a href="#org94d1a79">3. Eval</a>
+<li><a href="#orgda99418">3. Eval</a>
 <ul>
-<li><a href="#orge5c90a0">3.1. API</a></li>
-<li><a href="#orgaaface8">3.2. Simple Case: Atoms/Constants</a></li>
-<li><a href="#org1f31107">3.3. Symbol Case: Variables</a></li>
-<li><a href="#org13df88c">3.4. Function Call Case: List Evaluation</a></li>
+<li><a href="#orgdcbcb3d">3.1. API</a></li>
+<li><a href="#orgc81469d">3.2. Simple Case: Atoms/Constants</a></li>
+<li><a href="#orgf0cb0c4">3.3. Symbol Case: Variables</a></li>
+<li><a href="#org9bd7238">3.4. Function Call Case: List Evaluation</a></li>
 </ul>
 </li>
-<li><a href="#org7b8c317">4. Special Forms</a>
+<li><a href="#org1924135">4. Special Forms</a>
 <ul>
-<li><a href="#org95e1b88">4.1. If</a>
+<li><a href="#orgab76909">4.1. If</a>
 <ul>
-<li><a href="#orgb299782">4.1.1. Implementation</a></li>
+<li><a href="#orgaac9dba">4.1.1. Implementation</a></li>
 </ul>
 </li>
-<li><a href="#org0f80674">4.2. Define</a></li>
+<li><a href="#org58536b7">4.2. Define</a></li>
 </ul>
 </li>
-<li><a href="#org2ba17f0">5. Conclusion</a></li>
+<li><a href="#org498ec60">5. Conclusion</a></li>
 </ul>
 </div>
 </div>
@@ -70,8 +70,8 @@
 This is Part 2 (Evaluation) of a 3-part series.
 Reading: <a href="../../../2025/11/15/lisp-1.html">Part 1 (Parsing)</a> | <a href="../../../2026/02/21/lisp-3.html">Part 3 (Lambdas)</a>
 </p>
-<div id="outline-container-org7060627" class="outline-2">
-<h2 id="org7060627"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-orged8c773" class="outline-2">
+<h2 id="orged8c773"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 This is part 2 of 3 of the <code>Building a Lisp Interpreter (in Rust)</code> series. In
@@ -102,8 +102,8 @@ Where <code>expr</code> is a Lisp data structure that holds the code we will eva
 <code>env</code> contains the variables and functions that are available for use.
 </p>
 </div>
-<div id="outline-container-org1fb1c89" class="outline-3">
-<h3 id="org1fb1c89"><span class="section-number-3">1.1.</span> <code>eval</code> Rules</h3>
+<div id="outline-container-orga27602f" class="outline-3">
+<h3 id="orga27602f"><span class="section-number-3">1.1.</span> <code>eval</code> Rules</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Simple data (atoms) return just themselves.
@@ -178,8 +178,8 @@ x <span class="org-comment-delimiter">;; </span><span class="org-comment">12</sp
 </div>
 </div>
 </div>
-<div id="outline-container-org09127ee" class="outline-2">
-<h2 id="org09127ee"><span class="section-number-2">2.</span> Data structures</h2>
+<div id="outline-container-orgef278d5" class="outline-2">
+<h2 id="orgef278d5"><span class="section-number-2">2.</span> Data structures</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 We defined a basic data structure in <a href="../../../2025/11/15/lisp-1.html">Lisp 1</a>. Before continuing, they need a
@@ -192,8 +192,8 @@ little more refinement. We want to support:
 <li>Errors - Your standard Rust <code>enum</code> based error.</li>
 </ol>
 </div>
-<div id="outline-container-orga0774b6" class="outline-3">
-<h3 id="orga0774b6"><span class="section-number-3">2.1.</span> Function Type in Value</h3>
+<div id="outline-container-orgc1de1bd" class="outline-3">
+<h3 id="orgc1de1bd"><span class="section-number-3">2.1.</span> Function Type in Value</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 In our language, we have the concept of a function. For example, in <code>(+ 1 2 3)</code>,
@@ -224,8 +224,8 @@ Which makes our <code>Val</code>:
 </div>
 </div>
 </div>
-<div id="outline-container-orgd0bbbd0" class="outline-3">
-<h3 id="orgd0bbbd0"><span class="section-number-3">2.2.</span> Environment/Variables</h3>
+<div id="outline-container-orgb6304ff" class="outline-3">
+<h3 id="orgb6304ff"><span class="section-number-3">2.2.</span> Environment/Variables</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 In the <code>symbol</code> example, we referenced a variable.
@@ -273,8 +273,8 @@ with a <code>HashMap</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgf2f7d01" class="outline-3">
-<h3 id="orgf2f7d01"><span class="section-number-3">2.3.</span> Errors</h3>
+<div id="outline-container-orgd9ec2f5" class="outline-3">
+<h3 id="orgd9ec2f5"><span class="section-number-3">2.3.</span> Errors</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 We've been alluding to errors happening. Here are the final set of errors we use
@@ -302,12 +302,12 @@ in this post.
 </div>
 </div>
 </div>
-<div id="outline-container-org94d1a79" class="outline-2">
-<h2 id="org94d1a79"><span class="section-number-2">3.</span> Eval</h2>
+<div id="outline-container-orgda99418" class="outline-2">
+<h2 id="orgda99418"><span class="section-number-2">3.</span> Eval</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orge5c90a0" class="outline-3">
-<h3 id="orge5c90a0"><span class="section-number-3">3.1.</span> API</h3>
+<div id="outline-container-orgdcbcb3d" class="outline-3">
+<h3 id="orgdcbcb3d"><span class="section-number-3">3.1.</span> API</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 The eval function will take in an expression and an environment where it can
@@ -358,8 +358,8 @@ Now all we have to do is implement the eval function.
 </p>
 </div>
 </div>
-<div id="outline-container-orgaaface8" class="outline-3">
-<h3 id="orgaaface8"><span class="section-number-3">3.2.</span> Simple Case: Atoms/Constants</h3>
+<div id="outline-container-orgc81469d" class="outline-3">
+<h3 id="orgc81469d"><span class="section-number-3">3.2.</span> Simple Case: Atoms/Constants</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 The case for integers and booleans is easy. They just evaluate to
@@ -426,8 +426,8 @@ To implement this, we will simply return a copy of our input:
 </div>
 </div>
 </div>
-<div id="outline-container-org1f31107" class="outline-3">
-<h3 id="org1f31107"><span class="section-number-3">3.3.</span> Symbol Case: Variables</h3>
+<div id="outline-container-orgf0cb0c4" class="outline-3">
+<h3 id="orgf0cb0c4"><span class="section-number-3">3.3.</span> Symbol Case: Variables</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 A variable can be referenced by using a raw symbol. Let's say we manually define
@@ -469,8 +469,8 @@ To implement this, we will simply query the <code>Environment</code>.
 </div>
 </div>
 </div>
-<div id="outline-container-org13df88c" class="outline-3">
-<h3 id="org13df88c"><span class="section-number-3">3.4.</span> Function Call Case: List Evaluation</h3>
+<div id="outline-container-org9bd7238" class="outline-3">
+<h3 id="org9bd7238"><span class="section-number-3">3.4.</span> Function Call Case: List Evaluation</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 List evaluation is more complex. Let's fork this off into a function.
@@ -582,8 +582,8 @@ simple implementation.
 </div>
 </div>
 </div>
-<div id="outline-container-org7b8c317" class="outline-2">
-<h2 id="org7b8c317"><span class="section-number-2">4.</span> Special Forms</h2>
+<div id="outline-container-org1924135" class="outline-2">
+<h2 id="org1924135"><span class="section-number-2">4.</span> Special Forms</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Not all expressions follow the standard evaluation rules. These are called
@@ -592,8 +592,8 @@ evaluated before being passed to the function. Special forms have their own
 evaluation rules. We will introduce the special forms <code>if</code> and <code>define</code>.
 </p>
 </div>
-<div id="outline-container-org95e1b88" class="outline-3">
-<h3 id="org95e1b88"><span class="section-number-3">4.1.</span> If</h3>
+<div id="outline-container-orgab76909" class="outline-3">
+<h3 id="orgab76909"><span class="section-number-3">4.1.</span> If</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 The <code>if</code> special form takes 3 arguments: a condition, a "true" branch, and a
@@ -637,8 +637,8 @@ were a function call!
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orgb299782" class="outline-4">
-<h4 id="orgb299782"><span class="section-number-4">4.1.1.</span> Implementation</h4>
+<div id="outline-container-orgaac9dba" class="outline-4">
+<h4 id="orgaac9dba"><span class="section-number-4">4.1.1.</span> Implementation</h4>
 <div class="outline-text-4" id="text-4-1-1">
 <p>
 We need to handle <code>if</code> before attempting to call it as a function. Let's add an
@@ -711,8 +711,8 @@ Now, it is easy to evaluate our if expression.
 </div>
 </div>
 </div>
-<div id="outline-container-org0f80674" class="outline-3">
-<h3 id="org0f80674"><span class="section-number-3">4.2.</span> Define</h3>
+<div id="outline-container-org58536b7" class="outline-3">
+<h3 id="org58536b7"><span class="section-number-3">4.2.</span> Define</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 The <code>define</code> special form binds a value to a name in the environment. The first
@@ -824,8 +824,8 @@ if.
 </div>
 </div>
 </div>
-<div id="outline-container-org2ba17f0" class="outline-2">
-<h2 id="org2ba17f0"><span class="section-number-2">5.</span> Conclusion</h2>
+<div id="outline-container-org498ec60" class="outline-2">
+<h2 id="org498ec60"><span class="section-number-2">5.</span> Conclusion</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 With function evaluation, <code>if</code> and <code>define</code>, we can now write some non-trivial
@@ -846,11 +846,7 @@ Preview:
 </div>
 </div>
 <div id="postamble" class="status">
-
-<div></div>
-<p class="postamble-title">Title: Building a Lisp Interpreter (in Rust) - Part 2</p>
-<p class="author">Author: Will S. Medrano</p>
-<p class="date">Date: 2026-01-25</p>
+<p>Will S. Medrano · 2026-01-25</p>
 </div>
 </body>
 </html>

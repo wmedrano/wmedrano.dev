@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-10-21 Wed 20:12 -->
+<!-- 2026-10-21 Wed 21:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Local LLM</title>
@@ -13,11 +13,11 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-
-<link rel="stylesheet" href="/css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Sometype+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/syntax.css">
 <link rel="canonical" href="https://wmedrano.dev/drafts/local-llm.html">
 </head>
 <body>
@@ -32,15 +32,15 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org64141b2">1. Tests</a>
+<li><a href="#org97afc0b">1. Tests</a>
 <ul>
-<li><a href="#org4a3cf89">1.1. Prompt</a></li>
-<li><a href="#orgc6b9f9b">1.2. Response Quality</a></li>
-<li><a href="#org24906e9">1.3. Speed</a>
+<li><a href="#org35cd87c">1.1. Prompt</a></li>
+<li><a href="#org62ae76b">1.2. Response Quality</a></li>
+<li><a href="#org674fc16">1.3. Speed</a>
 <ul>
-<li><a href="#org1dff0cd">1.3.1. Turn 1</a></li>
-<li><a href="#org5ffc9f7">1.3.2. Turn 2</a></li>
-<li><a href="#org020e337">1.3.3. Turn 3</a></li>
+<li><a href="#org7f3bdbe">1.3.1. Turn 1</a></li>
+<li><a href="#orgeda212a">1.3.2. Turn 2</a></li>
+<li><a href="#org6eb5b44">1.3.3. Turn 3</a></li>
 </ul>
 </li>
 </ul>
@@ -51,14 +51,14 @@
 <p>
 <i>(Reading time: TODO)</i>
 </p>
-<div id="outline-container-org64141b2" class="outline-2">
-<h2 id="org64141b2"><span class="section-number-2">1.</span> Tests</h2>
+<div id="outline-container-org97afc0b" class="outline-2">
+<h2 id="org97afc0b"><span class="section-number-2">1.</span> Tests</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 I tested 4 local models and 2 cloud models with Ollama.
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -117,8 +117,8 @@ should aim to provide good reasoning given good context since less knowledge can
 fit.
 </p>
 </div>
-<div id="outline-container-org4a3cf89" class="outline-3">
-<h3 id="org4a3cf89"><span class="section-number-3">1.1.</span> Prompt</h3>
+<div id="outline-container-org35cd87c" class="outline-3">
+<h3 id="org35cd87c"><span class="section-number-3">1.1.</span> Prompt</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 The test is a conversation with 3 prompts. The initial prompt starts with a
@@ -150,8 +150,8 @@ local       forgejo-data
 </div>
 </div>
 </div>
-<div id="outline-container-orgc6b9f9b" class="outline-3">
-<h3 id="orgc6b9f9b"><span class="section-number-3">1.2.</span> Response Quality</h3>
+<div id="outline-container-org62ae76b" class="outline-3">
+<h3 id="org62ae76b"><span class="section-number-3">1.2.</span> Response Quality</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 All responses were adequate. Since the Qwen models are small, they can't pack as
@@ -162,14 +162,14 @@ and export functionality.
 </p>
 </div>
 </div>
-<div id="outline-container-org24906e9" class="outline-3">
-<h3 id="org24906e9"><span class="section-number-3">1.3.</span> Speed</h3>
+<div id="outline-container-org674fc16" class="outline-3">
+<h3 id="org674fc16"><span class="section-number-3">1.3.</span> Speed</h3>
 <div class="outline-text-3" id="text-1-3">
 </div>
-<div id="outline-container-org1dff0cd" class="outline-4">
-<h4 id="org1dff0cd"><span class="section-number-4">1.3.1.</span> Turn 1</h4>
+<div id="outline-container-org7f3bdbe" class="outline-4">
+<h4 id="org7f3bdbe"><span class="section-number-4">1.3.1.</span> Turn 1</h4>
 <div class="outline-text-4" id="text-1-3-1">
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -234,7 +234,7 @@ and export functionality.
 </tbody>
 </table>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -279,10 +279,10 @@ and export functionality.
 </table>
 </div>
 </div>
-<div id="outline-container-org5ffc9f7" class="outline-4">
-<h4 id="org5ffc9f7"><span class="section-number-4">1.3.2.</span> Turn 2</h4>
+<div id="outline-container-orgeda212a" class="outline-4">
+<h4 id="orgeda212a"><span class="section-number-4">1.3.2.</span> Turn 2</h4>
 <div class="outline-text-4" id="text-1-3-2">
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -347,7 +347,7 @@ and export functionality.
 </tbody>
 </table>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -392,10 +392,10 @@ and export functionality.
 </table>
 </div>
 </div>
-<div id="outline-container-org020e337" class="outline-4">
-<h4 id="org020e337"><span class="section-number-4">1.3.3.</span> Turn 3</h4>
+<div id="outline-container-org6eb5b44" class="outline-4">
+<h4 id="org6eb5b44"><span class="section-number-4">1.3.3.</span> Turn 3</h4>
 <div class="outline-text-4" id="text-1-3-3">
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -460,7 +460,7 @@ and export functionality.
 </tbody>
 </table>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<table>
 
 
 <colgroup>
@@ -509,11 +509,7 @@ and export functionality.
 </div>
 </div>
 <div id="postamble" class="status">
-
-<div></div>
-<p class="postamble-title">Title: Local LLM</p>
-<p class="author">Author: Will S. Medrano</p>
-<p class="date">Date: 2026-05-10 Sun 00:00</p>
+<p>Will S. Medrano · 2026-05-10 Sun 00:00</p>
 </div>
 </body>
 </html>

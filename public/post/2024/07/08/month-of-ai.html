@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-10-21 Wed 20:12 -->
+<!-- 2026-10-21 Wed 21:17 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Month of AI</title>
@@ -13,11 +13,11 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" href="/favicon.ico" sizes="any">
-
-<link rel="stylesheet" href="/css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=Sometype+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/syntax.css">
 <link rel="canonical" href="https://wmedrano.dev/post/2024/07/08/month-of-ai.html">
 </head>
 <body>
@@ -32,16 +32,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org1ea0e31">1. Introduction</a></li>
-<li><a href="#orgf85c669">2. Background</a>
+<li><a href="#org82f7c33">1. Introduction</a></li>
+<li><a href="#orgc798cc8">2. Background</a>
 <ul>
-<li><a href="#orgd26c6f3">2.1. Round 3: What I Did</a></li>
-<li><a href="#orge950706">2.2. Takeaways</a>
+<li><a href="#org0d743ab">2.1. Round 3: What I Did</a></li>
+<li><a href="#orgddc4eff">2.2. Takeaways</a>
 <ul>
-<li><a href="#org32b1d22">2.2.1. LLMs Can Run On Lots of Hardware</a></li>
-<li><a href="#orgf728b24">2.2.2. Running Models is Easyish</a></li>
-<li><a href="#org05f1f79">2.2.3. Model Documentation is Trash</a></li>
-<li><a href="#org5d06fa9">2.2.4. Text Vectorization Alone is Crap</a></li>
+<li><a href="#orgd04a748">2.2.1. LLMs Can Run On Lots of Hardware</a></li>
+<li><a href="#org3535e18">2.2.2. Running Models is Easyish</a></li>
+<li><a href="#org4a32c33">2.2.3. Model Documentation is Trash</a></li>
+<li><a href="#org2b79f52">2.2.4. Text Vectorization Alone is Crap</a></li>
 </ul>
 </li>
 </ul>
@@ -49,8 +49,8 @@
 </ul>
 </div>
 </div>
-<div id="outline-container-org1ea0e31" class="outline-2">
-<h2 id="org1ea0e31"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org82f7c33" class="outline-2">
+<h2 id="org82f7c33"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Generative AI models have been on fire lately. Proponents peddle it as
@@ -63,8 +63,8 @@ Huggingface, which reminded me of a more modern but janky
 </p>
 </div>
 </div>
-<div id="outline-container-orgf85c669" class="outline-2">
-<h2 id="orgf85c669"><span class="section-number-2">2.</span> Background</h2>
+<div id="outline-container-orgc798cc8" class="outline-2">
+<h2 id="orgc798cc8"><span class="section-number-2">2.</span> Background</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Round 1: In college (around 2015~2016) I messed around with some basic
@@ -88,8 +88,8 @@ somewhat distracting (expected), but it was great at generating docstrings on
 all my public <code>structs</code> and <code>functions</code>, an unexpected surprise.
 </p>
 </div>
-<div id="outline-container-orgd26c6f3" class="outline-3">
-<h3 id="orgd26c6f3"><span class="section-number-3">2.1.</span> Round 3: What I Did</h3>
+<div id="outline-container-org0d743ab" class="outline-3">
+<h3 id="org0d743ab"><span class="section-number-3">2.1.</span> Round 3: What I Did</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 I delved into AI for a month or so.
@@ -117,12 +117,12 @@ was able to run a variant of the Codestral 22B model.
 </p>
 </div>
 </div>
-<div id="outline-container-orge950706" class="outline-3">
-<h3 id="orge950706"><span class="section-number-3">2.2.</span> Takeaways</h3>
+<div id="outline-container-orgddc4eff" class="outline-3">
+<h3 id="orgddc4eff"><span class="section-number-3">2.2.</span> Takeaways</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
-<div id="outline-container-org32b1d22" class="outline-4">
-<h4 id="org32b1d22"><span class="section-number-4">2.2.1.</span> LLMs Can Run On Lots of Hardware</h4>
+<div id="outline-container-orgd04a748" class="outline-4">
+<h4 id="orgd04a748"><span class="section-number-4">2.2.1.</span> LLMs Can Run On Lots of Hardware</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 I purchased an AMD card last year expecting to do no ML work on
@@ -138,8 +138,8 @@ usable for some small scale offline processing.
 </p>
 </div>
 </div>
-<div id="outline-container-orgf728b24" class="outline-4">
-<h4 id="orgf728b24"><span class="section-number-4">2.2.2.</span> Running Models is Easyish</h4>
+<div id="outline-container-org3535e18" class="outline-4">
+<h4 id="org3535e18"><span class="section-number-4">2.2.2.</span> Running Models is Easyish</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 Although some of the APIs are ugly, HuggingFace has succeeded at
@@ -149,8 +149,8 @@ endpoint that offers ML as a service.
 </p>
 </div>
 </div>
-<div id="outline-container-org05f1f79" class="outline-4">
-<h4 id="org05f1f79"><span class="section-number-4">2.2.3.</span> Model Documentation is Trash</h4>
+<div id="outline-container-org4a32c33" class="outline-4">
+<h4 id="org4a32c33"><span class="section-number-4">2.2.3.</span> Model Documentation is Trash</h4>
 <div class="outline-text-4" id="text-2-2-3">
 <blockquote>
 <p>
@@ -176,8 +176,8 @@ text-generation, but my wishlist for a card:
 </ul>
 </div>
 </div>
-<div id="outline-container-org5d06fa9" class="outline-4">
-<h4 id="org5d06fa9"><span class="section-number-4">2.2.4.</span> Text Vectorization Alone is Crap</h4>
+<div id="outline-container-org2b79f52" class="outline-4">
+<h4 id="org2b79f52"><span class="section-number-4">2.2.4.</span> Text Vectorization Alone is Crap</h4>
 <div class="outline-text-4" id="text-2-2-4">
 <p>
 Listen to any layman interview and you will hear someone jump to the
@@ -194,11 +194,7 @@ Fridman’s <a href="https://youtu.be/e-gwvmhyU7A?si=znZM8TD-9O28t0v2">interview
 </div>
 </div>
 <div id="postamble" class="status">
-
-<div></div>
-<p class="postamble-title">Title: Month of AI</p>
-<p class="author">Author: Will S. Medrano</p>
-<p class="date">Date: 2024-07-08</p>
+<p>Will S. Medrano · 2024-07-08</p>
 </div>
 </body>
 </html>
