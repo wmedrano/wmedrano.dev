@@ -25,6 +25,6 @@ echo -e "[deploy] ${GREEN}Build complete.${NC}"
 
 echo -e "[deploy] ${YELLOW}Uploading files...${NC}"
 sftp -P "$PORT" "$TARGET" <<EOF
-put -r public/* ${REMOTE_PATH}
+put -r docs/* ${REMOTE_PATH}
 EOF
 echo -e "[deploy] ${GREEN}Upload complete.${NC}"

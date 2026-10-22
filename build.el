@@ -92,7 +92,7 @@
 (let ((website (list "wmedrano dot dev"
                      :recursive t
                      :base-directory "./content"
-                     :publishing-directory "./public"
+                     :publishing-directory "./docs"
                      :publishing-function 'org-html-publish-to-html))
       ;; Publish files served verbatim from the site root (favicons,
       ;; verification, robots, css, etc.).
@@ -100,13 +100,13 @@
                     :recursive t
                     :base-directory "./static"
                     :base-extension 'any
-                    :publishing-directory "./public"
+                    :publishing-directory "./docs"
                     :publishing-function 'org-publish-attachment))
       (images (list "wmedrano dot dev images"
                     :recursive t
                     :base-directory "./content"
                     :base-extension "png\\|jpg\\|svg\\|ico\\|ogg"
-                    :publishing-directory "./public"
+                    :publishing-directory "./docs"
                     :publishing-function 'org-publish-attachment)))
   (setq-local org-publish-project-alist
               (list website static images))
