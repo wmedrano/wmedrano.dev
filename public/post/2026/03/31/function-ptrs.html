@@ -1,0 +1,1036 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-10-21 Wed 20:12 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Functional Dispatch</title>
+<meta name="author" content="Will S. Medrano" />
+<meta name="generator" content="Org Mode" />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="canonical" href="https://wmedrano.dev/post/2026/03/31/function-ptrs.html">
+</head>
+<body>
+
+<div class="navbar" id="org-div-home-and-up">
+ <!--Ignore -->
+ <a accesskey="H" href="/">wmedrano dot dev</a>
+  <a href="/about">About</a>
+</div><div id="content" class="content">
+<h1 class="title">Functional Dispatch</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orga0cc64a">1. Introduction</a>
+<ul>
+<li><a href="#org75fba16">1.1. Tiny Skia</a></li>
+<li><a href="#orgf6d44df">1.2. Bytecode Interpreter? Function Pointers?</a>
+<ul>
+<li><a href="#orgf39bba0">1.2.1. Bytecode Interpreter</a></li>
+<li><a href="#org5180471">1.2.2. Example</a></li>
+<li><a href="#orgf554bbf">1.2.3. Performance Considerations</a></li>
+</ul>
+</li>
+<li><a href="#orgcd83544">1.3. Function Pointers vs Enum Instruction</a></li>
+</ul>
+</li>
+<li><a href="#org4f8070f">2. Setup &amp; Benchmark</a>
+<ul>
+<li><a href="#org65633b5">2.1. Hypothesis</a></li>
+<li><a href="#org78df422">2.2. Instructions</a></li>
+<li><a href="#org1af4f13">2.3. Benchmark</a></li>
+<li><a href="#org0ab71bd">2.4. Instruction Variants</a>
+<ul>
+<li><a href="#orgc6b4a6b">2.4.1. OpCodes: Enum Instructions</a></li>
+<li><a href="#orgb4d5762">2.4.2. Fn Ptr: Function pointer with data byte instruction</a></li>
+<li><a href="#orgb66a236">2.4.3. Fn Ptr Slim: Function pointer instruction</a></li>
+<li><a href="#orgce3ccd1">2.4.4. Fn Ptr Spec: Specialization</a></li>
+<li><a href="#org0bf2ff9">2.4.5. Fn Ptr Hyper: Ridiculous level of specialization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org7bee97d">3. Results</a>
+<ul>
+<li><a href="#org028bd99">3.1. Numbers</a></li>
+<li><a href="#org79187b4">3.2. Performance</a>
+<ul>
+<li><a href="#org9e9d9c4">3.2.1. Function Pointer</a></li>
+<li><a href="#org40a44cd">3.2.2. Specialization</a></li>
+</ul>
+</li>
+<li><a href="#org3aded29">3.3. Readability &amp; Maintainability</a></li>
+<li><a href="#org591da94">3.4. Future Work</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orga0cc64a" class="outline-2">
+<h2 id="orga0cc64a"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+I was working on the 2D rendering library <a href="https://github.com/linebender/tiny-skia">Tiny Skia</a> and was surprised to find a
+little compiler and virtual machine for filling out a gradient. I was also
+surprised that they compiled their sequence of instructions from an <code>enum</code> into
+a sequence of <code>function pointers</code>.
+</p>
+
+<p>
+This got me curious on why? Is it faster? More flexible?
+</p>
+
+<p>
+Spoiler: For my use case and set of benchmarks, the more compact <code>enum</code>
+implementation was generally faster. See the <a href="#org7bee97d">Results section</a>.
+</p>
+
+
+<div id="org1b8a926" class="figure">
+<p><img src="2pt-conical.svg" alt="2pt-conical.svg" class="org-svg" />
+</p>
+<p><span class="figure-number">Figure 1: </span>A two-point radial gradient</p>
+</div>
+</div>
+<div id="outline-container-org75fba16" class="outline-3">
+<h3 id="org75fba16"><span class="section-number-3">1.1.</span> Tiny Skia</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Tiny Skia is a Rust library that handles 2D rendering on the CPU. It is fairly
+performant and powers <a href="https://github.com/linebender/resvg">resvg</a>, the svg to png converter library/binary.
+</p>
+
+<p>
+It has an interesting mechanism for computing gradients. Given a gradient spec,
+Tiny Skia compiles to a <code>Context</code> to store parameters and a sequence of simple
+<code>enum</code> values for each opcode/instruction. However, at runtime, the sequence of
+enums is converted into a sequence of function pointers that run one after
+another.
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>Implementation of the Transform step. It tweaks some registers and moves on to the next stage.</label><pre class="src src-rust"><code><span class="org-keyword">fn</span> <span class="org-function-name">transform</span>(<span class="org-variable-name">p</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Pipeline</span>) {
+    <span class="org-keyword">let</span> <span class="org-variable-name">ts</span> = <span class="org-rust-ampersand">&amp;</span>p.ctx.transform;
+
+    <span class="org-keyword">let</span> (x, y) = (p.r, p.g);
+    <span class="org-keyword">let</span> <span class="org-variable-name">tx</span> = mad(x,
+                 <span class="org-constant">f32x8</span>::splat(ts.sx),
+                 mad(y, <span class="org-constant">f32x8</span>::splat(ts.kx), <span class="org-constant">f32x8</span>::splat(ts.tx)));
+    <span class="org-keyword">let</span> <span class="org-variable-name">ty</span> = mad(y,
+                 <span class="org-constant">f32x8</span>::splat(ts.ky),
+                 mad(y, <span class="org-constant">f32x8</span>::splat(ts.sy), <span class="org-constant">f32x8</span>::splat(ts.ty)));
+
+    (p.r, p.g) = (tx, ty);
+    p.next_stage(); <span class="org-comment-delimiter">// </span><span class="org-comment">Fetches the next instruction and executes the function.
+</span>}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf6d44df" class="outline-3">
+<h3 id="orgf6d44df"><span class="section-number-3">1.2.</span> Bytecode Interpreter? Function Pointers?</h3>
+<div class="outline-text-3" id="text-1-2">
+</div>
+<div id="outline-container-orgf39bba0" class="outline-4">
+<h4 id="orgf39bba0"><span class="section-number-4">1.2.1.</span> Bytecode Interpreter</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<p>
+A bytecode interpreter is a program that executes instructions encoded as
+compact binary data (bytecode). A bytecode interpreter defines its own virtual
+instruction set and executes it in a loop. This is the approach used by
+languages like Python and Ruby.
+</p>
+
+<p>
+The core of most bytecode interpreters is a <i>dispatch loop</i>.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Step</th>
+<th scope="col" class="org-left">Instruction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">Fetch the next instruction</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">Decode it</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">Execute it</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">Repeat.</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 2: </span>A simple Rust implementation uses an <code>enum</code> to represent instructions and a <code>match</code> to dispatch them.</label><pre class="src src-rust"><code><span class="org-keyword">impl</span> <span class="org-type">Vm</span> {
+    <span class="org-keyword">fn</span> <span class="org-function-name">run</span>(<span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-keyword">self</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt; {
+        <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">current_frame</span> = <span class="org-keyword">self</span>.stack_frames.pop().ok_or(<span class="org-type">Error</span>::<span class="org-type">StackUnderflow</span>)<span class="org-rust-question-mark">?</span>;
+        <span class="org-keyword">loop</span> {
+            <span class="org-keyword">match</span> current_frame.next_instruction() {
+                <span class="org-type">Instruction</span>::<span class="org-type">LoadInt</span>(x) =&gt; {
+                    <span class="org-keyword">self</span>.stack.push((x <span class="org-keyword">as</span> <span class="org-type">i64</span>).into());
+                }
+                ...
+            }
+        }
+    }
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5180471" class="outline-4">
+<h4 id="org5180471"><span class="section-number-4">1.2.2.</span> Example</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<p>
+For example, computing <code>1 + 2</code> compiles to three instructions. Each step either
+pushes a value onto the stack or pops values and pushes a result:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Step</th>
+<th scope="col" class="org-left">Instruction</th>
+<th scope="col" class="org-left">Stack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">LoadInt(1)</td>
+<td class="org-left">[1]</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">LoadInt(2)</td>
+<td class="org-left">[1, 2]</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">Binop(Add)</td>
+<td class="org-left">[3]</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">Return</td>
+<td class="org-left">[]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-orgf554bbf" class="outline-4">
+<h4 id="orgf554bbf"><span class="section-number-4">1.2.3.</span> Performance Considerations</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<p>
+The size of data structures is very important to an interpreter's
+performance. Smaller datastructures are preferred as:
+</p>
+
+<ol class="org-ol">
+<li>More data can fit in the CPU cache.</li>
+<li>More data can fit in the CPU registers.</li>
+<li>Less data to read and write.</li>
+</ol>
+
+<p>
+Many virtual machines resort to storing both <code>float64</code> and <code>pointer</code> values in a
+single <code>8 byte</code> value through <a href="https://craftinginterpreters.com/optimization.html#nan-boxing">NaN Boxing</a><sup><a id="fnr.64bit" class="footref" href="#fn.64bit" role="doc-backlink">1</a></sup>. This is impressive
+considering that both <code>float64</code> and <code>pointers</code> individually take <code>8 bytes</code>, but
+we can store them in a datastructure that itself takes <code>8 bytes</code>. Similarly,
+OCaml uses bit tagging to store either <a href="https://blog.janestreet.com/what-is-gained-and-lost-with-63-bit-integers/"><code>63bit int</code> or a pointer</a>.
+</p>
+
+<p>
+Instructions are another dimension that can be shrunk — which is why the
+function pointer approach is surprising: it uses a <code>8 byte pointer</code> instead of a
+more compact enum opcode.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcd83544" class="outline-3">
+<h3 id="orgcd83544"><span class="section-number-3">1.3.</span> Function Pointers vs Enum Instruction</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Since we want to shrink the size of data, using a function pointer<sup><a id="fnr.fnptr" class="footref" href="#fn.fnptr" role="doc-backlink">2</a></sup>
+instead of a more compact representation is interesting. Although it may induce
+more cache pressure, there is less processing that needs to happen to dispatch
+the function call. However, a function call in itself has some overhead.
+</p>
+
+<p>
+Let's convert the instructions into function pointers.
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 3: </span>Enum-based dispatch (before)</label><pre class="src src-rust"><code><span class="org-keyword">impl</span> <span class="org-type">Vm</span> {
+    <span class="org-keyword">fn</span> <span class="org-function-name">run</span>(<span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-keyword">self</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt; {
+        <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">current_frame</span> = <span class="org-keyword">self</span>.stack_frames.pop().ok_or(<span class="org-type">Error</span>::<span class="org-type">StackUnderflow</span>)<span class="org-rust-question-mark">?</span>;
+        <span class="org-keyword">loop</span> {
+            <span class="org-keyword">match</span> current_frame.next_instruction() {
+                <span class="org-type">Instruction</span>::<span class="org-type">LoadInt</span>(x) =&gt; {
+                    <span class="org-keyword">self</span>.stack.push((x <span class="org-keyword">as</span> <span class="org-type">i64</span>).into());
+                }
+                ...
+            }
+        }
+    }
+}
+</code></pre>
+</div>
+
+<p>
+A simple way to translate to the new architecture is to tweak the function
+implementations. Each instruction is now a function that
+</p>
+
+<ol class="org-ol">
+<li>Performs some operation on the VM.</li>
+<li>Continues on to the next instruction.<sup><a id="fnr.tailcall" class="footref" href="#fn.tailcall" role="doc-backlink">3</a></sup></li>
+</ol>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 4: </span>Function pointer dispatch (after)</label><pre class="src src-rust"><code><span class="org-comment-delimiter">// </span><span class="org-comment">An example instruction function
+</span><span class="org-comment-delimiter">// </span><span class="org-comment">1. Perform action
+</span><span class="org-comment-delimiter">// </span><span class="org-comment">2. Call the next function
+</span><span class="org-keyword">pub</span>(<span class="org-keyword">crate</span>) <span class="org-keyword">fn</span> <span class="org-function-name">load_int_fn</span>(<span class="org-variable-name">vm</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Vm</span>, <span class="org-keyword">mut</span> <span class="org-variable-name">frame</span>: <span class="org-type">StackFrame</span>, <span class="org-variable-name">data</span>: <span class="org-type">u8</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt; {
+    vm.stack.push((data <span class="org-keyword">as</span> <span class="org-type">i8</span> <span class="org-keyword">as</span> <span class="org-type">i64</span>).into());
+    <span class="org-keyword">let</span> (fn_ptr, data) = frame.advance_instruction_fn();
+    <span class="org-comment-delimiter">// </span><span class="org-comment">`become` is similar to `return`, but performs a tail call which should be more optimal.
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">See unstable feature: https://doc.rust-lang.org/std/keyword.become.html.
+</span>    become fn_ptr(vm, frame, data);
+}
+
+<span class="org-keyword">impl</span> <span class="org-type">Vm</span> {
+    <span class="org-comment-delimiter">// </span><span class="org-comment">Run loop executes functions.
+</span>    <span class="org-keyword">fn</span> <span class="org-function-name">run</span>(<span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-keyword">self</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt; {
+        <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">frame</span> = <span class="org-keyword">self</span>.stack_frames.pop().ok_or(<span class="org-type">Error</span>::<span class="org-type">StackUnderflow</span>)<span class="org-rust-question-mark">?</span>;
+        <span class="org-keyword">let</span> (func, data) = frame.advance_instruction_fn();
+        (func)(<span class="org-keyword">self</span>, frame, data)
+    }
+}
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org4f8070f" class="outline-2">
+<h2 id="org4f8070f"><span class="section-number-2">2.</span> Setup &amp; Benchmark</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+I built a simple bytecode interpreter to test how the performance of the
+function pointers approach is. Since it's just a toy, I made only the VM, no
+parser. The repository can be found on <a href="https://github.com/wmedrano/function-ptr-experiment/commits/main/">GitHub</a>.
+</p>
+</div>
+<div id="outline-container-org65633b5" class="outline-3">
+<h3 id="org65633b5"><span class="section-number-3">2.1.</span> Hypothesis</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Function pointers should be slower as:
+</p>
+
+<ul class="org-ul">
+<li>They take more bytes to represent. The <code>enum</code> used in this interpreter uses <code>2
+  bytes</code> vs the <code>8 bytes</code> for the function pointer and <code>1 byte</code> for the data
+byte. The <code>4.5x</code> increase in size means that fewer instructions fit in CPU
+cache, increasing cache pressure.</li>
+<li>Dispatching an enum should have lower overhead than even a tail function
+call. This is the part I'm less sure about, if you have any good resources on
+this, email me at will@wmedrano.dev. In addition to being less sure about
+this, the impact of the dispatch mechanism may change if we redesign
+representations or add/remove code.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org78df422" class="outline-3">
+<h3 id="org78df422"><span class="section-number-3">2.2.</span> Instructions</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+The following instruction set seems powerful enough to test. Don't worry,
+despite looking small, instructions like <code>Return</code> and <code>Eval</code> have a lot of
+complexity.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Instruction</th>
+<th scope="col" class="org-left">Parameter</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Eval</td>
+<td class="org-left">i8</td>
+<td class="org-left">Pop a <code>Func</code> from the stack and call it with <code>n</code> arguments. If <code>n</code> is negative, it's a recursive call with <code>n + 128</code> arguments.</td>
+</tr>
+
+<tr>
+<td class="org-left">Return</td>
+<td class="org-left">&nbsp;</td>
+<td class="org-left">Return from the current function.</td>
+</tr>
+
+<tr>
+<td class="org-left">LoadInt</td>
+<td class="org-left">i8</td>
+<td class="org-left">Push a small integer literal onto the stack.</td>
+</tr>
+
+<tr>
+<td class="org-left">LoadConst</td>
+<td class="org-left">u8</td>
+<td class="org-left">Push a constant from the function's constant table onto the stack.</td>
+</tr>
+
+<tr>
+<td class="org-left">LoadLocal</td>
+<td class="org-left">u8</td>
+<td class="org-left">Push a local variable (by index into the current stack frame) onto the stack.</td>
+</tr>
+
+<tr>
+<td class="org-left">SetLocal</td>
+<td class="org-left">u8</td>
+<td class="org-left">Set a local variable (by index into the current stack frame) from the top of the stack.</td>
+</tr>
+
+<tr>
+<td class="org-left">JumpIf</td>
+<td class="org-left">i8</td>
+<td class="org-left">Skip the next <code>n</code> instructions if the top of the stack is truthy.</td>
+</tr>
+
+<tr>
+<td class="org-left">Jump</td>
+<td class="org-left">i8</td>
+<td class="org-left">Skip the next <code>n</code> instructions unconditionally.</td>
+</tr>
+
+<tr>
+<td class="org-left">Binop</td>
+<td class="org-left">Binop</td>
+<td class="org-left">Apply a binary operation to the top two stack values, leaving the result.</td>
+</tr>
+
+<tr>
+<td class="org-left">AddN</td>
+<td class="org-left">i8</td>
+<td class="org-left">Add a small integer literal to the top-of-stack integer in place.</td>
+</tr>
+
+<tr>
+<td class="org-left">LessThan</td>
+<td class="org-left">i8</td>
+<td class="org-left">Replace the top-of-stack integer with a bool: <code>top &lt; n</code>.</td>
+</tr>
+
+<tr>
+<td class="org-left">GreaterThan</td>
+<td class="org-left">i8</td>
+<td class="org-left">Replace the top-of-stack integer with a bool: <code>top &gt; n</code>.</td>
+</tr>
+
+<tr>
+<td class="org-left">Equal</td>
+<td class="org-left">i8</td>
+<td class="org-left">Replace the top-of-stack integer with a bool: <code>top =</code> n=.</td>
+</tr>
+
+<tr>
+<td class="org-left">StringLength</td>
+<td class="org-left">&nbsp;</td>
+<td class="org-left">Replace the top-of-stack string with its integer length.</td>
+</tr>
+
+<tr>
+<td class="org-left">Dup</td>
+<td class="org-left">u8</td>
+<td class="org-left">Duplicate the top-of-stack value.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org1af4f13" class="outline-3">
+<h3 id="org1af4f13"><span class="section-number-3">2.3.</span> Benchmark</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+I used <code>add(1+2, 3+4)</code> and <code>fib(12)</code> as the benchmark. I handcoded the following
+bytecode functions for the stack based bytecode interpreter. The <code>fib</code> function
+takes a single parameter that is stored at index <code>0</code>. The <code>add</code> function takes 4
+arguments stored at index <code>0</code>, <code>1</code>, <code>2</code>, and <code>3</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-doc">/// Register and return a recursive Fibonacci function.
+///
+/// Implements: `fib(n) = if n &lt; 2 { n } else { fib(n-1) + fib(n-2) }`
+</span><span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">make_fib</span>() -&gt; <span class="org-type">Val</span> {
+    <span class="org-type">Func</span>::new(
+        1,
+        <span class="org-preprocessor">vec!</span>[
+            <span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(0),      <span class="org-comment-delimiter">//  </span><span class="org-comment">0: [n, n]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">LessThan</span>(2),       <span class="org-comment-delimiter">//  </span><span class="org-comment">1: [n, n&lt;2]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">JumpIf</span>(8),         <span class="org-comment-delimiter">//  </span><span class="org-comment">2: [n]  -- if n&lt;2 jump to 11
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(0),      <span class="org-comment-delimiter">//  </span><span class="org-comment">3: [n, n]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(-1),          <span class="org-comment-delimiter">//  </span><span class="org-comment">4: [n, n-1]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">Eval</span>(-127),        <span class="org-comment-delimiter">//  </span><span class="org-comment">5: [n, fib(n-1)]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(0),      <span class="org-comment-delimiter">//  </span><span class="org-comment">6: [n, fib(n-1), n]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(-2),          <span class="org-comment-delimiter">//  </span><span class="org-comment">7: [n, fib(n-1), n-2]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">Eval</span>(-127),        <span class="org-comment-delimiter">//  </span><span class="org-comment">8: [n, fib(n-1), fib(n-2)]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">Binop</span>(<span class="org-type">Binop</span>::<span class="org-type">Add</span>), <span class="org-comment-delimiter">//  </span><span class="org-comment">9: [n, fib(n-1)+fib(n-2)]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">Return</span>,            <span class="org-comment-delimiter">// </span><span class="org-comment">10: return fib(n-1)+fib(n-2)
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(0),      <span class="org-comment-delimiter">// </span><span class="org-comment">11: [n, n]  -- base case (n &lt; 2)
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">Return</span>,            <span class="org-comment-delimiter">// </span><span class="org-comment">12: return n
+</span>        ],
+        <span class="org-preprocessor">vec!</span>[],
+    )
+    .into()
+}
+
+<span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">make_adder</span>() -&gt; <span class="org-type">Val</span> {
+    <span class="org-type">Func</span>::new(
+        4,
+        <span class="org-preprocessor">vec!</span>[
+            <span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(0),      <span class="org-comment-delimiter">// </span><span class="org-comment">0: [a]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(1),      <span class="org-comment-delimiter">// </span><span class="org-comment">1: [a, b]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">Binop</span>(<span class="org-type">Binop</span>::<span class="org-type">Add</span>), <span class="org-comment-delimiter">// </span><span class="org-comment">2: [a+b]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(2),      <span class="org-comment-delimiter">// </span><span class="org-comment">3: [a+b, c]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(3),      <span class="org-comment-delimiter">// </span><span class="org-comment">4: [a+b, c, d]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">Binop</span>(<span class="org-type">Binop</span>::<span class="org-type">Add</span>), <span class="org-comment-delimiter">// </span><span class="org-comment">5: [a+b, c+d]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">Binop</span>(<span class="org-type">Binop</span>::<span class="org-type">Add</span>), <span class="org-comment-delimiter">// </span><span class="org-comment">6: [a+b+c+d]
+</span>            <span class="org-type">Instruction</span>::<span class="org-type">Return</span>,            <span class="org-comment-delimiter">// </span><span class="org-comment">7: return a+b+c+d
+</span>        ],
+        <span class="org-preprocessor">vec!</span>[],
+    )
+    .into()
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0ab71bd" class="outline-3">
+<h3 id="org0ab71bd"><span class="section-number-3">2.4.</span> Instruction Variants</h3>
+<div class="outline-text-3" id="text-2-4">
+</div>
+<div id="outline-container-orgc6b4a6b" class="outline-4">
+<h4 id="orgc6b4a6b"><span class="section-number-4">2.4.1.</span> OpCodes: Enum Instructions</h4>
+<div class="outline-text-4" id="text-2-4-1">
+<p>
+With the simple op code based interpreter, the representation of a function is
+mostly the instructions. The VM iterates and jumps around the <code>instructions</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[derive(Debug, PartialEq)]</span>
+<span class="org-keyword">struct</span> <span class="org-type">FuncInner</span> {
+    <span class="org-comment-delimiter">// </span><span class="org-comment">The number of arguments this function takes.
+</span>    <span class="org-variable-name">arg_count</span>: <span class="org-type">usize</span>,
+    <span class="org-comment-delimiter">// </span><span class="org-comment">The instructions for the function.
+</span>    <span class="org-variable-name">instructions</span>: <span class="org-type">Vec</span>&lt;<span class="org-type">Instruction</span>&gt;,
+    <span class="org-comment-delimiter">// </span><span class="org-comment">The table of constants. Instruction references this by index.
+</span>    <span class="org-variable-name">constants</span>: <span class="org-type">Vec</span>&lt;<span class="org-type">Val</span>&gt;,
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb4d5762" class="outline-4">
+<h4 id="orgb4d5762"><span class="section-number-4">2.4.2.</span> Fn Ptr: Function pointer with data byte instruction</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<p>
+With function pointer, the <code>Instruction</code> enum is converted to a function and a
+data byte. The data byte provides extra context for the function. The data byte
+is used to store things for some instructions such as how many instructions to
+jump or which argument to fetch.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[derive(Debug, PartialEq)]</span>
+<span class="org-keyword">struct</span> <span class="org-type">FuncInner</span> {
+    <span class="org-variable-name">arg_count</span>: <span class="org-type">usize</span>,
+    <span class="org-variable-name">funcs</span>: <span class="org-type">Vec</span>&lt;<span class="org-keyword">fn</span>(<span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Vm</span>, <span class="org-type">StackFrame</span>, <span class="org-type">u8</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt;&gt;,
+    <span class="org-variable-name">data</span>: <span class="org-type">Vec</span>&lt;<span class="org-type">u8</span>&gt;, <span class="org-comment-delimiter">// </span><span class="org-comment">data[idx] contains context for funcs[idx]
+</span>    <span class="org-variable-name">constants</span>: <span class="org-type">Vec</span>&lt;<span class="org-type">Val</span>&gt;,
+}
+
+
+<span class="org-comment-delimiter">// </span><span class="org-comment">An example instruction func.
+</span><span class="org-keyword">pub</span>(<span class="org-keyword">crate</span>) <span class="org-keyword">fn</span> <span class="org-function-name">load_int_fn</span>(<span class="org-variable-name">vm</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Vm</span>, <span class="org-keyword">mut</span> <span class="org-variable-name">frame</span>: <span class="org-type">StackFrame</span>, <span class="org-variable-name">data</span>: <span class="org-type">u8</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt; {
+    vm.stack.push((data <span class="org-keyword">as</span> <span class="org-type">i8</span> <span class="org-keyword">as</span> <span class="org-type">i64</span>).into());
+    <span class="org-keyword">let</span> (fn_ptr, data) = frame.advance_instruction_fn();
+    <span class="org-comment-delimiter">// </span><span class="org-comment">`become` is similar to `return`, but performs a tail call which should be more optimal.
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">See https://doc.rust-lang.org/std/keyword.become.html.
+</span>    become fn_ptr(vm, frame, data);
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb66a236" class="outline-4">
+<h4 id="orgb66a236"><span class="section-number-4">2.4.3.</span> Fn Ptr Slim: Function pointer instruction</h4>
+<div class="outline-text-4" id="text-2-4-3">
+<p>
+This is similar to <code>Fn Ptr</code>, but the data byte is not passed as a function
+argument. Instead, instructions that need it fetch it themselves by manually
+reading <code>instruction_data</code>. Instructions that don't need a data byte (like
+<code>Return</code>) skip the fetch entirely, potentially saving a memory read. The results
+of the lazy fetching are hard to predict on a general virtual machine and really
+depend on how often the data byte is needed.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[derive(Debug, PartialEq)]</span>
+<span class="org-keyword">struct</span> <span class="org-type">FuncInner</span> {
+    <span class="org-variable-name">arg_count</span>: <span class="org-type">usize</span>,
+    <span class="org-variable-name">funcs</span>: <span class="org-type">Vec</span>&lt;<span class="org-keyword">fn</span>(<span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Vm</span>, <span class="org-type">StackFrame</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt;&gt;,
+    <span class="org-variable-name">data</span>: <span class="org-type">Vec</span>&lt;<span class="org-type">u8</span>&gt;, <span class="org-comment-delimiter">// </span><span class="org-comment">data[idx] contains context for funcs[idx]
+</span>    <span class="org-variable-name">constants</span>: <span class="org-type">Vec</span>&lt;<span class="org-type">Val</span>&gt;,
+}
+
+
+<span class="org-comment-delimiter">// </span><span class="org-comment">An example instruction func.
+</span><span class="org-keyword">pub</span>(<span class="org-keyword">crate</span>) <span class="org-keyword">fn</span> <span class="org-function-name">load_int_fn</span>(<span class="org-variable-name">vm</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Vm</span>, <span class="org-keyword">mut</span> <span class="org-variable-name">frame</span>: <span class="org-type">StackFrame</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt; {
+    <span class="org-keyword">let</span> <span class="org-variable-name">data</span> = frame.func.instruction_data(frame.instruction_idx);
+    vm.stack.push((data <span class="org-keyword">as</span> <span class="org-type">i8</span> <span class="org-keyword">as</span> <span class="org-type">i64</span>).into());
+    frame.instruction_idx += 1;
+    <span class="org-keyword">let</span> <span class="org-variable-name">fn_ptr</span> = frame.func.instruction(frame.instruction_idx);
+    become fn_ptr(vm, frame);
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgce3ccd1" class="outline-4">
+<h4 id="orgce3ccd1"><span class="section-number-4">2.4.4.</span> Fn Ptr Spec: Specialization</h4>
+<div class="outline-text-4" id="text-2-4-4">
+<p>
+This introduces more functions based on the instruction. It can be seen as
+inlining some of the instructions parameters. Take the following compilation
+code snippet and see how common parameters have a different path.
+</p>
+
+<p>
+Take the following example:
+</p>
+<ol class="org-ol">
+<li>The general <code>add_n_fn</code> fetches the data byte and adds it to the top value.</li>
+<li>The optimized <code>add_n_const_fn::&lt;N&gt;</code> inlines the value that will be
+added. There is no fetching of the data byte, just performing the addition to
+the top value of the stack.</li>
+</ol>
+
+<p>
+For a few common values, the optimized implementation may help. For <code>fibonacci</code>
+specifically, this can be more optimal when performing the <code>n - 2</code> and <code>n - 1</code>
+operations.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-comment-delimiter">// </span><span class="org-comment">Fast path
+</span><span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(-2) =&gt; (add_n_const_fn::&lt;-2&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(-1) =&gt; (add_n_const_fn::&lt;-1&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(0) =&gt; (add_n_const_fn::&lt;0&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(1) =&gt; (add_n_const_fn::&lt;1&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(2) =&gt; (add_n_const_fn::&lt;2&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-comment-delimiter">// </span><span class="org-comment">Slow path
+</span><span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(n) =&gt; (add_n_fn <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, n <span class="org-keyword">as</span> <span class="org-type">u8</span>),
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-comment-delimiter">// </span><span class="org-comment">The normal implementation.
+</span><span class="org-keyword">pub</span>(<span class="org-keyword">crate</span>) <span class="org-keyword">fn</span> <span class="org-function-name">add_n_fn</span>(<span class="org-variable-name">vm</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Vm</span>, <span class="org-keyword">mut</span> <span class="org-variable-name">frame</span>: <span class="org-type">StackFrame</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt; {
+    <span class="org-keyword">let</span> <span class="org-variable-name">data</span> = frame.func.instruction_data(frame.instruction_idx);
+    <span class="org-keyword">let</span> <span class="org-variable-name">top</span> = vm.stack.last_mut().ok_or(<span class="org-type">Error</span>::<span class="org-type">StackUnderflow</span>)<span class="org-rust-question-mark">?</span>;
+    <span class="org-keyword">match</span> top {
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(x) =&gt; *x += data <span class="org-keyword">as</span> <span class="org-type">i8</span> <span class="org-keyword">as</span> <span class="org-type">i64</span>,
+        _ =&gt; {
+            <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">WrongType</span> {
+                <span class="org-variable-name">expected</span>: <span class="org-string">"Int"</span>,
+                <span class="org-variable-name">got</span>: top.type_name(),
+            });
+        }
+    }
+    frame.instruction_idx += 1;
+    <span class="org-keyword">let</span> <span class="org-variable-name">fn_ptr</span> = frame.func.instruction(frame.instruction_idx);
+    become fn_ptr(vm, frame);
+}
+
+<span class="org-comment-delimiter">// </span><span class="org-comment">A fast path implementation.
+</span><span class="org-keyword">pub</span>(<span class="org-keyword">crate</span>) <span class="org-keyword">fn</span> <span class="org-function-name">add_n_const_fn</span>&lt;<span class="org-keyword">const</span> <span class="org-variable-name">N</span>: <span class="org-type">i64</span>&gt;(<span class="org-variable-name">vm</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Vm</span>, <span class="org-keyword">mut</span> <span class="org-variable-name">frame</span>: <span class="org-type">StackFrame</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt; {
+    <span class="org-keyword">let</span> <span class="org-variable-name">top</span> = vm.stack.last_mut().ok_or(<span class="org-type">Error</span>::<span class="org-type">StackUnderflow</span>)<span class="org-rust-question-mark">?</span>;
+    <span class="org-keyword">match</span> top {
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(x) =&gt; *x += <span class="org-type">N</span>,
+        _ =&gt; {
+            <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">WrongType</span> {
+                <span class="org-variable-name">expected</span>: <span class="org-string">"Int"</span>,
+                <span class="org-variable-name">got</span>: top.type_name(),
+            });
+        }
+    }
+    frame.instruction_idx += 1;
+    <span class="org-keyword">let</span> <span class="org-variable-name">fn_ptr</span> = frame.func.instruction(frame.instruction_idx);
+    become fn_ptr(vm, frame);
+}
+
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0bf2ff9" class="outline-4">
+<h4 id="org0bf2ff9"><span class="section-number-4">2.4.5.</span> Fn Ptr Hyper: Ridiculous level of specialization</h4>
+<div class="outline-text-4" id="text-2-4-5">
+<p>
+This adds two extra specializations. For the adder, <code>triop_add_fn</code> fuses two
+consecutive <code>Binop::Add</code> instructions into a single three-operand add. This one
+is rather simple compared to the <code>fibonacci</code> instruction&hellip;
+</p>
+
+<p>
+For <code>fibonacci</code>, <code>jump_if_local0_lt2_fn</code> performs a jump if register <code>0</code> is less
+than <code>2</code>. The <code>enum -&gt; function</code> converter automatically detects these patterns
+and uses the specialized functions when appropriate.
+</p>
+
+<p>
+<code>jump_if_local0_lt2_fn</code> alone handles the first 3 operations in each <code>fibonacci</code>
+call. This is significant as each <code>fibonacci</code> call executes 5 instructions for the
+base case and 11 instructions for the recursive call case.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">pub</span>(<span class="org-keyword">crate</span>) <span class="org-keyword">fn</span> <span class="org-function-name">jump_if_local0_lt2_fn</span>(<span class="org-variable-name">vm</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Vm</span>, <span class="org-keyword">mut</span> <span class="org-variable-name">frame</span>: <span class="org-type">StackFrame</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>&gt; {
+    <span class="org-keyword">let</span> <span class="org-variable-name">data</span> = frame.func.instruction_data(frame.instruction_idx);
+    <span class="org-keyword">let</span> <span class="org-variable-name">local0</span> = <span class="org-keyword">match</span> <span class="org-rust-ampersand">&amp;</span>vm.stack[frame.stack_start] {
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(x) =&gt; *x,
+        top =&gt; {
+            <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">WrongType</span> {
+                <span class="org-variable-name">expected</span>: <span class="org-string">"Int"</span>,
+                <span class="org-variable-name">got</span>: top.type_name(),
+            });
+        }
+    };
+    <span class="org-keyword">let</span> <span class="org-variable-name">idx</span> = <span class="org-keyword">if</span> local0 &lt; 2 {
+        (1 + frame.instruction_idx <span class="org-keyword">as</span> <span class="org-type">isize</span> + data <span class="org-keyword">as</span> <span class="org-type">i8</span> <span class="org-keyword">as</span> <span class="org-type">isize</span>) <span class="org-keyword">as</span> <span class="org-type">usize</span>
+    } <span class="org-keyword">else</span> {
+        frame.instruction_idx + 1
+    };
+    frame.instruction_idx = idx;
+    <span class="org-keyword">let</span> <span class="org-variable-name">fn_ptr</span> = frame.func.instruction(idx);
+    become fn_ptr(vm, frame);
+}
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org7bee97d" class="outline-2">
+<h2 id="org7bee97d"><span class="section-number-2">3.</span> Results</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org028bd99" class="outline-3">
+<h3 id="org028bd99"><span class="section-number-3">3.1.</span> Numbers</h3>
+<div class="outline-text-3" id="text-3-1">
+<table id="org0db4c30" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Implementation</th>
+<th scope="col" class="org-right">add(1+2,3+4) (µs)</th>
+<th scope="col" class="org-right">add delta</th>
+<th scope="col" class="org-right">fib(12) (µs)</th>
+<th scope="col" class="org-right">fib delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Opcodes</td>
+<td class="org-right">0.0440</td>
+<td class="org-right">0%</td>
+<td class="org-right">7.2</td>
+<td class="org-right">0%</td>
+</tr>
+
+<tr>
+<td class="org-left">Fn Ptr</td>
+<td class="org-right">0.0503</td>
+<td class="org-right">+14%</td>
+<td class="org-right">11.1</td>
+<td class="org-right">+54%</td>
+</tr>
+
+<tr>
+<td class="org-left">Fn Ptr Slim</td>
+<td class="org-right">0.0451</td>
+<td class="org-right">+3%</td>
+<td class="org-right">11.7</td>
+<td class="org-right">+63%</td>
+</tr>
+
+<tr>
+<td class="org-left">Fn Ptr Spec</td>
+<td class="org-right">0.0451</td>
+<td class="org-right">+3%</td>
+<td class="org-right">8.8</td>
+<td class="org-right">+22%</td>
+</tr>
+
+<tr>
+<td class="org-left">Fn Ptr Hyper</td>
+<td class="org-right">0.0448</td>
+<td class="org-right">+2%</td>
+<td class="org-right">6.2</td>
+<td class="org-right">-13%</td>
+</tr>
+</tbody>
+</table>
+
+<div id="orgb8ca538" class="figure">
+<p><img src="results-add.svg" alt="results-add.svg" class="org-svg" />
+</p>
+</div>
+
+
+
+<div id="org57dabc2" class="figure">
+<p><img src="results-fib.svg" alt="results-fib.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org79187b4" class="outline-3">
+<h3 id="org79187b4"><span class="section-number-3">3.2.</span> Performance</h3>
+<div class="outline-text-3" id="text-3-2">
+</div>
+<div id="outline-container-org9e9d9c4" class="outline-4">
+<h4 id="org9e9d9c4"><span class="section-number-4">3.2.1.</span> Function Pointer</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<p>
+Function pointers are dramatically slower, but heavy specialization can beat
+enum dispatch. The simple adder function takes <code>15%</code> longer with <code>fibonacci</code>
+taking <code>54%</code> longer!
+</p>
+
+<p>
+In the <code>Fn Ptr Slim</code>, instead of fetching <code>(next_function, databyte)</code>, we only
+fetch <code>next_function</code>. The function itself will have to manually get the
+databyte if needed. This one was better for <code>fibonacci</code>, but worse for
+<code>add</code>. This is somewhat expected and depends on the code. if the <code>databyte</code> is
+usually used, then prefetching it and storing it in the proper register is
+good. If not, then copying it around just adds to our overhead.
+</p>
+</div>
+</div>
+<div id="outline-container-org40a44cd" class="outline-4">
+<h4 id="org40a44cd"><span class="section-number-4">3.2.2.</span> Specialization</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<p>
+Specialization greatly improves the cost of <code>fibonacci</code> while the <code>add</code> is
+around the same level. As a refresher, specialization allowed us to replace some
+special instructions with more optimized versions. The main optimization is that
+the functions have constants built-in instead of relying on the value in the
+<code>databyte</code>.
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 5: </span>The following special cases affected our benchmarks.</label><pre class="src src-rust"><code><span class="org-comment-delimiter">// </span><span class="org-comment">Used in both fib and adder
+</span><span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(0) =&gt; (load_local_const_fn::&lt;0&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+
+<span class="org-comment-delimiter">// </span><span class="org-comment">Used only in fib
+</span><span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(-2) =&gt; (add_n_const_fn::&lt;-2&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-type">Instruction</span>::<span class="org-type">AddN</span>(-1) =&gt; (add_n_const_fn::&lt;-1&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-type">Instruction</span>::<span class="org-type">LessThan</span>(2) =&gt; (less_than_const_fn::&lt;2&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-type">Instruction</span>::<span class="org-type">EvalRecursive</span>(1) =&gt; (eval_recursive_const_fn::&lt;1&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+
+<span class="org-comment-delimiter">// </span><span class="org-comment">Used only in adder
+</span><span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(1) =&gt; (load_local_const_fn::&lt;1&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(2) =&gt; (load_local_const_fn::&lt;2&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+<span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(3) =&gt; (load_local_const_fn::&lt;3&gt; <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>, 0),
+
+</code></pre>
+</div>
+
+
+<p>
+For hyper specialization, I added the silly <code>jump_if_local0_lt2_fn</code> function
+which greatly improves performance for <code>fibonacci</code> and this pushes it ahead of
+the original instruction <code>enum</code> based implementation. The adder benchmark only
+gets the <code>triop_add_fn</code> specialization which was a tiny win; We could probably
+muck around with better specializations to optimize <code>add</code> further, but it's not
+a very good exercise.
+</p>
+
+<p>
+The takeaway here is that with the added flexibility, we can hack up some
+functions to improve our benchmark scores. Two microbenchmarks aren't enough to
+characterize a dispatch mechanism. Results may look very different with a more
+diverse or realistic workload.
+</p>
+
+<blockquote>
+<p>
+<b>Note</b>: As the interpreter evolves, the performance implications may change. As
+we add more complexity and branches, function pointers give the branch predictor
+a stable target per instruction type. A large <code>match</code> has a single indirect
+branch with many possible targets.
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+<div id="outline-container-org3aded29" class="outline-3">
+<h3 id="org3aded29"><span class="section-number-3">3.3.</span> Readability &amp; Maintainability</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+Despite being a bit slower, it was actually easier to add specialized
+instructions when using functions. <code>jump_if_local0_lt2_fn</code> was easy to patch in
+without increasing complexity too much. To implement <code>jump_if_local0_lt2_fn</code> we
+had to implement the Rust function and the compiler optimization pass. The pass
+that introduces the function is rather simple:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-comment-delimiter">// </span><span class="org-comment">Pattern: LoadLocal(0), LessThan(2), JumpIf(n) -&gt; combined fast path + 2 nops.
+</span><span class="org-keyword">if</span> <span class="org-keyword">let</span> (
+    <span class="org-type">Some</span>(<span class="org-type">Instruction</span>::<span class="org-type">LoadLocal</span>(0)),
+    <span class="org-type">Some</span>(<span class="org-type">Instruction</span>::<span class="org-type">LessThan</span>(2)),
+    <span class="org-type">Some</span>(<span class="org-type">Instruction</span>::<span class="org-type">JumpIf</span>(n)),
+) = (
+    instructions.get(i),
+    instructions.get(i + 1),
+    instructions.get(i + 2),
+) {
+    funcs.extend_from_slice(<span class="org-rust-ampersand">&amp;</span>[
+        jump_if_local0_lt2_fn <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>,
+        nop_fn <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>,
+        nop_fn <span class="org-keyword">as</span> <span class="org-type">InstructionFn</span>,
+    ]);
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">The combined instruction sits at the LoadLocal(0) slot, so the jump offset
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">must be increased by 2 to reach the same target as the original JumpIf.
+</span>    data.extend_from_slice(<span class="org-rust-ampersand">&amp;</span>[n <span class="org-keyword">as</span> <span class="org-type">u8</span> + 2, 0, 0]);
+    i += 3;
+    <span class="org-keyword">continue</span>;
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org591da94" class="outline-3">
+<h3 id="org591da94"><span class="section-number-3">3.4.</span> Future Work</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+The next thing I want to try out is using the bare enum in Tiny Skia instead of
+the <a href="https://github.com/linebender/tiny-skia/blob/main/src/pipeline/highp.rs#L59">function table</a>. Unlike a general interpreter, Tiny Skia runs a predetermined
+pipeline that is repeatedly applied across many pixels. This use case is much
+different than a general purpose interpreter so I'm not sure what the results
+will be.
+</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.64bit" class="footnum" href="#fnr.64bit" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+I assume 64-bit machines in this post to simplify things. On 64-bit
+machines, pointers are 8 bytes.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.fnptr" class="footnum" href="#fnr.fnptr" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+In this post, "function" and "function pointer" are used
+interchangeably. In Rust, a function pointer (<code>fn(...) -&gt; ...</code>) is a pointer to
+a function, so referencing a function by name gives you a function pointer.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.tailcall" class="footnum" href="#fnr.tailcall" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+A tail call is used to reduce function call overhead. This may or
+may not automatically be done by the Rust compiler. See <a href="https://github.com/rust-lang/rust/issues/112788">explicit_tail_calls
+support on GitHub</a>.
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+
+<div></div>
+<p class="postamble-title">Title: Functional Dispatch</p>
+<p class="author">Author: Will S. Medrano</p>
+<p class="date">Date: 2026-03-31</p>
+</div>
+</body>
+</html>

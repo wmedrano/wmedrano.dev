@@ -3,7 +3,6 @@
 .sass-cache
 /.packages/
 _site
-public/
 target/
 vendor
 /.agent-shell/

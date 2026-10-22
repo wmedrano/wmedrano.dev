@@ -21,20 +21,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # ./public is built locally with tools/build.sh and checked in.
   build-site:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install deps
-        run: |
-          sudo apt install -y emacs-nox
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
-      - name: Build with Emacs
-        run: |
-          sh tools/build.sh
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

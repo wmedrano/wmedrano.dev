@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-10-21 Wed 20:12 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fonts Q1</title>
+<meta name="author" content="Will S. Medrano" />
+<meta name="generator" content="Org Mode" />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="canonical" href="https://wmedrano.dev/post/2026/04/11/fonts-q1.html">
+</head>
+<body>
+
+<div class="navbar" id="org-div-home-and-up">
+ <!--Ignore -->
+ <a accesskey="H" href="/">wmedrano dot dev</a>
+  <a href="/about">About</a>
+</div><div id="content" class="content">
+<h1 class="title">Fonts Q1</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org129a225">1. Introduction</a>
+<ul>
+<li><a href="#org38c671f">1.1. Google Fonts</a></li>
+<li><a href="#orgd28d2f3">1.2. Font Compiler</a></li>
+<li><a href="#org792d5d1">1.3. Fontations</a></li>
+</ul>
+</li>
+<li><a href="#orge11e126">2. Accomplishments</a>
+<ul>
+<li><a href="#org30db5b6">2.1. Better Gradients for Resvg+TinySkia</a>
+<ul>
+<li><a href="#org0ec0997">2.1.1. Task</a></li>
+<li><a href="#org8117d05">2.1.2. Detour</a></li>
+</ul>
+</li>
+<li><a href="#org2f48397">2.2. IFT - Incremental Font Transfer</a>
+<ul>
+<li><a href="#orga44c783">2.2.1. Background</a></li>
+<li><a href="#orgfbda62b">2.2.2. Actual Deliverables</a></li>
+<li><a href="#org724ab8f">2.2.3. Next</a></li>
+</ul>
+</li>
+<li><a href="#org8ffc86b">2.3. An Appreciation for Typeface</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<i>(Reading time: 5-10 minutes)</i>
+</p>
+<div id="outline-container-org129a225" class="outline-2">
+<h2 id="org129a225"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+I just completed my first full quarter on my new team<sup><a id="fnr.startdate" class="footref" href="#fn.startdate" role="doc-backlink">1</a></sup>, the Google
+Fonts team. It went about as I expected; I learned a lot of stuff, but wish I
+had learned it all faster.
+</p>
+
+<p>
+So what does the Google Fonts team do? Quite a bit of random stuff here and
+there, some of it internal to Google, and some of it open source. It's tricky to
+talk about the internal stuff, but I can comment on the open source efforts.
+</p>
+</div>
+<div id="outline-container-org38c671f" class="outline-3">
+<h3 id="org38c671f"><span class="section-number-3">1.1.</span> Google Fonts</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+The easiest thing to explain under my team's purview is <a href="https://fonts.google.com/">fonts.google.com</a>. You
+have probably used this! Many websites use Google Fonts as a CDN and LLMs even
+seem to default to Google Fonts as the source of fonts.
+</p>
+
+<p>
+Google Fonts lets you browse and select from a catalog of fonts. Once selected,
+you can embed the font files into your website.
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>Google Fonts Embed</label><pre class="src src-html"><code>&lt;<span class="org-function-name">link</span> <span class="org-variable-name">rel</span>=<span class="org-string">"preconnect"</span> <span class="org-variable-name">href</span>=<span class="org-string">"https://fonts.googleapis.com"</span>&gt;
+&lt;<span class="org-function-name">link</span> <span class="org-variable-name">rel</span>=<span class="org-string">"preconnect"</span> <span class="org-variable-name">href</span>=<span class="org-string">"https://fonts.gstatic.com"</span> crossorigin&gt;
+&lt;<span class="org-function-name">link</span> <span class="org-variable-name">href</span>=<span class="org-string">"https://fonts.googleapis.com/css2?family=Baskervville:wght@700&amp;family=Sen:wght@400..800&amp;display=swap"</span> <span class="org-variable-name">rel</span>=<span class="org-string">"stylesheet"</span>&gt;
+</code></pre>
+</div>
+
+<p>
+The neat part about Google Fonts is that the API takes care of the font
+hosting. No need to download and serve the fonts. If you look at the generated
+CSS, you can see how the serving is optimized compared to serving simple static
+files.
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 2: </span>Note the use of <code>woff2</code> and <code>unicode-range</code> to serve only the required glyphs. This blog post actually only needs the <i>latin</i> range.</label><pre class="src src-css"><code><span class="org-comment-delimiter">/* </span><span class="org-comment">latin-ext</span><span class="org-comment-delimiter"> */</span>
+<span class="org-builtin">@font-face</span> {
+  <span class="org-css-property">font-family</span>: <span class="org-string">'Baskervville'</span>;
+  <span class="org-css-property">font-style</span>: normal;
+  <span class="org-css-property">font-weight</span>: 700;
+  <span class="org-css-property">src</span>: url<span class="org-default">(</span><span class="org-string">https://fonts.gstatic.com/s/baskervville/v20/YA9Br0yU4l_XOrogbkun3kQ6vLFYXmpq8sRsYgfsigq4dC1F.woff2</span><span class="org-default">)</span> format(<span class="org-string">'woff2'</span>);
+  <span class="org-css-property">unicode-range</span>: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+<span class="org-comment-delimiter">/* </span><span class="org-comment">latin</span><span class="org-comment-delimiter"> */</span>
+<span class="org-builtin">@font-face</span> {
+  <span class="org-css-property">font-family</span>: <span class="org-string">'Baskervville'</span>;
+  <span class="org-css-property">font-style</span>: normal;
+  <span class="org-css-property">font-weight</span>: 700;
+  <span class="org-css-property">src</span>: url<span class="org-default">(</span><span class="org-string">https://fonts.gstatic.com/s/baskervville/v20/YA9Br0yU4l_XOrogbkun3kQ6vLFYXmpq8sRsYgfsigS4dA.woff2</span><span class="org-default">)</span> format(<span class="org-string">'woff2'</span>);
+  <span class="org-css-property">unicode-range</span>: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+<span class="org-comment-delimiter">/* </span><span class="org-comment">latin-ext</span><span class="org-comment-delimiter"> */</span>
+<span class="org-builtin">@font-face</span> {
+  <span class="org-css-property">font-family</span>: <span class="org-string">'Sen'</span>;
+  <span class="org-css-property">font-style</span>: normal;
+  <span class="org-css-property">font-weight</span>: 400 800;
+  <span class="org-css-property">src</span>: url<span class="org-default">(</span><span class="org-string">https://fonts.gstatic.com/s/sen/v12/6xKjdSxYI9_3kvWNEmo.woff2</span><span class="org-default">)</span> format(<span class="org-string">'woff2'</span>);
+  <span class="org-css-property">unicode-range</span>: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+<span class="org-comment-delimiter">/* </span><span class="org-comment">latin</span><span class="org-comment-delimiter"> */</span>
+<span class="org-builtin">@font-face</span> {
+  <span class="org-css-property">font-family</span>: <span class="org-string">'Sen'</span>;
+  <span class="org-css-property">font-style</span>: normal;
+  <span class="org-css-property">font-weight</span>: 400 800;
+  <span class="org-css-property">src</span>: url<span class="org-default">(</span><span class="org-string">https://fonts.gstatic.com/s/sen/v12/6xKjdSxYI9_3nPWN.woff2</span><span class="org-default">)</span> format(<span class="org-string">'woff2'</span>);
+  <span class="org-css-property">unicode-range</span>: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd28d2f3" class="outline-3">
+<h3 id="orgd28d2f3"><span class="section-number-3">1.2.</span> Font Compiler</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Google maintains and develops <a href="https://github.com/googlefonts/fontc">fontc</a>, a Rust-based compiler that takes font
+sources and converts them into the binary ttf and otf files. Font sources come
+in various formats, but usually boil down to definitions for outlines, kerning,
+metadata and more. It's a lot quicker than the previous Python font compiler,
+<a href="https://github.com/googlefonts/fontmake">fontmake</a>, which was also developed and maintained by Google.
+</p>
+</div>
+</div>
+<div id="outline-container-org792d5d1" class="outline-3">
+<h3 id="org792d5d1"><span class="section-number-3">1.3.</span> Fontations</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+The Rust <a href="https://github.com/googlefonts/fontations">Fontations</a> libraries provide a foundation to read and write font
+data. This library is used in <code>fontc</code> as well as Skia, the 2D graphics engine
+used by Chrome, Chromium, Firefox, and Android.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orge11e126" class="outline-2">
+<h2 id="orge11e126"><span class="section-number-2">2.</span> Accomplishments</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+I did a few things that are internal to Google, but most of my work has been
+open source. Since it's open source, I can actually present some of the stuff
+I've done.
+</p>
+</div>
+<div id="outline-container-org30db5b6" class="outline-3">
+<h3 id="org30db5b6"><span class="section-number-3">2.1.</span> Better Gradients for Resvg+TinySkia</h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+<div id="outline-container-org0ec0997" class="outline-4">
+<h4 id="org0ec0997"><span class="section-number-4">2.1.1.</span> Task</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+My starter project was to fix <a href="https://github.com/googlefonts/sleipnir">Sleipnir</a> rendering of color fonts like emojis and
+<a href="https://fonts.google.com/specimen/Nabla?query=nabla&amp;preview.script=Latn">Nabla</a>. Sleipnir is a Rust library that can render text and icons into png or
+svg.
+</p>
+
+<p>
+This one was quite a rabbit hole. The most important skill I picked up was
+understanding the font format. Fonts (binary ttf/otf files) are composed of
+tables. The tables define things such as outline contours, supported unicodes,
+ligatures, kerning, and lots of other stuff; it's a fairly extensible
+format. Font's can make use of any assortment of the spec to accomplish the
+goal. The spec is fairly complicated due to decades of legacy.
+</p>
+
+<p>
+To inspect the contents of a font, you can open it with the <code>ttx</code> command from
+<a href="https://github.com/fonttools/fonttools">fonttools</a>. This produces an <code>xml</code> representation of the tables. To help me out,
+I even made an Emacs package that adds the ability to open ttf, otf, and
+woff2<sup><a id="fnr.woff2" class="footref" href="#fn.woff2" role="doc-backlink">2</a></sup> font files. Check out <a href="https://github.com/wmedrano/ttx-mode"><code>ttx-mode</code></a> if interested.
+</p>
+</div>
+</div>
+<div id="outline-container-org8117d05" class="outline-4">
+<h4 id="org8117d05"><span class="section-number-4">2.1.2.</span> Detour</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<p>
+It turns out that getting Nabla to work was not too complicated. However,
+<code>tiny-skia</code>, the underlying 2D graphics library, did not have fully support
+Radial Gradients and was missing Sweep Gradients entirely. I originally was
+going to leave it as is, but my manager encouraged me to continue. So I ended up
+learning some math and implementing <a href="https://github.com/linebender/tiny-skia/pull/164">radial gradient</a> and <a href="https://github.com/linebender/tiny-skia/pull/166">sweep gradients</a>.
+</p>
+
+<p>
+What's rewarding about this is that it affects a few other users. Once <i>typst</i>
+updates their dependencies, they should have better gradients (<a href="https://github.com/typst/typst/issues/7760">issues</a>). I also
+<a href="https://github.com/linebender/resvg/pull/1014">completed</a> <i>resvg</i> integration to better render radial gradients. Both of these
+are pretty popular open source tools.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org2f48397" class="outline-3">
+<h3 id="org2f48397"><span class="section-number-3">2.2.</span> IFT - Incremental Font Transfer</h3>
+<div class="outline-text-3" id="text-2-2">
+</div>
+<div id="outline-container-orga44c783" class="outline-4">
+<h4 id="orga44c783"><span class="section-number-4">2.2.1.</span> Background</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+The main project I should be working on at the moment is landing IFT on the
+client. IFT is a font technology that reduces the size of fonts on the web. I
+said <i>should</i> since I've spent most of this quarter procrastinating and failing
+to comprehend specs. At least I've made a bit of progress.
+</p>
+
+<p>
+IFT stands for Incremental Font Transfer. It is a font technology that
+theoretically enables more efficient transfer of fonts. My coworker, Garret, has
+been working on the spec and prototype for a while. The spec can be seen on
+<a href="https://www.w3.org/TR/IFT/">W3.org</a>.
+</p>
+
+<p>
+IFT requires 2 components:
+</p>
+
+<ol class="org-ol">
+<li>An IFT encoded font. This splits the font into a base font and a collection
+of patches.</li>
+<li>Client support. Clients (web browsers) must be able to request and apply the
+patches as needed.</li>
+</ol>
+
+
+<div id="org6319605" class="figure">
+<p><img src="ift-encoder.svg" alt="ift-encoder.svg" class="org-svg" style="width:50%;" />
+</p>
+<p><span class="figure-number">Figure 1: </span>The encoder converts a font file into a font and its patches.</p>
+</div>
+
+
+<div id="org2c7b84b" class="figure">
+<p><img src="ift-client.svg" alt="ift-client.svg" class="org-svg" style="width:33%;" />
+</p>
+<p><span class="figure-number">Figure 2: </span>The client must download and apply the relevant patches at runtime.</p>
+</div>
+
+<p>
+So why is it useful to split up a font? This is all to reduce download sizes and
+make things load quickly and more consistently. When using a font, a web page
+may not need all the glyphs (characters) or styles (italic/bold).
+</p>
+</div>
+</div>
+<div id="outline-container-orgfbda62b" class="outline-4">
+<h4 id="orgfbda62b"><span class="section-number-4">2.2.2.</span> Actual Deliverables</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+Well, I've been really procrastinating on IFT since it's rather
+intimidating. I've read some spec, encoding code, decoding code, and Chromium
+code, but that's not really a deliverable<sup><a id="fnr.ift-progress" class="footref" href="#fn.ift-progress" role="doc-backlink">3</a></sup>.
+</p>
+
+<p>
+However, I kind of lied about not having any deliverables. At the end of the
+quarter I managed to squeeze in <code>IFT</code> support (<a href="https://github.com/fonttools/fonttools/pull/4072">PR</a>) into <code>ttx</code>. This will allow
+us to inspect the <code>IFT</code> table as human readable <code>XML</code>. This is useful for
+inspecting the patch definitions while we debug quirks of our new <code>IFT</code>
+implementation.
+</p>
+</div>
+</div>
+<div id="outline-container-org724ab8f" class="outline-4">
+<h4 id="org724ab8f"><span class="section-number-4">2.2.3.</span> Next</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+My Q2 goal is to have working IFT support in the browser. This means
+understanding the Chromium code, implementing the feature, and shipping it
+behind an experimental flag.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org8ffc86b" class="outline-3">
+<h3 id="org8ffc86b"><span class="section-number-3">2.3.</span> An Appreciation for Typeface</h3>
+<div class="outline-text-3" id="text-2-3">
+
+<div id="orgc301aba" class="figure">
+<p><img src="./pooh.jpg" alt="Tuxedo Winnie the Pooh meme: regular Pooh labeled &quot;font&quot;, fancy tuxedo Pooh labeled &quot;typeface&quot;." style="width:50%;margin:auto;" />
+</p>
+</div>
+
+<p>
+I've also gained an appreciation for typeface<sup><a id="fnr.typeface" class="footref" href="#fn.typeface" role="doc-backlink">4</a></sup>. I've liked tweaking
+around the monospace font I use after I started programming. Here's where I've
+landed for now:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Context</th>
+<th scope="col" class="org-left">Purpose</th>
+<th scope="col" class="org-left">Typeface</th>
+<th scope="col" class="org-left">Designer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">OS</td>
+<td class="org-left">Interface</td>
+<td class="org-left"><a href="https://indestructibletype.com/Jost.html">Jost*</a></td>
+<td class="org-left"><a href="https://indestructibletype.com/BuyJost.html">indestructible type*</a> (Owen Earl)</td>
+</tr>
+
+<tr>
+<td class="org-left">OS</td>
+<td class="org-left">Body</td>
+<td class="org-left"><a href="https://rsms.me/inter/">Inter</a></td>
+<td class="org-left"><a href="https://rsms.me/inter/download/">rsms</a> (Rasmus)</td>
+</tr>
+
+<tr>
+<td class="org-left">OS</td>
+<td class="org-left">Terminal</td>
+<td class="org-left"><a href="http://levien.com/type/myfonts/inconsolata.html">Inconsolata</a></td>
+<td class="org-left"><a href="https://github.com/raphlinus">raphlinus</a> (<a href="https://tug.org/tc/devfund/">TUG</a> for funding)</td>
+</tr>
+
+<tr>
+<td class="org-left">OS/Blog</td>
+<td class="org-left">Code</td>
+<td class="org-left"><a href="https://github.com/tonsky/FiraCode">Fira Code</a></td>
+<td class="org-left"><a href="https://carrois.com/studio/">Carrois Type Design</a> &amp; <a href="https://github.com/tonsky">tonsky</a></td>
+</tr>
+
+<tr>
+<td class="org-left">Blog</td>
+<td class="org-left">Header</td>
+<td class="org-left"><a href="https://anrt-nancy.fr/en/fonts/baskervville">Baskervville</a></td>
+<td class="org-left"><a href="https://anrt-nancy.fr/en">ANRT</a> (<a href="https://www.rosaliewagner.com/">Rosalie Wagner</a>, on <a href="https://ko-fi.com/rosaliewagner">ko-fi</a>)</td>
+</tr>
+
+<tr>
+<td class="org-left">Blog</td>
+<td class="org-left">Body</td>
+<td class="org-left"><a href="https://philatype.com/sen">Sen</a></td>
+<td class="org-left"><a href="https://philatype.com/">PHILATYPE</a> (Kosal Sen)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.startdate" class="footnum" href="#fnr.startdate" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+I actually started on the team in late November, but it's a short
+quarter between all the holidays, nobody being present, and some unexpected sick
+days.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.woff2" class="footnum" href="#fnr.woff2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+A woff2 font is just a compressed version of a font.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.ift-progress" class="footnum" href="#fnr.ift-progress" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+At the time this was written, my grasp is a lot better. That's
+a relief, but it would be a 2026Q2 update!
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.typeface" class="footnum" href="#fnr.typeface" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+Typeface is the design, for example, the Helvetica typeface. The
+font is the digital representation manifested into bytes.
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+
+<div></div>
+<p class="postamble-title">Title: Fonts Q1</p>
+<p class="author">Author: Will S. Medrano</p>
+<p class="date">Date: 2026-04-11 Sat 00:00</p>
+</div>
+</body>
+</html>

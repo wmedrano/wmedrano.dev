@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-10-21 Wed 20:12 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Local LLM</title>
+<meta name="author" content="Will S. Medrano" />
+<meta name="generator" content="Org Mode" />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="canonical" href="https://wmedrano.dev/drafts/local-llm.html">
+</head>
+<body>
+
+<div class="navbar" id="org-div-home-and-up">
+ <!--Ignore -->
+ <a accesskey="H" href="/">wmedrano dot dev</a>
+  <a href="/about">About</a>
+</div><div id="content" class="content">
+<h1 class="title">Local LLM</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org64141b2">1. Tests</a>
+<ul>
+<li><a href="#org4a3cf89">1.1. Prompt</a></li>
+<li><a href="#orgc6b9f9b">1.2. Response Quality</a></li>
+<li><a href="#org24906e9">1.3. Speed</a>
+<ul>
+<li><a href="#org1dff0cd">1.3.1. Turn 1</a></li>
+<li><a href="#org5ffc9f7">1.3.2. Turn 2</a></li>
+<li><a href="#org020e337">1.3.3. Turn 3</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<i>(Reading time: TODO)</i>
+</p>
+<div id="outline-container-org64141b2" class="outline-2">
+<h2 id="org64141b2"><span class="section-number-2">1.</span> Tests</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+I tested 4 local models and 2 cloud models with Ollama.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Model</th>
+<th scope="col" class="org-left">Category</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Kimi K2.6</td>
+<td class="org-left">Cloud</td>
+<td class="org-left">An open weight MoE model with 1 trillion parameters and 32b active parameters.</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemini 3 Flash</td>
+<td class="org-left">Cloud</td>
+<td class="org-left">Google's fast model.</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 27b</td>
+<td class="org-left">Local</td>
+<td class="org-left">A 27b dense model.</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 35b</td>
+<td class="org-left">Local</td>
+<td class="org-left">A 35b MoE model with 3b active parameters.</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 26b</td>
+<td class="org-left">Local</td>
+<td class="org-left">A 26b MoE model with 4b active parameters.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+For the tests, I did a short conversation about `podman`. All the answers seemed
+generally correct. This first test is just a quick one to get a feel. In real
+performance, I expect the prompt/input to be longer as smaller models need more
+context. Larger models can be used as a "Google" of sorts, but smaller models
+should aim to provide good reasoning given good context since less knowledge can
+fit.
+</p>
+</div>
+<div id="outline-container-org4a3cf89" class="outline-3">
+<h3 id="org4a3cf89"><span class="section-number-3">1.1.</span> Prompt</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+The test is a conversation with 3 prompts. The initial prompt starts with a
+system like prompt to "Respond concisely" and asks for a list of podman
+containers. The next prompt then asks for how to get the volumes. The final
+prompt is more complex and asks to perform a backup and restore on a volume.
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>A system prompt and basic command.</label><pre class="src src-md"><code>Respond concisely and with code snippets: List all podman containers
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 2: </span>A follow up command.</label><pre class="src src-markdown"><code>List all podman volumes
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 3: </span>Something a little more complex and specific.</label><pre class="src src-markdown"><code><span class="org-markdown-code"><span class="org-markdown-markup">```</span></span><span class="org-markdown-code"><span class="org-markdown-language-keyword">sh</span></span><span class="org-markdown-code">
+</span><span class="org-markdown-code"><span class="org-markdown-pre">podman volume ls
+DRIVER      VOLUME NAME
+local       forgejo-data
+</span></span><span class="org-markdown-code"><span class="org-markdown-markup">```</span></span><span class="org-markdown-code">
+</span>
+<span class="org-markdown-list">1.</span> Back up the <span class="org-markdown-markup">`</span><span class="org-markdown-inline-code">forgejo-data</span><span class="org-markdown-markup">`</span> volume.
+<span class="org-markdown-list">2.</span> How can this volume be restored later?
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc6b9f9b" class="outline-3">
+<h3 id="orgc6b9f9b"><span class="section-number-3">1.2.</span> Response Quality</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+All responses were adequate. Since the Qwen models are small, they can't pack as
+much information in. However, for `podman` all models did well. The final step
+used a little bit of reasoning and models provided similar solutions. However,
+Gemini 3 Flash may have known a little bit extra and it used the volume import
+and export functionality.
+</p>
+</div>
+</div>
+<div id="outline-container-org24906e9" class="outline-3">
+<h3 id="org24906e9"><span class="section-number-3">1.3.</span> Speed</h3>
+<div class="outline-text-3" id="text-1-3">
+</div>
+<div id="outline-container-org1dff0cd" class="outline-4">
+<h4 id="org1dff0cd"><span class="section-number-4">1.3.1.</span> Turn 1</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Model</th>
+<th scope="col" class="org-left">Total Duration</th>
+<th scope="col" class="org-left">Prompt Eval Count</th>
+<th scope="col" class="org-left">Eval Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Kimi K2.6</td>
+<td class="org-left">3.6s</td>
+<td class="org-left">21 tokens</td>
+<td class="org-left">147 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemini 3 Flash</td>
+<td class="org-left">2.2s</td>
+<td class="org-left">13 tokens</td>
+<td class="org-left">296 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 27b</td>
+<td class="org-left">24s</td>
+<td class="org-left">24 tokens</td>
+<td class="org-left">273 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 35b</td>
+<td class="org-left">9.3s</td>
+<td class="org-left">24 tokens</td>
+<td class="org-left">384 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 31b</td>
+<td class="org-left">11.2s</td>
+<td class="org-left">28 tokens</td>
+<td class="org-left">114 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 26b</td>
+<td class="org-left">3.8s</td>
+<td class="org-left">28 tokens</td>
+<td class="org-left">176 tokens</td>
+</tr>
+</tbody>
+</table>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Model</th>
+<th scope="col" class="org-left">Prompt Rate</th>
+<th scope="col" class="org-left">Eval Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Qwen3.6 27b</td>
+<td class="org-left">103.5 t/s</td>
+<td class="org-left">11.2 t/s</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 35b</td>
+<td class="org-left">197.1 t/s</td>
+<td class="org-left">43.2 t/s</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 31b</td>
+<td class="org-left">277.9 t/s</td>
+<td class="org-left">10.5 t/s</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 26b</td>
+<td class="org-left">283.9</td>
+<td class="org-left">51.8 t/s</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org5ffc9f7" class="outline-4">
+<h4 id="org5ffc9f7"><span class="section-number-4">1.3.2.</span> Turn 2</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Model</th>
+<th scope="col" class="org-left">Total Duration</th>
+<th scope="col" class="org-left">Prompt Eval Count</th>
+<th scope="col" class="org-left">Eval Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Kimi K2.6</td>
+<td class="org-left">6.1s</td>
+<td class="org-left">91 tokens</td>
+<td class="org-left">124 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemini 3 Flash</td>
+<td class="org-left">1.6s</td>
+<td class="org-left">102 tokens</td>
+<td class="org-left">145 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 27b</td>
+<td class="org-left">40s</td>
+<td class="org-left">63 tokens</td>
+<td class="org-left">441 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 35b</td>
+<td class="org-left">6.9s</td>
+<td class="org-left">69 tokens</td>
+<td class="org-left">279 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 31b</td>
+<td class="org-left">5.7s</td>
+<td class="org-left">82 tokens</td>
+<td class="org-left">55 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 26b</td>
+<td class="org-left">2.1s</td>
+<td class="org-left">82 tokens</td>
+<td class="org-left">92 tokens</td>
+</tr>
+</tbody>
+</table>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Model</th>
+<th scope="col" class="org-left">Prompt Rate</th>
+<th scope="col" class="org-left">Eval Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Qwen3.6 27b</td>
+<td class="org-left">225.46 t/s</td>
+<td class="org-left">11.0 t/s</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 35b</td>
+<td class="org-left">338.7 t/s</td>
+<td class="org-left">42.9 t/s</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 31b</td>
+<td class="org-left">277 t/s</td>
+<td class="org-left">10.6 t/s</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 26b</td>
+<td class="org-left">813.4 t/s</td>
+<td class="org-left">52.2 t/s</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org020e337" class="outline-4">
+<h4 id="org020e337"><span class="section-number-4">1.3.3.</span> Turn 3</h4>
+<div class="outline-text-4" id="text-1-3-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Model</th>
+<th scope="col" class="org-left">Total Duration</th>
+<th scope="col" class="org-left">Prompt Eval Count</th>
+<th scope="col" class="org-left">Eval Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Kimi K2.6</td>
+<td class="org-left">29.1s</td>
+<td class="org-left">181 tokens</td>
+<td class="org-left">1655 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemini Flash</td>
+<td class="org-left">4.7s</td>
+<td class="org-left">215 tokens</td>
+<td class="org-left">914 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 27b</td>
+<td class="org-left">208.5s</td>
+<td class="org-left">128 tokens</td>
+<td class="org-left">2256 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 35b</td>
+<td class="org-left">46.5</td>
+<td class="org-left">153 tokens</td>
+<td class="org-left">1949 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 31b</td>
+<td class="org-left">65.1s</td>
+<td class="org-left">147 tokens</td>
+<td class="org-left">649 tokens</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 26b</td>
+<td class="org-left">18.0s</td>
+<td class="org-left">155 tokens</td>
+<td class="org-left">870 tokens</td>
+</tr>
+</tbody>
+</table>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Model</th>
+<th scope="col" class="org-left">Prompt Rate</th>
+<th scope="col" class="org-left">Eval Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Qwen3.6 27b</td>
+<td class="org-left">256.7 t/s</td>
+<td class="org-left">10.9 t/s</td>
+</tr>
+
+<tr>
+<td class="org-left">Qwen3.6 35b</td>
+<td class="org-left">542.0 t/s</td>
+<td class="org-left">42.7 t/s</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 31b</td>
+<td class="org-left">443.3 t/s</td>
+<td class="org-left">10.1 t/s</td>
+</tr>
+
+<tr>
+<td class="org-left">Gemma4 26b</td>
+<td class="org-left">1272.0 t/s</td>
+<td class="org-left">49.7 t/s</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div></div>
+<p class="postamble-title">Title: Local LLM</p>
+<p class="author">Author: Will S. Medrano</p>
+<p class="date">Date: 2026-05-10 Sun 00:00</p>
+</div>
+</body>
+</html>

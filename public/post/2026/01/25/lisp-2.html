@@ -1,0 +1,856 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-10-21 Wed 20:12 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Building a Lisp Interpreter (in Rust) - Part 2</title>
+<meta name="author" content="Will S. Medrano" />
+<meta name="generator" content="Org Mode" />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="canonical" href="https://wmedrano.dev/post/2026/01/25/lisp-2.html">
+</head>
+<body>
+
+<div class="navbar" id="org-div-home-and-up">
+ <!--Ignore -->
+ <a accesskey="H" href="/">wmedrano dot dev</a>
+  <a href="/about">About</a>
+</div><div id="content" class="content">
+<h1 class="title">Building a Lisp Interpreter (in Rust) - Part 2</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org7060627">1. Introduction</a>
+<ul>
+<li><a href="#org1fb1c89">1.1. <code>eval</code> Rules</a></li>
+</ul>
+</li>
+<li><a href="#org09127ee">2. Data structures</a>
+<ul>
+<li><a href="#orga0774b6">2.1. Function Type in Value</a></li>
+<li><a href="#orgd0bbbd0">2.2. Environment/Variables</a></li>
+<li><a href="#orgf2f7d01">2.3. Errors</a></li>
+</ul>
+</li>
+<li><a href="#org94d1a79">3. Eval</a>
+<ul>
+<li><a href="#orge5c90a0">3.1. API</a></li>
+<li><a href="#orgaaface8">3.2. Simple Case: Atoms/Constants</a></li>
+<li><a href="#org1f31107">3.3. Symbol Case: Variables</a></li>
+<li><a href="#org13df88c">3.4. Function Call Case: List Evaluation</a></li>
+</ul>
+</li>
+<li><a href="#org7b8c317">4. Special Forms</a>
+<ul>
+<li><a href="#org95e1b88">4.1. If</a>
+<ul>
+<li><a href="#orgb299782">4.1.1. Implementation</a></li>
+</ul>
+</li>
+<li><a href="#org0f80674">4.2. Define</a></li>
+</ul>
+</li>
+<li><a href="#org2ba17f0">5. Conclusion</a></li>
+</ul>
+</div>
+</div>
+<p>
+This is Part 2 (Evaluation) of a 3-part series.
+Reading: <a href="../../../2025/11/15/lisp-1.html">Part 1 (Parsing)</a> | <a href="../../../2026/02/21/lisp-3.html">Part 3 (Lambdas)</a>
+</p>
+<div id="outline-container-org7060627" class="outline-2">
+<h2 id="org7060627"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This is part 2 of 3 of the <code>Building a Lisp Interpreter (in Rust)</code> series. In
+<a href="../../../2025/11/15/lisp-1.html">Part 1</a>, we created the Lisp value and a tokenizer/parser. In this part, we will
+evaluate expressions.
+</p>
+
+<p>
+To recap, a Lisp interpreter has 2 main components.
+</p>
+
+<ol class="org-ol">
+<li><code>read</code> - Read the text into a Lisp data structure. (In Part 1)</li>
+<li><code>eval</code> - Evaluate that structure according to Lisp’s simple rules. (This part)</li>
+</ol>
+
+<p>
+Our main goal will be to implement:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">fn</span> <span class="org-function-name">eval</span>(<span class="org-variable-name">expr</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-type">Val</span>, <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; { .. }
+</code></pre>
+</div>
+
+<p>
+Where <code>expr</code> is a Lisp data structure that holds the code we will evaluate and
+<code>env</code> contains the variables and functions that are available for use.
+</p>
+</div>
+<div id="outline-container-org1fb1c89" class="outline-3">
+<h3 id="org1fb1c89"><span class="section-number-3">1.1.</span> <code>eval</code> Rules</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Simple data (atoms) return just themselves.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>12 <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; 12
+</span>#true <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; #true</span>
+</code></pre>
+</div>
+
+<p>
+A naked symbol returns the variable it references.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>pi <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; 3.1415... ?
+</span>does-not-exist <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; error</span>
+</code></pre>
+</div>
+
+<p>
+Lists are function calls. The first element is the function and the rest are the
+arguments.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(+ 1 2) <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; 3
+</span>(+ 1 2 (* 3 4)) <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; (+ 1 2 12) =&gt; 15</span>
+</code></pre>
+</div>
+
+<p>
+Because we aren't guaranteed to have a function at the first position, sometimes
+it may be an error to evaluate a list.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(1 2 3) <span class="org-comment-delimiter">;; </span><span class="org-comment">Error, 1 is not a function</span>
+</code></pre>
+</div>
+
+<p>
+Also, the function itself may be misused leading to an error.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(/) <span class="org-comment-delimiter">;; </span><span class="org-comment">Error, / requires at least 1 argument.
+</span>(+ #true #false) <span class="org-comment-delimiter">;; </span><span class="org-comment">Error, + only accepts numbers.</span>
+</code></pre>
+</div>
+
+<p>
+A list can also have special behavior based on the first element. For example,
+an if statement.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span class="org-keyword">if</span> #true (run-this-code) (never-run-this-code))
+</code></pre>
+</div>
+
+<p>
+Or <code>define</code> can be used to set a variable.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span class="org-keyword">define</span> <span class="org-function-name">x</span> 12)
+x <span class="org-comment-delimiter">;; </span><span class="org-comment">12</span>
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org09127ee" class="outline-2">
+<h2 id="org09127ee"><span class="section-number-2">2.</span> Data structures</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+We defined a basic data structure in <a href="../../../2025/11/15/lisp-1.html">Lisp 1</a>. Before continuing, they need a
+little more refinement. We want to support:
+</p>
+
+<ol class="org-ol">
+<li>Functions - To be defined in native Rust at the moment.</li>
+<li>Environment - A place where we can store and retrieve variables.</li>
+<li>Errors - Your standard Rust <code>enum</code> based error.</li>
+</ol>
+</div>
+<div id="outline-container-orga0774b6" class="outline-3">
+<h3 id="orga0774b6"><span class="section-number-3">2.1.</span> Function Type in Value</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+In our language, we have the concept of a function. For example, in <code>(+ 1 2 3)</code>,
+<code>+</code> is a function that adds all its arguments. We will keep a function simple. A
+function takes in any number of arguments and can return either the resulting
+value or an error.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">type</span> <span class="org-type">Function</span> = <span class="org-keyword">fn</span>(<span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>]) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt;;
+</code></pre>
+</div>
+
+<p>
+Which makes our <code>Val</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[derive(Clone, Debug, PartialEq)]</span>
+<span class="org-keyword">pub</span> <span class="org-keyword">enum</span> <span class="org-type">Val</span> {
+    <span class="org-type">Int</span>(<span class="org-type">i64</span>),
+    <span class="org-type">Bool</span>(<span class="org-type">bool</span>),
+    <span class="org-type">Symbol</span>(<span class="org-type">String</span>),
+    <span class="org-type">List</span>(<span class="org-type">Vec</span>&lt;<span class="org-type">Val</span>&gt;),
+    <span class="org-type">Function</span>(<span class="org-type">Function</span>), <span class="org-comment-delimiter">// </span><span class="org-comment">Support for functions!
+</span>}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd0bbbd0" class="outline-3">
+<h3 id="orgd0bbbd0"><span class="section-number-3">2.2.</span> Environment/Variables</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+In the <code>symbol</code> example, we referenced a variable.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>pi <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; 3.14</span>
+</code></pre>
+</div>
+
+<p>
+Even in <code>(+ 1 2 3)</code>, we also reference a variable. <code>+</code> is bound to a
+function.
+</p>
+
+<p>
+To handle this, we will create an <code>Environment</code>. Values can be stored and
+retrieved from the environment, similar to a hashmap. In fact, we'll back it
+with a <code>HashMap</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">use</span> <span class="org-constant">std</span>::<span class="org-constant">collections</span>::<span class="org-type">HashMap</span>;
+
+<span class="org-preprocessor">#[derive(Debug, Default)]</span>
+<span class="org-keyword">pub</span> <span class="org-keyword">struct</span> <span class="org-type">Environment</span> {
+    <span class="org-variable-name">values</span>: <span class="org-type">HashMap</span>&lt;<span class="org-type">String</span>, <span class="org-type">Val</span>&gt;,
+}
+
+<span class="org-keyword">impl</span> <span class="org-type">Environment</span> {
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">with_value</span>(<span class="org-keyword">mut</span> <span class="org-keyword">self</span>, <span class="org-variable-name">name</span>: <span class="org-keyword">impl</span> <span class="org-type">Into</span>&lt;<span class="org-type">String</span>&gt;, <span class="org-variable-name">val</span>: <span class="org-type">Val</span>) -&gt; <span class="org-type">Environment</span> {
+        <span class="org-keyword">self</span>.set(name.into(), val);
+        <span class="org-keyword">self</span>
+    }
+
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">set</span>(<span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-keyword">self</span>, <span class="org-variable-name">name</span>: <span class="org-keyword">impl</span> <span class="org-type">Into</span>&lt;<span class="org-type">String</span>&gt;, <span class="org-variable-name">val</span>: <span class="org-type">Val</span>) {
+        <span class="org-keyword">self</span>.values.insert(name.into(), val);
+    }
+
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">get</span>(<span class="org-rust-ampersand">&amp;</span><span class="org-keyword">self</span>, <span class="org-variable-name">name</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-type">str</span>) -&gt; <span class="org-type">Option</span>&lt;<span class="org-rust-ampersand">&amp;</span><span class="org-type">Val</span>&gt; {
+        <span class="org-keyword">self</span>.values.get(name)
+    }
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf2f7d01" class="outline-3">
+<h3 id="orgf2f7d01"><span class="section-number-3">2.3.</span> Errors</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+We've been alluding to errors happening. Here are the final set of errors we use
+in this post.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[derive(Debug, Clone, PartialEq)]</span>
+<span class="org-keyword">pub</span> <span class="org-keyword">enum</span> <span class="org-type">Error</span> {
+    <span class="org-type">TokenizerError</span>(<span class="org-type">TokenizerError</span>),
+    <span class="org-type">ValueNotFound</span>(<span class="org-type">String</span>),
+    <span class="org-type">ValueNotCallable</span>(<span class="org-type">Val</span>),
+    <span class="org-type">WrongType</span> { <span class="org-variable-name">expected</span>: <span class="org-rust-ampersand">&amp;</span>'<span class="org-keyword">static</span> <span class="org-type">str</span>, <span class="org-variable-name">got</span>: <span class="org-type">Val</span> },
+    <span class="org-type">WrongArity</span> { <span class="org-variable-name">expected</span>: <span class="org-type">usize</span>, <span class="org-variable-name">got</span>: <span class="org-type">usize</span> },
+    <span class="org-type">Other</span>(<span class="org-rust-ampersand">&amp;</span>'<span class="org-keyword">static</span> <span class="org-type">str</span>),
+}
+
+<span class="org-keyword">impl</span> <span class="org-type">From</span>&lt;<span class="org-type">TokenizerError</span>&gt; <span class="org-keyword">for</span> <span class="org-type">Error</span> {
+    <span class="org-keyword">fn</span> <span class="org-function-name">from</span>(<span class="org-variable-name">e</span>: <span class="org-type">TokenizerError</span>) -&gt; <span class="org-type">Error</span> {
+        <span class="org-type">Error</span>::<span class="org-type">TokenizerError</span>(e)
+    }
+}
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org94d1a79" class="outline-2">
+<h2 id="org94d1a79"><span class="section-number-2">3.</span> Eval</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orge5c90a0" class="outline-3">
+<h3 id="orge5c90a0"><span class="section-number-3">3.1.</span> API</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+The eval function will take in an expression and an environment where it can
+store and retrieve values from. The behavior is based on the value.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">eval</span>(<span class="org-variable-name">expr</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-type">Val</span>, <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-keyword">match</span> expr {
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(x) =&gt; <span class="org-preprocessor">todo!</span>(),
+        <span class="org-type">Val</span>::<span class="org-type">Bool</span>(x) =&gt; <span class="org-preprocessor">todo!</span>(),
+        <span class="org-type">Val</span>::<span class="org-type">Symbol</span>(x) =&gt; <span class="org-preprocessor">todo!</span>(),
+        <span class="org-type">Val</span>::<span class="org-type">List</span>(x) =&gt; <span class="org-preprocessor">todo!</span>(),
+        <span class="org-type">Val</span>::<span class="org-type">Function</span>(x) =&gt; <span class="org-preprocessor">todo!</span>(),
+    }
+}
+</code></pre>
+</div>
+
+<p>
+For convenience purposes, we will also create <code>eval_str</code> which automatically
+converts a string into a <code>Val</code> expression for us.
+</p>
+
+<p>
+In case there are multiple expressions, we will return the final result. There
+are some other reasonable alternatives like returning a vector of all the values
+or maybe even returning an error if there is more than one expression.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">eval_str</span>(<span class="org-variable-name">s</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-type">str</span>, <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">res_val</span>: <span class="org-type">Option</span>&lt;<span class="org-type">Val</span>&gt; = <span class="org-type">None</span>;
+
+    <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">tokenizer</span> = <span class="org-type">Tokenizer</span>::new(s);
+    <span class="org-keyword">while</span> <span class="org-keyword">let</span> <span class="org-type">Some</span>(expr) = read_next(<span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> tokenizer)<span class="org-rust-question-mark">?</span> {
+        res_val = <span class="org-type">Some</span>(eval(<span class="org-rust-ampersand">&amp;</span>expr, env)<span class="org-rust-question-mark">?</span>);
+    }
+
+    res_val
+        .ok_or(<span class="org-type">Error</span>::<span class="org-type">TokenizerError</span>(<span class="org-type">TokenizerError</span>::<span class="org-type">UnexpectedEndOfInput</span>))
+}
+</code></pre>
+</div>
+
+<p>
+Now all we have to do is implement the eval function.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaaface8" class="outline-3">
+<h3 id="orgaaface8"><span class="section-number-3">3.2.</span> Simple Case: Atoms/Constants</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+The case for integers and booleans is easy. They just evaluate to
+themselves. Another one that may not seem obvious is a function. When we
+encounter a function (that is not the first element of a list), we should just
+return that function as a value.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>12 <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; 12
+</span>#true <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; #true
+</span>#false <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; #false
+</span>+ <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; &lt;function&gt;</span>
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[test]</span>
+<span class="org-keyword">fn</span> <span class="org-function-name">eval_int_produces_int</span>() {
+    <span class="org-preprocessor">assert_eq!</span>(
+        eval_str(<span class="org-string">"12"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>::default()).unwrap(),
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(12)
+    );
+}
+
+<span class="org-preprocessor">#[test]</span>
+<span class="org-keyword">fn</span> <span class="org-function-name">eval_bool_produces_bool</span>() {
+    <span class="org-preprocessor">assert_eq!</span>(
+        eval_str(<span class="org-string">"#true"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>::default()).unwrap(),
+        <span class="org-type">Val</span>::<span class="org-type">Bool</span>(<span class="org-keyword">true</span>)
+    );
+    <span class="org-preprocessor">assert_eq!</span>(
+        eval_str(<span class="org-string">"#false"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>::default()).unwrap(),
+        <span class="org-type">Val</span>::<span class="org-type">Bool</span>(<span class="org-keyword">false</span>)
+    );
+}
+
+<span class="org-preprocessor">#[test]</span>
+<span class="org-keyword">fn</span> <span class="org-function-name">eval_function_literal_returns_function</span>() {
+    <span class="org-keyword">fn</span> <span class="org-function-name">no_op</span>(<span class="org-variable-name">_</span>: <span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>]) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+        <span class="org-type">Ok</span>(<span class="org-type">Val</span>::<span class="org-type">Int</span>(0))
+    }
+    <span class="org-preprocessor">assert_eq!</span>(
+        eval(<span class="org-rust-ampersand">&amp;</span><span class="org-type">Val</span>::<span class="org-type">Function</span>(no_op), <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>::default()).unwrap(),
+        <span class="org-type">Val</span>::<span class="org-type">Function</span>(no_op)
+    );
+}
+</code></pre>
+</div>
+
+<p>
+To implement this, we will simply return a copy of our input:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">eval</span>(<span class="org-variable-name">expr</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-type">Val</span>, <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-keyword">match</span> expr {
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(_) | <span class="org-type">Val</span>::<span class="org-type">Bool</span>(_) | <span class="org-type">Val</span>::<span class="org-type">Function</span>(_) =&gt; <span class="org-type">Ok</span>(expr.clone()),
+        <span class="org-type">Val</span>::<span class="org-type">Symbol</span>(x) =&gt; <span class="org-preprocessor">todo!</span>(),
+        <span class="org-type">Val</span>::<span class="org-type">List</span>(x) =&gt; <span class="org-preprocessor">todo!</span>(),
+    }
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org1f31107" class="outline-3">
+<h3 id="org1f31107"><span class="section-number-3">3.3.</span> Symbol Case: Variables</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+A variable can be referenced by using a raw symbol. Let's say we manually define
+<code>x</code> as 10 in our environment, then:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>x <span class="org-comment-delimiter">;; </span><span class="org-comment">10</span>
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[test]</span>
+<span class="org-keyword">fn</span> <span class="org-function-name">eval_variable_returns_value_referenced_by_variable</span>() {
+    <span class="org-preprocessor">assert_eq!</span>(
+        eval_str(<span class="org-string">"x"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>::default().with_value(<span class="org-string">"x"</span>, <span class="org-type">Val</span>::<span class="org-type">Int</span>(10))).unwrap(),
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(10)
+    );
+}
+</code></pre>
+</div>
+
+<p>
+To implement this, we will simply query the <code>Environment</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">eval</span>(<span class="org-variable-name">expr</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-type">Val</span>, <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-keyword">match</span> expr {
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(_) | <span class="org-type">Val</span>::<span class="org-type">Bool</span>(_) | <span class="org-type">Val</span>::<span class="org-type">Function</span>(_) =&gt; <span class="org-type">Ok</span>(expr.clone()),
+        <span class="org-type">Val</span>::<span class="org-type">Symbol</span>(x) =&gt; env
+            .get(x.as_str())
+            .cloned()
+            .ok_or_else(|| <span class="org-type">Error</span>::<span class="org-type">ValueNotFound</span>(x.clone())),
+        <span class="org-type">Val</span>::<span class="org-type">List</span>(x) =&gt; <span class="org-preprocessor">todo!</span>(),
+    }
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org13df88c" class="outline-3">
+<h3 id="org13df88c"><span class="section-number-3">3.4.</span> Function Call Case: List Evaluation</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+List evaluation is more complex. Let's fork this off into a function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">eval</span>(<span class="org-variable-name">expr</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-type">Val</span>, <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-keyword">match</span> expr {
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(_) | <span class="org-type">Val</span>::<span class="org-type">Bool</span>(_) | <span class="org-type">Val</span>::<span class="org-type">Function</span>(_) =&gt; <span class="org-type">Ok</span>(expr.clone()),
+        <span class="org-type">Val</span>::<span class="org-type">Symbol</span>(x) =&gt; env
+            .get(x.as_str())
+            .cloned()
+            .ok_or_else(|| <span class="org-type">Error</span>::<span class="org-type">ValueNotFound</span>(x.clone())),
+        <span class="org-type">Val</span>::<span class="org-type">List</span>(x) =&gt; eval_list(x.as_slice(), env),
+    }
+}
+
+<span class="org-keyword">fn</span> <span class="org-function-name">eval_list</span>(<span class="org-variable-name">expr</span>: <span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>], <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-preprocessor">todo!</span>()
+}
+</code></pre>
+</div>
+
+<p>
+For our test, let's use the simple <code>(+ 1 2 3)</code> and only handle integers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(+ 1 2 3) <span class="org-comment-delimiter">;; </span><span class="org-comment">6</span>
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">fn</span> <span class="org-function-name">add</span>(<span class="org-variable-name">args</span>: <span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>]) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">sum</span>: <span class="org-type">i64</span> = 0;
+    <span class="org-keyword">for</span> <span class="org-variable-name">arg</span> <span class="org-keyword">in</span> args {
+        <span class="org-keyword">let</span> <span class="org-type">Val</span>::<span class="org-type">Int</span>(x) = arg <span class="org-keyword">else</span> {
+            <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">WrongType</span> {
+                <span class="org-variable-name">expected</span>: <span class="org-string">"Int"</span>,
+                <span class="org-variable-name">got</span>: arg.clone(),
+            });
+        };
+        sum += x;
+    }
+    <span class="org-type">Ok</span>(<span class="org-type">Val</span>::<span class="org-type">Int</span>(sum))
+}
+
+<span class="org-preprocessor">#[test]</span>
+<span class="org-keyword">fn</span> <span class="org-function-name">function_call_expression_evaluates_function</span>() {
+    <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">env</span> = <span class="org-type">Environment</span>::default().with_value(<span class="org-string">"+"</span>, <span class="org-type">Val</span>::<span class="org-type">Function</span>(add));
+    <span class="org-preprocessor">assert_eq!</span>(eval_str(<span class="org-string">"(+ 1 2 3)"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> env).unwrap(), <span class="org-type">Val</span>::<span class="org-type">Int</span>(6));
+}
+</code></pre>
+</div>
+
+<p>
+Let's see what it takes to evaluate a list. In <code>(func a b c)</code>, what do we need
+to do? We need to get the arguments, and pass them to <code>func</code>. So there are
+roughly 3 steps:
+</p>
+
+<ol class="org-ol">
+<li>Evaluate the first argument. If it does not resolve to a function, then it is
+an error.</li>
+<li>Evaluate the arguments and collect them.</li>
+<li>Call the function with the given arguments.</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">fn</span> <span class="org-function-name">eval_list</span>(<span class="org-variable-name">expr</span>: <span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>], <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-comment-delimiter">// </span><span class="org-comment">1. Evaluate the first argument.
+</span>    <span class="org-keyword">let</span> (func_expr, arg_vals) = <span class="org-keyword">match</span> expr {
+        [] =&gt; <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">Other</span>(<span class="org-string">"empty function call"</span>)),
+        [first, rest @ ..] =&gt; (first, rest),
+    };
+    <span class="org-keyword">let</span> <span class="org-variable-name">func_val</span> = eval(func_expr, env)<span class="org-rust-question-mark">?</span>;
+    <span class="org-comment-delimiter">// </span><span class="org-comment">1a. If it does not resolve to a function, then return an error.
+</span>    <span class="org-keyword">let</span> <span class="org-type">Val</span>::<span class="org-type">Function</span>(f) = func_val <span class="org-keyword">else</span> {
+        <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">ValueNotCallable</span>(func_val));
+    };
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">2. Evaluate the arguments and collect them.
+</span>    <span class="org-keyword">let</span> <span class="org-variable-name">args</span>: <span class="org-type">Vec</span>&lt;<span class="org-type">Val</span>&gt; = arg_vals
+        .iter()
+        .map(|x| eval(x, env))
+        .collect::&lt;<span class="org-type">Result</span>&lt;_, _&gt;&gt;()<span class="org-rust-question-mark">?</span>;
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">3. Call the function with the given arguments.
+</span>    f(<span class="org-rust-ampersand">&amp;</span>args)
+}
+</code></pre>
+</div>
+
+<blockquote>
+<p>
+Any sufficiently complicated [program] contains an ad-hoc, informally-specified,
+bug-ridden, slow implementation of half of [Lisp].
+</p>
+
+<p>
+&mdash; Greenspun's Tenth Rule
+</p>
+</blockquote>
+
+<p>
+Tada 🥳! We have a basic interpreter that is relatively powerful despite the
+simple implementation.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org7b8c317" class="outline-2">
+<h2 id="org7b8c317"><span class="section-number-2">4.</span> Special Forms</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Not all expressions follow the standard evaluation rules. These are called
+special forms. In a normal function call like <code>(+ 1 2)</code>, all arguments are
+evaluated before being passed to the function. Special forms have their own
+evaluation rules. We will introduce the special forms <code>if</code> and <code>define</code>.
+</p>
+</div>
+<div id="outline-container-org95e1b88" class="outline-3">
+<h3 id="org95e1b88"><span class="section-number-3">4.1.</span> If</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+The <code>if</code> special form takes 3 arguments: a condition, a "true" branch, and a
+"false" branch. Only one branch should be evaluated based on the condition.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span class="org-keyword">if</span> #true 1 2) <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; 1
+</span>(<span class="org-keyword">if</span> #false 1 2) <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; 2</span>
+</code></pre>
+</div>
+
+<p>
+If <code>if</code> were a normal function, both branches would be evaluated. This would be
+problematic for side effects. For example, this program would be broken if <code>if</code>
+were a function call!
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span class="org-keyword">if</span> #false (crash-my-program!) 42)
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[test]</span>
+<span class="org-keyword">fn</span> <span class="org-function-name">if_statement_only_executes_single_branch</span>() {
+    <span class="org-keyword">fn</span> <span class="org-function-name">crash</span>(<span class="org-variable-name">_</span>: <span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>]) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+        <span class="org-preprocessor">panic!</span>(<span class="org-string">"This should never be called!"</span>);
+    }
+
+    <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">env</span> = <span class="org-type">Environment</span>::default()
+        .with_value(<span class="org-string">"crash-my-program!"</span>, <span class="org-type">Val</span>::<span class="org-type">Function</span>(crash));
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">The true branch (call crash-my-program!) should not be evaluated on
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">#false.
+</span>    <span class="org-preprocessor">assert_eq!</span>(
+        eval_str(<span class="org-string">"(if #false (crash-my-program!) 42)"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> env).unwrap(),
+        <span class="org-type">Val</span>::<span class="org-type">Int</span>(42)
+    );
+}
+</code></pre>
+</div>
+</div>
+<div id="outline-container-orgb299782" class="outline-4">
+<h4 id="orgb299782"><span class="section-number-4">4.1.1.</span> Implementation</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<p>
+We need to handle <code>if</code> before attempting to call it as a function. Let's add an
+escape hatch for our special forms in <code>eval_list</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">fn</span> <span class="org-function-name">eval_list</span>(<span class="org-variable-name">expr</span>: <span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>], <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-keyword">let</span> (func_expr, arg_vals) = <span class="org-keyword">match</span> expr {
+        [] =&gt; <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">Other</span>(<span class="org-string">"empty function call"</span>)),
+        [first, rest @ ..] =&gt; (first, rest),
+    };
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">Handle special forms
+</span>    <span class="org-keyword">if</span> <span class="org-keyword">let</span> <span class="org-type">Val</span>::<span class="org-type">Symbol</span>(s) = func_expr {
+        <span class="org-keyword">match</span> s.as_str() {
+            <span class="org-string">"if"</span> =&gt; <span class="org-keyword">return</span> eval_if(arg_vals, env),
+            _ =&gt; {}
+        }
+    }
+    <span class="org-comment-delimiter">// </span><span class="org-comment">Normal function call
+</span>    <span class="org-keyword">let</span> <span class="org-variable-name">func_val</span> = eval(func_expr, env)<span class="org-rust-question-mark">?</span>;
+    <span class="org-comment-delimiter">// </span><span class="org-comment">... rest of function unchanged
+</span>}
+</code></pre>
+</div>
+
+<p>
+Now, it is easy to evaluate our if expression.
+</p>
+
+<ol class="org-ol">
+<li>First we need to deconstruct our arguments into the <code>condition</code>, the <code>true
+   branch</code> and the <code>false branch</code>.</li>
+<li>Then we evaluate our <code>condition</code>. How do we evaluate our condition? Well,
+<code>eval</code> can evaluate an expression given an environment. We can call that.</li>
+<li>Based on the result, we can then choose to evaluate the <code>true branch</code> or
+<code>false branch</code>.</li>
+</ol>
+
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">fn</span> <span class="org-function-name">eval_if</span>(<span class="org-variable-name">args</span>: <span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>], <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-comment-delimiter">// </span><span class="org-comment">1. Deconstruct our arguments.
+</span>    <span class="org-keyword">let</span> [cond, true_branch, false_branch] = args <span class="org-keyword">else</span> {
+        <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">WrongArity</span> {
+            <span class="org-variable-name">expected</span>: 3,
+            <span class="org-variable-name">got</span>: args.len(),
+        });
+    };
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">2. Evaluate our condition.
+</span>    <span class="org-keyword">let</span> <span class="org-variable-name">cond_val</span> = eval(cond, env)<span class="org-rust-question-mark">?</span>;
+    <span class="org-keyword">let</span> <span class="org-type">Val</span>::<span class="org-type">Bool</span>(b) = cond_val <span class="org-keyword">else</span> {
+        <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">WrongType</span> {
+            <span class="org-variable-name">expected</span>: <span class="org-string">"Bool"</span>,
+            <span class="org-variable-name">got</span>: cond_val,
+        });
+    };
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">3. Evaluate the chosen branch.
+</span>    <span class="org-keyword">if</span> b {
+        eval(true_branch, env)
+    } <span class="org-keyword">else</span> {
+        eval(false_branch, env)
+    }
+}
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org0f80674" class="outline-3">
+<h3 id="org0f80674"><span class="section-number-3">4.2.</span> Define</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+The <code>define</code> special form binds a value to a name in the environment. The first
+argument is the symbol (not evaluated), and the second is the value (evaluated).
+</p>
+
+<p>
+Here is a simple definition and variable reference:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span class="org-keyword">define</span> <span class="org-function-name">x</span> 10)
+x <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; 10</span>
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[test]</span>
+<span class="org-keyword">fn</span> <span class="org-function-name">define_sets_variable_reference</span>() {
+    <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">env</span> = <span class="org-type">Environment</span>::default().with_value(<span class="org-string">"+"</span>, <span class="org-type">Val</span>::<span class="org-type">Function</span>(add));
+    eval_str(<span class="org-string">"(define x 10)"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> env).unwrap();
+    <span class="org-preprocessor">assert_eq!</span>(eval_str(<span class="org-string">"x"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> env).unwrap(), <span class="org-type">Val</span>::<span class="org-type">Int</span>(10));
+}
+</code></pre>
+</div>
+
+<p>
+Now here is an expression assigned to a variable:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span class="org-keyword">define</span> <span class="org-function-name">y</span> (+ 1 2 3))
+y <span class="org-comment-delimiter">;; </span><span class="org-comment">=&gt; 6</span>
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-preprocessor">#[test]</span>
+<span class="org-keyword">fn</span> <span class="org-function-name">define_with_expression_assigns_result_of_expression_to_variable</span>() {
+    <span class="org-keyword">let</span> <span class="org-keyword">mut</span> <span class="org-variable-name">env</span> = <span class="org-type">Environment</span>::default().with_value(<span class="org-string">"+"</span>, <span class="org-type">Val</span>::<span class="org-type">Function</span>(add));
+    eval_str(<span class="org-string">"(define y (+ 1 2 3))"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> env).unwrap();
+    <span class="org-preprocessor">assert_eq!</span>(eval_str(<span class="org-string">"y"</span>, <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> env).unwrap(), <span class="org-type">Val</span>::<span class="org-type">Int</span>(6));
+}
+</code></pre>
+</div>
+
+<p>
+To implement this, we can add another escape hatch in <code>eval_list</code> for
+<code>define</code>. Then we implement define.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">fn</span> <span class="org-function-name">eval_list</span>(<span class="org-variable-name">expr</span>: <span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>], <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-comment-delimiter">// </span><span class="org-comment">... destructure expr into func_expr and arg_vals ...
+</span>
+    <span class="org-comment-delimiter">// </span><span class="org-comment">Handle special forms
+</span>    <span class="org-keyword">if</span> <span class="org-keyword">let</span> <span class="org-type">Val</span>::<span class="org-type">Symbol</span>(s) = func_expr {
+        <span class="org-keyword">match</span> s.as_str() {
+            <span class="org-string">"if"</span> =&gt; <span class="org-keyword">return</span> eval_if(arg_vals, env),
+            <span class="org-string">"define"</span> =&gt; <span class="org-keyword">return</span> eval_define(arg_vals, env),
+            _ =&gt; {}
+        }
+    }
+    <span class="org-comment-delimiter">// </span><span class="org-comment">... rest of function unchanged
+</span>}
+</code></pre>
+</div>
+
+<p>
+Define can be implemented with a similar philosophy to function evaluation and
+if.
+</p>
+
+<ol class="org-ol">
+<li>Deconstruct the args into the <code>name</code> of the variable and the <code>expression</code>.</li>
+<li>Evaluate the <code>expression</code>.</li>
+<li>Assign its result to <code>name</code>.</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-rust"><code><span class="org-keyword">fn</span> <span class="org-function-name">eval_define</span>(<span class="org-variable-name">args</span>: <span class="org-rust-ampersand">&amp;</span>[<span class="org-type">Val</span>], <span class="org-variable-name">env</span>: <span class="org-rust-ampersand">&amp;</span><span class="org-keyword">mut</span> <span class="org-type">Environment</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">Val</span>, <span class="org-type">Error</span>&gt; {
+    <span class="org-comment-delimiter">// </span><span class="org-comment">1. Deconstruct the name and expression.
+</span>    <span class="org-keyword">let</span> [name, expr] = args <span class="org-keyword">else</span> {
+        <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">WrongArity</span> {
+            <span class="org-variable-name">expected</span>: 2,
+            <span class="org-variable-name">got</span>: args.len(),
+        });
+    };
+    <span class="org-comment-delimiter">// </span><span class="org-comment">1a. Name must be a symbol.
+</span>    <span class="org-keyword">let</span> <span class="org-type">Val</span>::<span class="org-type">Symbol</span>(name) = name <span class="org-keyword">else</span> {
+        <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">WrongType</span> {
+            <span class="org-variable-name">expected</span>: <span class="org-string">"Symbol"</span>,
+            <span class="org-variable-name">got</span>: name.clone(),
+        });
+    };
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">2. Evaluate the expression.
+</span>    <span class="org-keyword">let</span> <span class="org-variable-name">val</span> = eval(expr, env)<span class="org-rust-question-mark">?</span>;
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">3. Assign the result to name.
+</span>    env.set(name.clone(), val.clone());
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">We must return a value, so here you go. Some Lisps choose to return an
+</span>    <span class="org-comment-delimiter">// </span><span class="org-comment">"undefined" value.
+</span>    <span class="org-type">Ok</span>(val)
+}
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org2ba17f0" class="outline-2">
+<h2 id="org2ba17f0"><span class="section-number-2">5.</span> Conclusion</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+With function evaluation, <code>if</code> and <code>define</code>, we can now write some non-trivial
+programs. In <a href="../../02/21/lisp-3.html">Part 3</a>, we'll add user-defined functions with <code>lambda</code>.
+</p>
+
+<p>
+Preview:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><code>(<span class="org-keyword">define</span> <span class="org-function-name">foo</span> (<span class="org-keyword">lambda</span> (a b c) (+ a b c)))
+
+(foo 10 20 30) <span class="org-comment-delimiter">;; </span><span class="org-comment">60</span>
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div></div>
+<p class="postamble-title">Title: Building a Lisp Interpreter (in Rust) - Part 2</p>
+<p class="author">Author: Will S. Medrano</p>
+<p class="date">Date: 2026-01-25</p>
+</div>
+</body>
+</html>

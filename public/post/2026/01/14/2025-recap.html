@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-10-21 Wed 20:12 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2025 Recap</title>
+<meta name="author" content="Will S. Medrano" />
+<meta name="generator" content="Org Mode" />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Sen:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="canonical" href="https://wmedrano.dev/post/2026/01/14/2025-recap.html">
+</head>
+<body>
+
+<div class="navbar" id="org-div-home-and-up">
+ <!--Ignore -->
+ <a accesskey="H" href="/">wmedrano dot dev</a>
+  <a href="/about">About</a>
+</div><div id="content" class="content">
+<h1 class="title">2025 Recap</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org7454d98">1. Scheme Interpreter</a></li>
+<li><a href="#org220aaa6">2. Self-Hosted Git + JJ</a>
+<ul>
+<li><a href="#org7916b57">2.1. ForgeJo</a></li>
+<li><a href="#orgdc432b6">2.2. JJ</a></li>
+</ul>
+</li>
+<li><a href="#org3bcdeef">3. 3D Printer</a></li>
+<li><a href="#org498c710">4. New Job</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org7454d98" class="outline-2">
+<h2 id="org7454d98"><span class="section-number-2">1.</span> Scheme Interpreter</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+I actually started writing an interpreter in Zig (and Rust) in 2024. In 2025, I
+did a few more attempts and got a little farther.
+</p>
+
+<p>
+I implemented a lot of the <a href="https://r7rs.org/">Scheme R7RS</a> in Zig as opposed to some custom
+spec. This was great because I got to focus a lot on the implementation and not
+the design. Designing a language involves so many unimportant decisions. I also
+learned some stuff that is specific to Scheme. The most difficult bits to
+internalize and implement were continuations and dynamically scoped
+variables. The most difficult thing that I have left is the controversial
+dynamic unwind.
+</p>
+
+<p>
+Overall, I'm pretty happy with the progress. Implementing the Scheme spec was
+insightful, though I don't see myself finishing the implementation. However, I
+might reboot the effort and start a new interpreter.
+</p>
+
+
+<div id="orgc20a97a" class="figure">
+<p><img src="szl.png" alt="szl.png" />
+</p>
+<p><span class="figure-number">Figure 1: </span>It even has error messages</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org220aaa6" class="outline-2">
+<h2 id="org220aaa6"><span class="section-number-2">2.</span> Self-Hosted Git + JJ</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org7916b57" class="outline-3">
+<h3 id="org7916b57"><span class="section-number-3">2.1.</span> ForgeJo</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+For my meaningless personal projects, I use my self-hosted <a href="https://forgejo.org/">ForgeJo</a>
+instance. ForgeJo is very <i>fast</i>, light, and works pretty well. I'm a sucker for
+responsiveness, so I love that pages and git operations happen instantly. On the
+downside, I really notice the latency when using other source control systems.
+</p>
+
+
+<div id="org336979a" class="figure">
+<p><img src="forgejo.png" alt="forgejo.png" />
+</p>
+<p><span class="figure-number">Figure 2: </span>So fast</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdc432b6" class="outline-3">
+<h3 id="orgdc432b6"><span class="section-number-3">2.2.</span> JJ</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+I also switched from Mercurial and Git to purely <a href="https://github.com/jj-vcs/jj">jj</a>. I didn't have gripes with
+Mercurial or Git, but I appreciate being able to use just jj. jj is sort of a
+frontend to Git and also <a href="https://en.wikipedia.org/wiki/Piper_(source_control_system)">Google's Internal Source Control</a>.
+</p>
+
+<p>
+Bonus:
+</p>
+<ul class="org-ul">
+<li>It's really fast with Google's source control compared to the Mercurial
+wrapper.</li>
+<li>The model is an upgrade over Git and Mercurial.</li>
+</ul>
+
+<p>
+One important lesson from jj is that parasitic systems win. Even if a version
+control system is better, it will have a hard time displacing Git. jj is
+partially successful because it builds on top of Git. Other examples I can think
+of:
+</p>
+
+<ul class="org-ul">
+<li>Kotlin/Clojure/Scala on JVM ecosystem.</li>
+<li>Typescript on JavaScript.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org3bcdeef" class="outline-2">
+<h2 id="org3bcdeef"><span class="section-number-2">3.</span> 3D Printer</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+I got a 3D printer, the Prusa Mini+! Very cool, I can see why they were so hyped
+up over 10 years ago. I've printed and painted some cool figures. Hopefully this
+year I can learn Blender and CAD to make better use of it.
+</p>
+
+
+<div id="org200bed4" class="figure">
+<p><img src="lisp.jpg" alt="lisp.jpg" />
+</p>
+<p><span class="figure-number">Figure 3: </span>3D Printed Lisp Alien</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org498c710" class="outline-2">
+<h2 id="org498c710"><span class="section-number-2">4.</span> New Job</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+🎵New Job🎶New Job🎵
+</p>
+
+<p>
+I started a new job on the Google Fonts team in November. After 9 years of being
+on Big Data processing, it felt strange to move to something complete
+different. However, after 2 months, I no longer feel like being a "data person"
+is in my bones.
+</p>
+
+<p>
+The new job is great, though my performance has been mixed. Some days I feel
+confident and capable, other days I feel like a beginner again. But I'm making
+steady progress and expect things to smooth out soon.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div></div>
+<p class="postamble-title">Title: 2025 Recap</p>
+<p class="author">Author: Will S. Medrano</p>
+<p class="date">Date: 2026-01-14</p>
+</div>
+</body>
+</html>
